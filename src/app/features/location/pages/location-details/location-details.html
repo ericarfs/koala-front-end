@@ -6,13 +6,15 @@
         class="btn px-4 bg-primary text-primary-foreground hover:bg-primary-details gap-1"
       >
         <i class="fa-solid fa-plus"></i>
-        Novo ambiente
+        {{'LOCATIONS.ADD.TITLE' | translate}}
   </button>
   <div class="flex flex-col gap-6 flex-1">
     @if (location(); as loc) {
 
       <nav class="flex flex-wrap items-center gap-2 text-sm">
-        <a routerLink="/location" class="text-primary hover:text-primary-details">Ambientes</a>
+        <a routerLink="/location" class="text-primary hover:text-primary-details">
+          {{ 'LOCATIONS.LIST.TITLE' | translate }}
+        </a>
         @for (item of breadcrumb(); track item.id; let last = $last) {
           <i class="fa-solid fa-angle-right text-xs text-neutral"></i>
           @if (last) {
@@ -30,7 +32,9 @@
 
       @if (children().length > 0) {
         <div class="flex flex-col gap-3">
-          <h2 class="text-lg font-semibold">Ambientes internos ({{ children().length }})</h2>
+          <h2 class="text-lg font-semibold">
+            {{ 'LOCATIONS.DETAILS.SUB_LOCATIONS' | translate:{ count: children().length } }}
+          </h2>
           <div class="grid grid-cols-1 md:grid-cols-4 gap-1">
             @for (child of children(); track child.id) {
               <app-location-card
@@ -47,14 +51,16 @@
       @if (showDevices()) {
         <div class="flex flex-col gap-3 break-all flex-1">
           <h2 class="text-lg font-semibold">
-            Dispositivos neste ambiente ({{ devices().length }})
+            {{ 'LOCATIONS.DETAILS.VIEW_DEVICES' | translate:{ count: devices().length } }}
           </h2>
           <app-device-list [devices]="devices()"></app-device-list>
         </div>
       }
 
     } @else {
-      <p class="text-xl text-default font-medium">Ambiente não encontrado.</p>
+      <p class="text-xl text-default font-medium">
+        {{ 'LOCATIONS.DETAILS.NOT_FOUND' | translate }}
+      </p>
     }
   </div>
 </app-content-layout>

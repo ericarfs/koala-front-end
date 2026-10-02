@@ -1,0 +1,171 @@
+{
+  "MENU": {
+    "MONITORING": "Monitoramento",
+    "LOCATIONS": "Ambientes",
+    "SENSORS": "Sensores",
+    "DASHBOARD": "Dashboard",
+    "DEVICES": "Dispositivos",
+    "SETTINGS": "Configurações",
+    "USERS": "Usuários"
+  },
+  "MONITORING": {
+    "FILTERS": {
+      "DEVICE_NAME": "Nome",
+      "DEVICE_NAME_PLACEHOLDER": "Nome do dispositivo",
+      "LOCATION": "Ambiente",
+      "SELECTED_COUNT": "{{selected}}/{{total}} selecionados",
+      "INTERVAL": "Intervalo",
+      "DEVICE_TYPES": "Sensores",
+      "DEVICES": "Dispositivos (opcional)",
+      "EMPTY":"Nenhum resultado"
+    },
+    "PLACEHOLDERS": {
+      "SELECT_LOCATION": "Selecione um ambiente",
+      "FIND_LOCATION": "Buscar ambiente..."
+    },
+    "DATE_RANGE": {
+      "FROM": "De",
+      "TO": "Até"
+    },
+    "EMPTY": {
+      "DASHBOARD":"Selecione um ambiente e ao menos um sensor, depois clique em Pesquisar",
+      "DEVICES":"Selecione ao menos um sensor e clique em Pesquisar"
+    }
+  },
+  "COMMON": {
+    "ACTIONS": {
+      "CREATE": "Criar",
+      "SAVE": "Salvar",
+      "CANCEL": "Cancelar",
+      "DELETE": "Excluir",
+      "CONFIRM": "Confirmar",
+      "EDIT": "Editar",
+      "BACK": "Voltar",
+      "CLOSE": "Fechar",
+      "SEARCH": "Pesquisar",
+      "CONFIRM_DELETE":"Tem certeza que deseja excluir?"
+    },
+    "FORM": {
+      "NAME": "Nome",
+      "NAME_PLACEHOLDER": "Digite o nome",
+      "USERNAME": "Usuário",
+      "USERNAME_PLACEHOLDER": "Digite o nome de usuário",
+      "DESCRIPTION": "Descrição",
+      "DESCRIPTION_PLACEHOLDER": "Opcional",
+      "EMAIL": "E-mail",
+      "PASSWORD": "Senha",
+      "CONFIRM_PASSWORD": "Confirmar senha"
+    },
+    "STATES": {
+      "LOADING": "Carregando...",
+      "SENDING": "Enviando...",
+      "SEARCHING": "Buscando...",
+      "EMPTY": "Nenhum item encontrado"
+    },
+    "VALIDATION": {
+      "REQUIRED": "Este campo é obrigatório"
+    },
+    "PAGINATION": {
+      "PAGE_OF": "Página {{current}} de {{total}}"
+    }
+  },
+
+  "ERRORS": {
+    "NETWORK": "Sem conexão. Verifique sua internet.",
+    "SERVER": "Erro no servidor. Tente novamente.",
+    "UNAUTHORIZED": "Sessão expirada. Faça login novamente."
+  },
+
+  "ENUMS": {
+    "STATUS": {
+      "ALL": "Todos",
+      "ONLINE": "Online",
+      "OFFLINE": "Offline"
+    }
+  },
+
+  "SENSORS": {
+    "LIST": {
+      "TITLE": "Sensores",
+      "SUBTITLE": "Categorias de sensores disponíveis",
+      "EMPTY": "Nenhum sensor cadastrado"
+    },
+    "ADD": {
+      "TITLE": "Novo sensor",
+      "SUBTITLE": "Preencha os dados do sensor"
+    },
+    "EDIT": {
+      "TITLE": "Editar sensor",
+      "SUBTITLE": "Altere os dados do sensor"
+    },
+    "DELETE": {
+      "CONFIRM": "Tem certeza que deseja excluir o sensor '{{name}}'?"
+    }
+  },
+
+  "DEVICES": {
+    "LIST": {
+      "TITLE": "Dispositivos",
+      "SUBTITLE": "Todos os dispositivos cadastrados",
+      "EMPTY": "Nenhum dispositivo cadastrado"
+    },
+    "ADD": {
+      "TITLE": "Novo dispositivo",
+      "SUBTITLE": "Preencha os dados do dispositivo"
+    },
+    "EDIT": {
+      "TITLE": "Editar dispositivo"
+    },
+    "DELETE": {
+      "CONFIRM": "Tem certeza que deseja excluir este dispositivo?"
+    },
+    "DETAILS": {
+      "NOT_FOUND":"Dispositivo não encontrado."
+    }
+  },
+
+  "LOCATIONS": {
+    "LIST": {
+      "TITLE": "Ambientes",
+      "SUBTITLE": "Espaços físicos monitorados",
+      "EMPTY": "Nenhum ambiente cadastrado"
+    },
+    "ADD": {
+      "TITLE": "Novo ambiente",
+      "SUBTITLE": "Preencha os dados do ambiente"
+    },
+    "EDIT": {
+      "TITLE": "Editar ambiente",
+      "SUBTITLE": "Altere os dados do ambiente"
+    },
+    "DELETE": {
+      "CONFIRM": "Tem certeza que deseja excluir o ambiente '{{name}}'?"
+    },
+    "DETAILS": {
+      "SUB_LOCATIONS": "Sub-ambientes ({{count}})",
+      "SUB_LOCATIONS_COUNT": "{{count}} locais",
+      "VIEW_DEVICES": "Ver dispositivos",
+      "VIEW_DEVICES_COUNT": "Ver {{count}} dispositivos",
+      "NOT_FOUND": "Ambiente não encontrado."
+    }
+  },
+
+  "USERS": {
+    "LIST": {
+      "TITLE": "Usuários",
+      "SUBTITLE": "Lista de usuários cadastrados",
+      "EMPTY": "Nenhum usuário cadastrado"
+    },
+    "ADD": {
+      "TITLE": "Novo usuário",
+      "SUBTITLE": "Preencha os dados de usuário"
+    },
+    "EDIT": {
+      "TITLE": "Editar usuário",
+      "SUBTITLE": "Altere os dados do usuário"
+    },
+    "DELETE": {
+      "CONFIRM": "Tem certeza que deseja excluir o usuário '{{name}}'?"
+    }
+  }
+}

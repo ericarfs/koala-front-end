@@ -1,6 +1,6 @@
 <app-content-layout
-  title="Usuários"
-  subtitle="Lista de usuários cadastrados"
+  [title]="'USERS.LIST.TITLE' | translate"
+  [subtitle]="'USERS.LIST.SUBTITLE' | translate"
 >
   <button
         actions
@@ -9,7 +9,7 @@
         class="btn px-4 bg-primary text-primary-foreground hover:bg-primary-details gap-1"
       >
         <i class="fa-solid fa-plus"></i>
-        Novo usuário
+        {{'USERS.ADD.TITLE' | translate}}
   </button>
   <div class="grid grid-cols-1 gap-1">
     @for(user of pagination.pagedItems(); track user.id){
@@ -28,8 +28,10 @@
           </div>
         </div>
         <app-action-buttons
+          [deleteMessageKey]="'USERS.DELETE.CONFIRM'"
+          [deleteMessageParams]="{ name: user.username }"
           (edit)="updateUser(user)"
-          (delete)="updateUser(user)"
+          (delete)="deleteUser(user.id)"
         ></app-action-buttons>
       </div>
     }

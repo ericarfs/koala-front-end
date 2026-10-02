@@ -5,12 +5,16 @@
     <form [formGroup]="filterForm" class="flex flex-col gap-4 bg-container border border-outline rounded-md p-4 break-all">
       <div class="flex flex-wrap gap-4">
         <div class="flex flex-col gap-1 w-full lg:w-auto md:min-w-75">
-          <label class="text-sm text-neutral font-medium mb-1.5">Ambiente</label>
+          <label class="text-sm text-neutral font-medium mb-1.5">
+            {{'MONITORING.FILTERS.LOCATION' | translate}}
+          </label>
           <app-location-tree-select formControlName="location"></app-location-tree-select>
         </div>
 
         <div class="flex flex-col gap-1 w-full lg:max-w-140">
-          <label class="text-sm text-neutral font-medium mb-1.5">Intervalo</label>
+          <label class="text-sm text-neutral font-medium mb-1.5">
+            {{'MONITORING.FILTERS.INTERVAL' | translate}}
+          </label>
           <div class="flex flex-wrap border border-outline rounded-md min-h-10 overflow-hidden">
             @for (opt of intervalOptions; track opt.id) {
               <button
@@ -28,12 +32,16 @@
 
         <div class="flex flex-wrap gap-2 max-w-full ">
           <div class="flex flex-col gap-1 max-w-full">
-            <label class="text-sm text-medium text-neutral mb-1">De</label>
+            <label class="text-sm text-medium text-neutral mb-1">
+              {{'MONITORING.DATE_RANGE.FROM' | translate}}
+            </label>
             <input type="date" class="border border-outline rounded-md px-3 py-2 bg-container text-default" formControlName="fromDate">
           </div>
 
           <div class="flex flex-col gap-1 max-w-full">
-            <label class="text-sm text-neutral text-medium mb-1">Até</label>
+            <label class="text-sm text-neutral text-medium mb-1">
+              {{'MONITORING.DATE_RANGE.TO' | translate}}
+            </label>
             <input type="date" class="border border-outline rounded-md px-3 py-2 bg-container text-default" formControlName="toDate">
           </div>
         </div>
@@ -41,8 +49,13 @@
 
       <div class="flex flex-col gap-1 w-full">
         <div class="flex flex-wrap items-center justify-between mb-1.5 break-all">
-          <span class="text-sm text-neutral font-medium">Sensores</span>
-          <span class="text-xs text-neutral">{{ selectedTypes().length }}/2 selecionados</span>
+          <span class="text-sm text-neutral font-medium">
+            {{'MONITORING.FILTERS.DEVICE_TYPES' | translate}}
+          </span>
+          <span class="text-xs text-neutral">
+            {{ 'MONITORING.FILTERS.SELECTED_COUNT' | translate:{
+              selected: selectedTypes().length, total: 2 } }}
+          </span>
         </div>
         <div class="flex flex-wrap gap-2">
           @for (type of deviceTypeOptions; track type.id) {
@@ -69,8 +82,13 @@
       @if (selectedTypes().length === 1 && availableDevices().length > 0) {
         <div class="flex flex-col gap-1">
           <div class="flex justify-between mb-1.5 break-all">
-            <span class="text-sm text-neutral font-medium ">Dispositivos (opcional)</span>
-            <span class="text-xs text-neutral">{{ selectedDevices().length }}/5 selecionados</span>
+            <span class="text-sm text-neutral font-medium ">
+              {{'MONITORING.FILTERS.DEVICES' | translate}}
+            </span>
+            <span class="text-xs text-neutral">
+              {{ 'MONITORING.FILTERS.SELECTED_COUNT' | translate:{
+              selected: selectedDevices().length, total: 5 } }}
+            </span>
           </div>
           <div class="flex flex-wrap gap-2">
             @for (device of availableDevices(); track device.id) {
@@ -103,10 +121,14 @@
       >
         @if (loading()) {
           <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-          <span>Buscando...</span>
+          <span>
+            {{'COMMON.STATES.SEARCHING' | translate}}
+          </span>
         } @else {
           <i class="fa-solid fa-magnifying-glass"></i>
-          <span>Pesquisar</span>
+          <span>
+            {{'COMMON.ACTIONS.SEARCH' | translate}}
+          </span>
         }
       </button>
     </form>
@@ -115,14 +137,18 @@
       @if (loading()) {
         <div class="absolute inset-0 bg-container/80 backdrop-blur-sm rounded-md flex flex-col items-center justify-center gap-3 z-10">
           <div class="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-          <span class="text-sm text-neutral">Buscando dados...</span>
+          <span class="text-sm text-neutral">
+            {{'COMMON.STATES.SEARCHING' | translate}}
+          </span>
         </div>
       }
 
       @if (fields().length === 0 && !loading()) {
         <div class="flex flex-col items-center justify-center py-20 gap-3 text-neutral">
           <i class="fa-solid fa-chart-line text-5xl opacity-20"></i>
-          <p class="text-sm">Selecione um ambiente e ao menos um sensor, depois clique em Pesquisar</p>
+          <p class="text-sm">
+            {{'MONITORING.EMPTY.DASHBOARD' | translate}}
+          </p>
         </div>
       } @else {
         <app-device-chart

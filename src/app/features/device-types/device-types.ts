@@ -6,9 +6,10 @@ import { DEVICE_TYPES_MOCK } from '../../mocks/device-types';
 import { ActionButtonsComponent } from '@shared/components/action-buttons/action-buttons';
 import { FormDialogService } from '@shared/components/form-dialog/form-dialog.service';
 import { ContentLayoutComponent } from '@shared/layouts/content/content';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
-  imports: [ContentLayoutComponent, ActionButtonsComponent],
+  imports: [ContentLayoutComponent, ActionButtonsComponent, TranslatePipe],
   selector: 'app-device-type',
   styleUrl: './device-types.css',
   templateUrl: './device-types.html',
@@ -16,6 +17,7 @@ import { ContentLayoutComponent } from '@shared/layouts/content/content';
 export class DeviceTypes {
   private readonly http = inject(HttpClient);
   private readonly formDialog = inject(FormDialogService);
+  private readonly translate = inject(TranslateService);
 
   readonly deviceTypes = signal<DeviceType[]>(DEVICE_TYPES_MOCK);;
 
@@ -25,17 +27,24 @@ export class DeviceTypes {
 
     this.formDialog
       .open<DeviceType>({
-        title: isEdit ? 'Editar sensor' : 'Novo sensor',
-        subtitle: isEdit
-          ? 'Altere os dados do sensor'
-          : 'Preencha os dados do sensor',
-        submitLabel: isEdit ? 'Salvar' : 'Criar',
-
+        title: isEdit ? 'SENSORS.EDIT.TITLE' : 'SENSORS.ADD.TITLE',
+        subtitle: isEdit ? 'SENSORS.EDIT.SUBTITLE' : 'SENSORS.ADD.SUBTITLE',
+        submitLabel: isEdit ? 'COMMON.ACTIONS.SAVE' : 'COMMON.ACTIONS.CREATE',
         fields: [
-          { key: 'name',        label: 'Nome',      placeholder: 'Ex: Temperature', required: true },
-          { key: 'description', label: 'Descrição', placeholder: 'Opcional', type: 'textarea', rows: 3 },
+          {
+            key: 'name',
+            label: 'COMMON.FORM.NAME',
+            placeholder: 'COMMON.FORM.NAME_PLACEHOLDER',
+            required: true
+          },
+          {
+            key: 'description',
+            label: 'COMMON.FORM.DESCRIPTION',
+            placeholder: 'COMMON.FORM.DESCRIPTION_PLACEHOLDER',
+            type: 'textarea',
+            rows: 4
+          },
         ],
-
         initialValues: sensor
           ? { name: sensor.name, description: sensor.description }
           : undefined,
@@ -87,8 +96,7 @@ export class DeviceTypes {
     this.openSensorDialog(sensor);
   }
 
-  deleteSensor(id: any) {
-    if (!confirm('Tem certeza que deseja excluir este sensor?')) return;
-    this.deviceTypes.update(sensors => sensors.filter(s => s.id !== id));
+  deleteSensor(sensor: DeviceType) {
+    this.deviceTypes.update(sensors => sensors.filter(s => s.id !== sensor.id));
   }
 }

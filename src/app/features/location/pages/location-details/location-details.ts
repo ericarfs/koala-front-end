@@ -11,13 +11,14 @@ import { LocationStore } from '@shared/domain/location/location-store';
 import { FormDialogService } from '@shared/components/form-dialog/form-dialog.service';
 import { DEVICES_MOCK } from '../../../../mocks/devices';
 import { Location } from '@shared/interfaces/location';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 
 
 @Component({
   selector: 'app-location-details',
   standalone: true,
-  imports: [CommonModule, RouterLink, ContentLayoutComponent, DeviceListComponent, LocationCardComponent],
+  imports: [CommonModule, RouterLink, ContentLayoutComponent, DeviceListComponent, LocationCardComponent, TranslatePipe],
   templateUrl: './location-details.html',
   host: {
     class: 'block flex-1',
@@ -27,6 +28,7 @@ export class LocationDetails {
   private readonly route = inject(ActivatedRoute);
   private readonly store = inject(LocationStore);
   private readonly formDialog = inject(FormDialogService);
+  private readonly translate = inject(TranslateService);
 
   private readonly id = toSignal(
     this.route.paramMap.pipe(map((p) => Number(p.get('id')))),
@@ -50,7 +52,8 @@ export class LocationDetails {
   }
 
   deleteLocation(location: Location): void {
-    if (!confirm(`Excluir "${location.name}"?`)) return;
+    const message = this.translate.instant('LOCATIONS.DELETE.CONFIRM');
+    if (!confirm(message)) return;
     this.store.remove(location.id!);
   }
 
@@ -60,12 +63,23 @@ export class LocationDetails {
 
     this.formDialog
       .open<Location>({
-        title: isEdit ? 'Editar ambiente' : 'Novo ambiente',
-        subtitle: isEdit ? 'Altere os dados do ambiente' : 'Preencha os dados do ambiente',
-        submitLabel: isEdit ? 'Salvar' : 'Criar',
+        title: isEdit ? 'LOCATIONS.EDIT.TITLE' : 'LOCATIONS.ADD.TITLE',
+        subtitle: isEdit ? 'LOCATIONS.EDIT.SUBTITLE' : 'LOCATIONS.ADD.SUBTITLE',
+        submitLabel: isEdit ? 'COMMON.ACTIONS.SAVE' : 'COMMON.ACTIONS.CREATE',
         fields: [
-          { key: 'name',        label: 'Nome',      placeholder: 'Ex: Laboratorio 1006', required: true },
-          { key: 'description', label: 'Descrição', placeholder: 'Opcional', type: 'textarea', rows: 4 },
+          {
+            key: 'name',
+            label: 'COMMON.FORM.NAME',
+            placeholder: 'COMMON.FORM.NAME_PLACEHOLDER',
+            required: true
+          },
+          {
+            key: 'description',
+            label: 'COMMON.FORM.DESCRIPTION',
+            placeholder: 'COMMON.FORM.DESCRIPTION_PLACEHOLDER',
+            type: 'textarea',
+            rows: 4
+          },
         ],
         initialValues: location
           ? { name: location.name, description: location.description }

@@ -1,0 +1,171 @@
+{
+  "MENU": {
+    "MONITORING": "Monitoring",
+    "LOCATIONS": "Locations",
+    "SENSORS": "Sensors",
+    "DASHBOARD": "Dashboard",
+    "DEVICES": "Devices",
+    "SETTINGS": "Settings",
+    "USERS": "Users"
+  },
+  "MONITORING": {
+    "FILTERS": {
+      "DEVICE_NAME": "Name",
+      "DEVICE_NAME_PLACEHOLDER": "Device name",
+      "LOCATION": "Location",
+      "SELECTED_COUNT": "{{selected}}/{{total}} selected",
+      "INTERVAL": "Interval",
+      "DEVICE_TYPES": "Sensors",
+      "DEVICES": "Devices (optional)",
+      "EMPTY": "No results"
+    },
+    "PLACEHOLDERS": {
+      "SELECT_LOCATION": "Select a location",
+      "FIND_LOCATION": "Search location..."
+    },
+    "DATE_RANGE": {
+      "FROM": "From",
+      "TO": "To"
+    },
+    "EMPTY": {
+      "DASHBOARD": "Select a location and at least one sensor, then click Search",
+      "DEVICES": "Select at least one sensor and click Search"
+    }
+  },
+  "COMMON": {
+    "ACTIONS": {
+      "CREATE": "Create",
+      "SAVE": "Save",
+      "CANCEL": "Cancel",
+      "DELETE": "Delete",
+      "CONFIRM": "Confirm",
+      "EDIT": "Edit",
+      "BACK": "Back",
+      "CLOSE": "Close",
+      "SEARCH": "Search",
+      "CONFIRM_DELETE": "Are you sure you want to delete?"
+    },
+    "FORM": {
+      "NAME": "Name",
+      "NAME_PLACEHOLDER": "Enter the name",
+      "USERNAME": "Username",
+      "USERNAME_PLACEHOLDER": "Enter the username",
+      "DESCRIPTION": "Description",
+      "DESCRIPTION_PLACEHOLDER": "Optional",
+      "EMAIL": "Email",
+      "PASSWORD": "Password",
+      "CONFIRM_PASSWORD": "Confirm password"
+    },
+    "STATES": {
+      "LOADING": "Loading...",
+      "SENDING": "Sending...",
+      "SEARCHING": "Searching...",
+      "EMPTY": "No items found"
+    },
+    "VALIDATION": {
+      "REQUIRED": "This field is required"
+    },
+    "PAGINATION": {
+      "PAGE_OF": "Page {{current}} of {{total}}"
+    }
+  },
+
+  "ERRORS": {
+    "NETWORK": "No connection. Check your internet.",
+    "SERVER": "Server error. Please try again.",
+    "UNAUTHORIZED": "Session expired. Please log in again."
+  },
+
+  "ENUMS": {
+    "STATUS": {
+      "ALL": "All",
+      "ONLINE": "Online",
+      "OFFLINE": "Offline"
+    }
+  },
+
+  "SENSORS": {
+    "LIST": {
+      "TITLE": "Sensors",
+      "SUBTITLE": "Available sensor categories",
+      "EMPTY": "No device type registered"
+    },
+    "ADD": {
+      "TITLE": "New sensor",
+      "SUBTITLE": "Fill in the sensor data"
+    },
+    "EDIT": {
+      "TITLE": "Edit sensor",
+      "SUBTITLE": "Change the sensor data"
+    },
+    "DELETE": {
+      "CONFIRM": "Are you sure you want to delete the sensor '{{name}}'?"
+    }
+  },
+
+  "DEVICES": {
+    "LIST": {
+      "TITLE": "Devices",
+      "SUBTITLE": "All registered devices",
+      "EMPTY": "No device registered"
+    },
+    "ADD": {
+      "TITLE": "New device",
+      "SUBTITLE": "Fill in the device data"
+    },
+    "EDIT": {
+      "TITLE": "Edit device"
+    },
+    "DELETE": {
+      "CONFIRM": "Are you sure you want to delete this device?"
+    },
+    "DETAILS": {
+      "NOT_FOUND": "Device not found."
+    }
+  },
+
+  "LOCATIONS": {
+    "LIST": {
+      "TITLE": "Locations",
+      "SUBTITLE": "Monitored physical spaces",
+      "EMPTY": "No location registered"
+    },
+    "ADD": {
+      "TITLE": "New location",
+      "SUBTITLE": "Fill in the location data"
+    },
+    "EDIT": {
+      "TITLE": "Edit location",
+      "SUBTITLE": "Change the location data"
+    },
+    "DELETE": {
+      "CONFIRM": "Are you sure you want to delete the location '{{name}}'?"
+    },
+    "DETAILS": {
+      "SUB_LOCATIONS": "Sub-locations ({{count}})",
+      "SUB_LOCATIONS_COUNT": "{{count}} locations",
+      "VIEW_DEVICES": "View devices",
+      "VIEW_DEVICES_COUNT": "View {{count}} devices",
+      "NOT_FOUND": "Location not found."
+    }
+  },
+
+  "USERS": {
+    "LIST": {
+      "TITLE": "Users",
+      "SUBTITLE": "Registered users list",
+      "EMPTY": "No user registered"
+    },
+    "ADD": {
+      "TITLE": "New user",
+      "SUBTITLE": "Fill in the user data"
+    },
+    "EDIT": {
+      "TITLE": "Edit user",
+      "SUBTITLE": "Change the user data"
+    },
+    "DELETE": {
+      "CONFIRM": "Are you sure you want to delete the user '{{name}}'?"
+    }
+  }
+}

@@ -5,6 +5,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { buildTree } from './location-tree';
+import { TranslatePipe } from '@ngx-translate/core';
 
 interface LocationNode {
   id: number;
@@ -23,7 +24,7 @@ interface FlatNode {
 @Component({
   selector: 'app-location-tree-select',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: forwardRef(() => LocationTreeSelectComponent),
@@ -38,7 +39,7 @@ interface FlatNode {
         class="h-10 w-full flex items-center justify-between gap-2 border border-outline rounded-md px-3 bg-container text-default focus:outline-none focus:border-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       >
         <span class="truncate text-left" [class.text-neutral]="!selectedName()">
-          {{ selectedName() || 'Selecione um ambiente' }}
+          {{ selectedName() || ('MONITORING.PLACEHOLDERS.SELECT_LOCATION' | translate) }}
         </span>
         <i class="fa-solid fa-chevron-down text-xs text-neutral transition-transform"
            [class.rotate-180]="open()"></i>
@@ -54,7 +55,7 @@ interface FlatNode {
                 type="text"
                 [value]="search()"
                 (input)="onSearch($event)"
-                placeholder="Buscar ambiente..."
+                [placeholder]="'MONITORING.PLACEHOLDERS.FIND_LOCATION' | translate"
                 class="w-full h-9 pl-8 pr-3 text-sm border border-outline rounded-md bg-container text-default focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
@@ -62,7 +63,9 @@ interface FlatNode {
 
           <ul class="max-h-72 overflow-auto py-1">
             @if (visibleNodes().length === 0) {
-              <li class="px-3 py-4 text-sm text-neutral text-center">Nenhum resultado</li>
+              <li class="px-3 py-4 text-sm text-neutral text-center">
+                {{ 'MONITORING.FILTERS.EMPTY' | translate }}
+              </li>
             }
             @for (node of visibleNodes(); track node.id) {
               <li>

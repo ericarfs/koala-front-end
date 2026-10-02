@@ -1,8 +1,8 @@
+import { ContentLayoutComponent } from './../../../../shared/layouts/content/content';
 import { Component, computed } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { of } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ContentLayoutComponent } from '@shared/layouts/content/content';
 import { DeviceListComponent } from '@shared/domain/device/components/device-list';
 import { InputComponent } from '@shared/components/input/input';
 import { LocationTreeSelectComponent } from '@shared/domain/location/location-tree-select';
@@ -10,13 +10,14 @@ import { DEVICES_MOCK } from '../../../../mocks/devices';
 import { Device } from '@shared/interfaces/device';
 import { getDescendantIds, getPath } from '@shared/domain/location/location-tree';
 import { LOCATIONS_MOCK } from '../../../../mocks/locations';
+import { TranslatePipe } from '@ngx-translate/core';
 
 
 
 @Component({
   selector: 'app-devices-list',
   standalone: true,
-  imports: [ReactiveFormsModule, ContentLayoutComponent, DeviceListComponent, InputComponent, LocationTreeSelectComponent],
+  imports: [ReactiveFormsModule, ContentLayoutComponent, DeviceListComponent, InputComponent, LocationTreeSelectComponent, TranslatePipe],
   styleUrl: './devices-list.css',
   templateUrl: './devices-list.html',
   host: {
@@ -37,9 +38,9 @@ export class DevicesList {
   });
 
   statusOptions = [
-    { value: '', label: 'Todos' },
-    { value: '1', label: 'Ativado' },
-    { value: '2', label: 'Desativado' },
+    { value: '',   labelKey: 'ENUMS.STATUS.ALL'     },
+    { value: '1',  labelKey: 'ENUMS.STATUS.ONLINE'  },
+    { value: '2',  labelKey: 'ENUMS.STATUS.OFFLINE' },
   ];
 
   private filters = toSignal(this.searchForms.valueChanges, {

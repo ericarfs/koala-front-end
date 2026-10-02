@@ -5,20 +5,21 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { Observable, finalize } from 'rxjs';
+import { TranslatePipe } from '@ngx-translate/core';
 
 
 @Component({
   selector: 'app-form-dialog',
   standalone: true,
-  imports: [FormsModule, InputComponent],
+  imports: [FormsModule, InputComponent, TranslatePipe],
   template: `
   <div class="bg-container border-2 border-outline rounded-md shadow-xl w-full max-w-md
               max-h-[90vh] gap-4 flex flex-col overflow-hidden">
 
     <header class="p-6 pb-0">
-      <h2 class="text-lg font-semibold text-default">{{ data.title }}</h2>
+      <h2 class="text-lg font-semibold text-default">{{ data.title | translate }}</h2>
       @if (data.subtitle) {
-        <p class="text-sm text-neutral mt-1">{{ data.subtitle }}</p>
+        <p class="text-sm text-neutral mt-1">{{ data.subtitle | translate }}</p>
       }
     </header>
 
@@ -43,9 +44,9 @@ import { Observable, finalize } from 'rxjs';
         >
           @if (loading()) {
             <i class="fa-solid fa-spinner fa-spin"></i>
-            <span class="animate-pulse"> Enviando...</span>
+            <span class="animate-pulse"> {{ 'COMMON.STATES.SENDING' | translate }}</span>
           } @else {
-            <span>{{ (data.submitLabel ?? 'Salvar') }}</span>
+            <span>{{ (data.submitLabel ?? 'COMMON.ACTIONS.SAVE') | translate }}</span>
           }
         </button>
 
@@ -54,7 +55,7 @@ import { Observable, finalize } from 'rxjs';
           (click)="close()"
           class="btn border border-outline text-sm font-medium hover:bg-neutral/20"
         >
-          {{ data.cancelLabel ?? 'Cancelar' }}
+          {{ (data.cancelLabel ?? 'COMMON.ACTIONS.CANCEL') | translate }}
         </button>
       </div>
     </form>

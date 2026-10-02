@@ -3,19 +3,23 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, input } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { combineLatest, map, of, switchMap } from 'rxjs';
-import { PaginatorComponent } from '../../../components/pagination/paginator';
 import { Device, DeviceWithTypes } from '@shared/interfaces/device';
+import { PaginatorComponent } from '@shared/components/pagination/paginator';
 import { paginate } from '@shared/utils/paginate';
 import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
+import { TranslatePipe } from '@ngx-translate/core';
+
 
 
 @Component({
   selector: 'app-device-list',
   standalone: true,
-  imports: [CommonModule, DeviceCardComponent, PaginatorComponent],
+  imports: [CommonModule, DeviceCardComponent, PaginatorComponent, TranslatePipe],
   template: `
     @if (devices().length === 0) {
-      <p class="text-neutral">Nenhum dispositivo encontrado.</p>
+      <p class="text-neutral">
+        {{'DEVICES.LIST.EMPTY' | translate}}
+      </p>
     } @else {
       <div class="grid grid-cols-1 md:grid-cols-3 gap-1">
         @for (device of pagination.pagedItems(); track device.id) {

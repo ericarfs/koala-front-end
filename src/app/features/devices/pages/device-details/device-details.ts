@@ -10,13 +10,14 @@ import { DeviceMappingService } from '@shared/domain/device/services/device-mapp
 import { DashboardFilterInterface, DashboardResponseInterface, DashboardService } from '@shared/domain/device/services/device-metrics';
 import { DeviceWithTypes } from '@shared/interfaces/device';
 import { DEVICES_MOCK } from '../../../../mocks/devices';
+import { TranslatePipe } from '@ngx-translate/core';
 
 
 
 @Component({
   selector: 'app-device-details',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ContentLayoutComponent, DeviceChartComponent],
+  imports: [CommonModule, ReactiveFormsModule, ContentLayoutComponent, DeviceChartComponent, TranslatePipe],
   templateUrl: './device-details.html',
 })
 export class DeviceDetails {

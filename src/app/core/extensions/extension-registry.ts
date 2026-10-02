@@ -5,7 +5,7 @@ import { KOALA_MODULE_EXTENSIONS } from './koala-module-extensions.token';
 
 export interface MenuItem {
   id: string;
-  label: string;
+  labelKey: string;
   routerLink: string;
   icon: string;
   subItems: MenuItem[];
@@ -16,27 +16,27 @@ export class ExtensionRegistryService {
   private readonly modules: KoalaModuleDefinition[];
 
   // Grupo fixo, sempre o primeiro item do menu.
-  private readonly monitoramentoGroup: MenuItem = {
-    id: 'monitoramento',
-    label: 'Monitoramento',
+  private readonly monitoringGroup: MenuItem = {
+    id: 'monitoring',
+    labelKey: 'MENU.MONITORING',
     routerLink: '',
     icon: 'fa-solid fa-chart-line',
     subItems: [
-      { id: 'location', label: 'Ambientes', routerLink: '/location', icon: 'fa-solid fa-map-location-dot', subItems: [] },
-      { id: 'sensores', label: 'Sensores', routerLink: '/device-type', icon: 'fa-solid fa-tower-broadcast', subItems: [] },
-      { id: 'dashboard', label: 'Dashboard', routerLink: '/dashboard', icon: 'fa-solid fa-gauge-high', subItems: [] },
-      { id: 'dispositivos', label: 'Dispositivos', routerLink: '/devices', icon: 'fa-solid fa-microchip', subItems: [] },
+      { id: 'location',    labelKey: 'MENU.LOCATIONS',    routerLink: '/location',    icon: 'fa-solid fa-map-location-dot', subItems: [] },
+      { id: 'sensores',    labelKey: 'MENU.SENSORS',      routerLink: '/device-type', icon: 'fa-solid fa-tower-broadcast',  subItems: [] },
+      { id: 'dashboard',   labelKey: 'MENU.DASHBOARD',    routerLink: '/dashboard',   icon: 'fa-solid fa-gauge-high',       subItems: [] },
+      { id: 'dispositivos',labelKey: 'MENU.DEVICES',      routerLink: '/devices',     icon: 'fa-solid fa-microchip',        subItems: [] },
     ],
-  };
+};
 
   // Grupo fixo, sempre o último item do menu.
-  private readonly configuracoesGroup: MenuItem = {
-    id: 'configuracoes',
-    label: 'Configurações',
+  private readonly settingsGroup: MenuItem = {
+    id: 'settings',
+    labelKey: 'MENU.SETTINGS',
     routerLink: '',
     icon: 'fa-solid fa-gear',
     subItems: [
-      { id: 'users', label: 'Usuários', routerLink: '/users', icon: 'fa-solid fa-user', subItems: [] },
+      { id: 'users', labelKey: 'MENU.USERS', routerLink: '/users', icon: 'fa-solid fa-user', subItems: [] },
     ],
   };
 
@@ -57,19 +57,19 @@ export class ExtensionRegistryService {
 
     const pluginItems: MenuItem[] = sortedModules.map((m) => ({
       id: m.id,
-      label: m.label,
+      labelKey: m.label,
       routerLink: `/${m.routePath}`,
       icon: m.icon ?? 'fa-solid fa-puzzle-piece',
       subItems: (m.subItems ?? []).map((s) => ({
         id: s.id,
-        label: s.label,
+        labelKey: s.label,
         routerLink: `/${s.routePath}`,
         icon: s.icon ?? 'fa-solid fa-circle',
         subItems: [],
       })),
     }));
 
-    return [this.monitoramentoGroup, ...pluginItems, this.configuracoesGroup];
+    return [this.monitoringGroup, ...pluginItems, this.settingsGroup];
   }
 
   buildRoutes(): Route[] {

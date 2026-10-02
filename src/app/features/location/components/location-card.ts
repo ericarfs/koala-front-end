@@ -19,6 +19,8 @@ import { ActionButtonsComponent } from '../../../shared/components/action-button
           <i class="fa-solid fa-location-dot"></i>
         </div>
         <app-action-buttons
+          [deleteMessageKey]="'LOCATIONS.DELETE.CONFIRM'"
+          [deleteMessageParams]="{ name: location().name }"
           (edit)="onEdit()"
           (delete)="onDelete()"
         ></app-action-buttons>

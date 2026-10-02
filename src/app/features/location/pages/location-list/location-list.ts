@@ -9,10 +9,11 @@ import { LocationStore } from '@shared/domain/location/location-store';
 import { getChildren } from '@shared/domain/location/location-tree';
 import { paginate } from '@shared/utils/paginate';
 import { Location } from '@shared/interfaces/location';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 
 @Component({
-  imports: [ContentLayoutComponent, LocationCardComponent, PaginatorComponent],
+  imports: [ContentLayoutComponent, LocationCardComponent, PaginatorComponent, TranslatePipe],
   selector: 'app-location-list',
   styleUrl: './location-list.css',
   templateUrl: './location-list.html',
@@ -40,12 +41,23 @@ export class LocationList {
 
     this.formDialog
       .open<Location>({
-        title: isEdit ? 'Editar ambiente' : 'Novo ambiente',
-        subtitle: isEdit ? 'Altere os dados do ambiente' : 'Preencha os dados do ambiente',
-        submitLabel: isEdit ? 'Salvar' : 'Criar',
+        title: isEdit ? 'LOCATIONS.EDIT.TITLE' : 'LOCATIONS.ADD.TITLE',
+        subtitle: isEdit ? 'LOCATIONS.EDIT.SUBTITLE' : 'LOCATIONS.ADD.SUBTITLE',
+        submitLabel: isEdit ? 'COMMON.ACTIONS.SAVE' : 'COMMON.ACTIONS.CREATE',
         fields: [
-          { key: 'name',        label: 'Nome',      placeholder: 'Ex: Laboratorio 1006', required: true },
-          { key: 'description', label: 'Descrição', placeholder: 'Opcional', type: 'textarea', rows: 4 },
+          {
+            key: 'name',
+            label: 'COMMON.FORM.NAME',
+            placeholder: 'COMMON.FORM.NAME_PLACEHOLDER',
+            required: true
+          },
+          {
+            key: 'description',
+            label: 'COMMON.FORM.DESCRIPTION',
+            placeholder: 'COMMON.FORM.DESCRIPTION_PLACEHOLDER',
+            type: 'textarea',
+            rows: 4
+          },
         ],
         initialValues: location
           ? { name: location.name, description: location.description }
@@ -91,7 +103,6 @@ export class LocationList {
   }
 
   deleteLocation(location: Location): void {
-    if (!confirm(`Excluir "${location.name}"?`)) return;
     this.store.remove(location.id!);
   }
 }

@@ -1,11 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'li[app-nav-item]',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, NgClass],
+  imports: [RouterLink, RouterLinkActive, NgClass, TranslatePipe],
   template: `
    <a
     [routerLink]="route"
@@ -17,7 +18,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
     <i [ngClass]="icon" class="text-lg w-5 text-center shrink-0"></i>
 
     @if (!collapsed) {
-      <span class="text-sm whitespace-nowrap">{{ label }}</span>
+      <span class="text-sm whitespace-nowrap">{{ label | translate}}</span>
     }
   </a>
   `

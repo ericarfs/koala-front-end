@@ -93,7 +93,7 @@
         @if (item.subItems.length > 0) {
           <li
             app-nav-group
-            [label]="item.label"
+            [labelKey]="item.labelKey"
             [icon]="item.icon"
             [subItems]="item.subItems"
             [collapsed]="sidebar.collapsed()"
@@ -104,7 +104,7 @@
           <li
             app-nav-item
             [route]="item.routerLink"
-            [label]="item.label"
+            [label]="item.labelKey"
             [icon]="item.icon"
             [collapsed]="sidebar.collapsed()"
           ></li>
@@ -112,8 +112,10 @@
       }
     </ul>
   </nav>
-  <div class="shrink-0 border-t border-white/10 px-2 bg-red-100 flex flex-wrap justify-start gap-2">
+  <div class="px-2 flex flex-wrap justify-start gap-2"
+      [class.md:justify-center]="sidebar.collapsed()">
     <app-theme-toggle/>
+    <app-language-selector/>
   </div>
   <div class="shrink-0 border-t border-white/10 p-2">
     <app-user-menu />

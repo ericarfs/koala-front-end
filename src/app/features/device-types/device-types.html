@@ -1,6 +1,6 @@
 <app-content-layout
-  title="Sensores"
-  subtitle="Categorias de sensores disponiveis"
+  [title]="'SENSORS.LIST.TITLE' | translate"
+  [subtitle]="'SENSORS.LIST.SUBTITLE' | translate"
 >
   <button
         actions
@@ -9,7 +9,7 @@
         class="btn px-4 bg-primary text-primary-foreground hover:bg-primary-details gap-1"
       >
         <i class="fa-solid fa-plus"></i>
-        Novo sensor
+       {{'SENSORS.ADD.TITLE' | translate}}
   </button>
 
   <div class="flex flex-wrap justify-center lg:justify-start gap-2 w-full">
@@ -22,8 +22,10 @@
           <p class="text-sm leading-tight">{{ sensor.description }}</p>
         </div>
         <app-action-buttons
+          [deleteMessageKey]="'SENSORS.DELETE.CONFIRM'"
+          [deleteMessageParams]="{ name: sensor.name }"
           (edit)="updateSensor(sensor)"
-          (delete)="deleteSensor(sensor.id)"
+          (delete)="deleteSensor(sensor)"
         ></app-action-buttons>
       </div>
     }

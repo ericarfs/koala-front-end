@@ -9,12 +9,13 @@ import { NavItemComponent } from './nav-item/nav-item';
 import { NavGroupComponent } from './nav-group/nav-group';
 import { UserMenuComponent } from './user-menu/user-menu';
 import { ThemeToggleComponent } from './theme-toggle/theme-toggle';
+import { LanguageSelectorComponent } from './language-selector/language-selector';
 
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, NgClass, NavItemComponent, NavGroupComponent, UserMenuComponent, ThemeToggleComponent],
+  imports: [CommonModule, NgClass, NavItemComponent, NavGroupComponent, UserMenuComponent, ThemeToggleComponent, LanguageSelectorComponent],
   templateUrl:'./navbar.html'
 })
 export class NavbarComponent {
@@ -44,10 +45,10 @@ export class NavbarComponent {
       for (const item of this.menuItems) {
         if (item.subItems.length > 0) {
           for (const sub of item.subItems) {
-            flat.push({ label: sub.label, routerLink: sub.routerLink, groupId: item.id });
+            flat.push({ label: sub.labelKey, routerLink: sub.routerLink, groupId: item.id });
           }
         } else {
-          flat.push({ label: item.label, routerLink: item.routerLink });
+          flat.push({ label: item.labelKey, routerLink: item.routerLink });
         }
       }
       flat.sort((a, b) => b.routerLink.length - a.routerLink.length);

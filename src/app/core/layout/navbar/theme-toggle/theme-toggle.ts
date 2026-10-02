@@ -8,10 +8,10 @@ import { Component, OnInit } from '@angular/core';
       (click)="toggleTheme()"
       [attr.aria-label]="isDark ? 'Alternar para modo claro' : 'Alternar para modo escuro'"
       [attr.aria-pressed]="isDark"
-      class="inline-flex items-center justify-center p-2 rounded-xl border border-outline bg-container text-default hover:bg-input transition-colors duration-200"
+      class="inline-flex items-center justify-center p-2 rounded-xl border border-outline bg-container text-default hover:bg-input transition-colors duration-200 cursor-pointer"
       title="{{ isDark ? 'Ativar modo claro' : 'Ativar modo escuro' }}">
 
-      <span aria-hidden="true" class="text-xl">
+      <span aria-hidden="true" class="text-md">
         {{ isDark ? '☀️' : '🌙' }}
       </span>
 

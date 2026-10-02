@@ -5,11 +5,12 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs';
 import { ExtensionRegistryService } from '../../extensions/extension-registry';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, NgClass],
+  imports: [RouterOutlet, NavbarComponent, NgClass, TranslatePipe],
   template: `
     <div class="flex h-screen w-full max-w-[2560px] mx-auto overflow-hidden">
       <app-navbar></app-navbar>
@@ -19,7 +20,7 @@ import { ExtensionRegistryService } from '../../extensions/extension-registry';
           @if (currentGroup(); as g) {
             <div class="flex items-center gap-2 text-sm text-neutral mb-2 break-all">
               <i [ngClass]="g.icon" class="text-xs"></i>
-              <span>{{ g.label }}</span>
+              <span>{{ g.label | translate }}</span>
             </div>
           }
 
@@ -50,7 +51,7 @@ export class MainLayoutComponent {
       for (const sub of item.subItems) {
         const hit = url === sub.routerLink || url.startsWith(sub.routerLink + '/');
         if (hit && (!best || sub.routerLink.length > best.len)) {
-          best = { label: item.label, icon: item.icon, len: sub.routerLink.length };
+          best = { label: item.labelKey, icon: item.icon, len: sub.routerLink.length };
         }
       }
     }

@@ -1,8 +1,10 @@
 // paginator.component.ts
 import { Component, input, model } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-paginator',
+  imports:[TranslatePipe],
   standalone: true,
   template: `
     @if (totalPages() > 1) {
@@ -17,7 +19,8 @@ import { Component, input, model } from '@angular/core';
         </button>
 
         <span class="w-full text-sm text-neutral">
-          Página {{ pageIndex() + 1 }} de {{ totalPages() }}
+          {{ 'COMMON.PAGINATION.PAGE_OF' | translate:{
+              current: pageIndex() + 1, total: totalPages() } }}
         </span>
 
         <button

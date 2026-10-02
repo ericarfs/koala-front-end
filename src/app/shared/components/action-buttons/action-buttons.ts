@@ -1,5 +1,6 @@
-import { Component, inject, output } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { PERMISSIONS } from '../../tokens/permissions';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   imports: [],
@@ -17,15 +18,21 @@ import { PERMISSIONS } from '../../tokens/permissions';
 })
 export class ActionButtonsComponent {
   protected readonly permissions = inject(PERMISSIONS);
+  protected readonly translate = inject(TranslateService);
 
   edit = output<void>();
   delete = output<void>();
+
+  deleteMessageKey = input('COMMON.ACTIONS.CONFIRM_DELETE');
+  deleteMessageParams = input<Record<string, unknown>>({});
 
   onEdit(): void {
     this.edit.emit();
   }
 
   onDelete(): void {
+    const msg = this.translate.instant(this.deleteMessageKey(), this.deleteMessageParams());
+    if (!confirm(msg)) return;
     this.delete.emit();
   }
 }

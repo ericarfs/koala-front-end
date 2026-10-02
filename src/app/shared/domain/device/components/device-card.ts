@@ -28,7 +28,7 @@ import { DeviceWithTypes } from '@shared/interfaces/device';
           [class.text-success-foreground]="device.available"
           [class.text-destructive-foreground]="!device.available"
         >
-          {{ device.available ? 'Ativado' : 'Desativado' }}
+          {{ device.available ? 'Online' : 'Offline' }}
         </div>
       </div>
 

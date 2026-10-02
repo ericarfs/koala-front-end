@@ -7,10 +7,11 @@ import { ContentLayoutComponent } from '@shared/layouts/content/content';
 import { USERS_MOCK } from '../../mocks/users';
 import { paginate } from '@shared/utils/paginate';
 import { delay, of, tap } from 'rxjs';
+import { TranslatePipe } from '@ngx-translate/core';
 
 
 @Component({
-  imports: [ContentLayoutComponent, ActionButtonsComponent, PaginatorComponent],
+  imports: [ContentLayoutComponent, ActionButtonsComponent, PaginatorComponent, TranslatePipe],
   selector: 'app-users',
   styleUrl: './users.css',
   templateUrl: './users.html',
@@ -31,9 +32,9 @@ export class Users {
 
     this.formDialog
       .open<UserBasic>({
-        title: isEdit ? 'Editar usuário' : 'Novo usuário',
-        subtitle: isEdit ? 'Altere os dados do usuário' : 'Preencha os dados do usuário',
-        submitLabel: isEdit ? 'Salvar' : 'Criar',
+        title: isEdit ? 'USERS.EDIT.TITLE' : 'USERS.ADD.TITLE',
+        subtitle: isEdit ? 'USERS.EDIT.SUBTITLE' : 'USERS.ADD.SUBTITLE',
+        submitLabel: isEdit ? 'COMMON.ACTIONS.SAVE' : 'COMMON.ACTIONS.CREATE',
 
         fields: [
           { key: 'username', label: 'Username', placeholder: 'Username', required: true },
@@ -82,7 +83,6 @@ export class Users {
   }
 
   deleteUser(id: number){
-    confirm("Tem certeza que quer deletar usuário?")
     this.allUsers.update(users => users.filter(u => u.id !== id));
   }
 

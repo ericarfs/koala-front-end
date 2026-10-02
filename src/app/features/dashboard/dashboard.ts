@@ -12,13 +12,14 @@ import { LOCATIONS_MOCK } from '../../mocks/locations';
 import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
 import { DashboardFilterInterface, DashboardService } from '@shared/domain/device/services/device-metrics';
 import { forkJoin, map, of, switchMap } from 'rxjs';
+import { TranslatePipe } from '@ngx-translate/core';
 
 
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ContentLayoutComponent, DeviceChartComponent, LocationTreeSelectComponent],
+  imports: [CommonModule, ReactiveFormsModule, ContentLayoutComponent, DeviceChartComponent, LocationTreeSelectComponent, TranslatePipe],
   templateUrl: './dashboard.html',
 })
 export class Dashboard {

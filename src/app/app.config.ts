@@ -10,12 +10,23 @@ import { mffModuleDefinition } from './domains/mff/mff.module-definition';
 import { AuthService } from './core/auth/services/auth';
 import { PERMISSIONS } from './shared/tokens/permissions';
 
+//Traducao
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
+
 export const appConfig: ApplicationConfig = {
   providers: [
     { provide: PERMISSIONS, useExisting: AuthService },
     provideBrowserGlobalErrorListeners(),
     provideRouter(CORE_ROUTES),
     provideHttpClient(withInterceptors([authInterceptor])),
+    provideTranslateService({
+      fallbackLang: 'en',
+      loader: provideTranslateHttpLoader({
+        prefix: './i18n/',
+        suffix: '.json'
+      })
+    }),
     provideKoalaModule(mffModuleDefinition),
 
     provideAppInitializer(() => {

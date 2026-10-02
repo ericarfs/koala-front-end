@@ -2,11 +2,12 @@ import { MenuItem } from '../../../extensions/extension-registry';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'li[app-nav-group]',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, NgClass],
+  imports: [RouterLink, RouterLinkActive, NgClass, TranslatePipe],
   template:`
   <button
     type="button"
@@ -18,7 +19,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
     <i [ngClass]="icon" class="text-lg w-5 text-center shrink-0"></i>
 
     @if (!collapsed) {
-      <span class="flex-1 text-left whitespace-nowrap">{{ label }}</span>
+      <span class="flex-1 text-left whitespace-nowrap">{{ labelKey | translate }}</span>
       <i
         class="fa-solid fa-chevron-down text-xs transition-transform duration-200"
         [class.rotate-180]="expanded"
@@ -37,7 +38,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
             class="flex items-center gap-3 px-3 py-1.5 rounded-md text-neutral hover:bg-neutral/15 transition"
           >
             <i [ngClass]="sub.icon" class="w-4 text-center"></i>
-            <span>{{ sub.label }}</span>
+            <span>{{ sub.labelKey | translate }}</span>
           </a>
         </li>
       }
@@ -53,7 +54,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   `
 })
 export class NavGroupComponent {
-  @Input({ required: true }) label!: string;
+  @Input({ required: true }) labelKey!: string;
   @Input({ required: true }) icon!: string;
   @Input({ required: true }) subItems!: MenuItem[];
   @Input() expanded = false;
