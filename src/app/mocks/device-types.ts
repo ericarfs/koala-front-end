@@ -1,0 +1,12 @@
+import { DeviceType } from "@shared/interfaces/device-type";
+
+export const DEVICE_TYPES_MOCK: DeviceType[] = [
+  { id: 1, name: 'Temperature', description: 'Sensor realiza leitura da temperatura do ambiente' },
+      { id: 2, name: 'Humidity', description: 'Sensor realiza leitura de umidade do ambiente' },
+      { id: 3, name: 'Brightness', description: 'Sensor realiza leitura da luminosidade do ambiente' },
+      { id: 4, name: 'Energy', description: 'Sensor realiza leitura da corrente consumida' },
+      { id: 5, name: 'Presence', description: 'Verifica se há pessoas no ambiente' },
+      { id: 6, name: 'Umidade de Solo', description: 'Sensor Capacitivo V2' },
+      { id: 7, name: 'Temperatura de Solo', description: 'Solo' },
+      { id: 8, name: 'Sensor de Fluxo', description: 'Sensor de fluxo' }
+]

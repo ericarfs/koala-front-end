@@ -1,0 +1,196 @@
+import { CommonModule } from '@angular/common';
+import { Component, computed, inject, signal } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ChartSeriesData, DeviceChartComponent } from '@shared/domain/device/components/device-chart';
+import { getDescendantIds } from '@shared/domain/location/location-tree';
+import { LocationTreeSelectComponent } from '@shared/domain/location/location-tree-select';
+import { Device } from '@shared/interfaces/device';
+import { ContentLayoutComponent } from '@shared/layouts/content/content';
+import { DEVICE_TYPES_MOCK } from '../../mocks/device-types';
+import { DEVICES_MOCK } from '../../mocks/devices';
+import { LOCATIONS_MOCK } from '../../mocks/locations';
+import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
+import { DashboardFilterInterface, DashboardService } from '@shared/domain/device/services/device-metrics';
+import { forkJoin, map, of, switchMap } from 'rxjs';
+
+
+
+@Component({
+  selector: 'app-dashboard',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, ContentLayoutComponent, DeviceChartComponent, LocationTreeSelectComponent],
+  templateUrl: './dashboard.html',
+})
+export class Dashboard {
+  private readonly mappingService = inject(DeviceMappingService);
+  private readonly dashboardService = inject(DashboardService);
+
+  readonly loading = signal(false);
+
+  deviceTypeOptions = DEVICE_TYPES_MOCK;
+
+  // ---------- Form ----------
+  filterForm = new FormGroup({
+    location: new FormControl<number | null>(null, Validators.required),
+    timeBucket: new FormControl('5 minutes', { nonNullable: true, validators: Validators.required }),
+    fromDate: new FormControl<string | null>(null, Validators.required),
+    toDate: new FormControl<string | null>(null),
+  });
+
+  selectedTypes = signal<number[]>([]);
+  selectedDevices = signal<number[]>([]);
+
+  intervalOptions = [
+    { id: '30 seconds', text: '30s' },
+    { id: '1 minute', text: '1min' },
+    { id: '5 minutes', text: '5min' },
+    { id: '15 minutes', text: '15min' },
+    { id: '30 minutes', text: '30min' },
+    { id: '1 hour', text: '1h' },
+    { id: '2 hours', text: '2h' },
+  ];
+
+  // ---------- Dispositivos disponíveis (dependem de location + type único) ----------
+  availableDevices = signal<Device[]>([]);
+
+  constructor() {
+    this.filterForm.valueChanges.subscribe(() => this.updateAvailableDevices());
+  }
+
+  private updateAvailableDevices(): void {
+    const locationId = this.filterForm.value.location;
+    const types = this.selectedTypes();
+
+    if (locationId == null || types.length !== 1) {
+      this.availableDevices.set([]);
+      this.selectedDevices.set([]);
+      return;
+    }
+
+    const descendantIds = getDescendantIds(locationId, LOCATIONS_MOCK);
+
+    this.mappingService.getDevicesForType(types[0]).subscribe(deviceIds => {
+      const devices = DEVICES_MOCK.filter(
+        d => d.id != null &&
+             deviceIds.includes(d.id) &&
+             d.id_enviroment != null &&
+             descendantIds.has(d.id_enviroment)
+      );
+      this.availableDevices.set(devices);
+      // remove seleções que não fazem mais sentido
+      this.selectedDevices.update(list => list.filter(id => devices.some(d => d.id === id)));
+    });
+  }
+
+  isTypeSelected(id: number): boolean {
+    return this.selectedTypes().includes(id);
+  }
+
+  toggleType(id: number): void {
+    this.selectedTypes.update(list => {
+      if (list.includes(id)) return list.filter(t => t !== id);
+      if (list.length >= 2) return list;
+      return [...list, id];
+    });
+    this.updateAvailableDevices();
+  }
+
+  isDeviceSelected(id: number): boolean {
+    return this.selectedDevices().includes(id);
+  }
+
+  toggleDevice(id: number): void {
+    this.selectedDevices.update(list => {
+      if (list.includes(id)) return list.filter(d => d !== id);
+      if (list.length >= 5) return list;
+      return [...list, id];
+    });
+  }
+
+  setTimeBucket(value: string): void {
+    this.filterForm.patchValue({ timeBucket: value });
+  }
+
+  // ---------- Gráfico ----------
+  fields = signal<Date[]>([]);
+  primaryValues = signal<ChartSeriesData>({ title: '', values: [] });
+  secondaryValues = signal<ChartSeriesData>({ title: '', values: [] });
+  deviceSeries = signal<ChartSeriesData[]>([]);
+
+  private typeName(id: number): string {
+    return DEVICE_TYPES_MOCK.find(t => t.id === id)?.name ?? '';
+  }
+
+  search(): void {
+    const { location, timeBucket, fromDate, toDate } = this.filterForm.getRawValue();
+    const types = this.selectedTypes();
+    if (location == null || types.length === 0 || this.filterForm.invalid) return;
+
+    this.loading.set(true);
+
+    const start = fromDate ? new Date(fromDate) : null;
+    const end = toDate ? new Date(toDate) : new Date();
+    end.setHours(23, 59, 59);
+
+    const baseFilter = {
+      idEnviroment: location,
+      startDate: start,
+      endDate: end,
+      timeBucket,
+    };
+
+    // Regra 1: dois tipos de sensor
+    if (types.length > 1) {
+      const req1 = this.dashboardService.filter({ ...baseFilter, idDeviceType: types[0], idDevice: null } as DashboardFilterInterface);
+      const req2 = this.dashboardService.filter({ ...baseFilter, idDeviceType: types[1], idDevice: null } as DashboardFilterInterface);
+
+      forkJoin([req1, req2]).subscribe(([r1, r2]) => {
+        this.fields.set(r1.map(v => v.time_interval));
+        this.primaryValues.set({ title: this.typeName(types[0]), values: r1.map(v => v.avg_value) });
+        this.secondaryValues.set({ title: this.typeName(types[1]), values: r2.map(v => v.avg_value) });
+        this.deviceSeries.set([]);
+        this.loading.set(false);
+      });
+      return;
+    }
+
+    const devices = this.selectedDevices();
+
+    // Regra 3: um tipo + dispositivos selecionados (média tracejada + cada dispositivo)
+    if (devices.length > 0) {
+      const avgReq = this.dashboardService.filter({ ...baseFilter, idDeviceType: types[0], idDevice: null } as DashboardFilterInterface);
+      const deviceReqs = devices.map(deviceId =>
+        this.dashboardService.filter({ ...baseFilter, idDeviceType: types[0], idDevice: deviceId } as DashboardFilterInterface).pipe(
+          map(res => ({
+            title: DEVICES_MOCK.find(d => d.id === deviceId)?.name ?? `Dispositivo ${deviceId}`,
+            values: res.map(v => v.avg_value),
+          }))
+        )
+      );
+
+      forkJoin([avgReq, ...deviceReqs]).subscribe(([avgRes, ...deviceResults]) => {
+        this.fields.set(avgRes.map(v => v.time_interval));
+        this.primaryValues.set({
+          title: `${this.typeName(types[0])} (Média)`,
+          values: avgRes.map(v => v.avg_value),
+          dashed: true,
+        });
+        this.secondaryValues.set({ title: '', values: [] });
+        this.deviceSeries.set(deviceResults as ChartSeriesData[]);
+        this.loading.set(false);
+      });
+      return;
+    }
+
+    // Regra 2: um tipo, sem dispositivos
+    this.dashboardService
+      .filter({ ...baseFilter, idDeviceType: types[0], idDevice: null } as DashboardFilterInterface)
+      .subscribe(res => {
+        this.fields.set(res.map(v => v.time_interval));
+        this.primaryValues.set({ title: this.typeName(types[0]), values: res.map(v => v.avg_value) });
+        this.secondaryValues.set({ title: '', values: [] });
+        this.deviceSeries.set([]);
+        this.loading.set(false);
+      });
+  }
+}

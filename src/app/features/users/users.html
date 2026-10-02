@@ -1,0 +1,41 @@
+<app-content-layout
+  title="Usuários"
+  subtitle="Lista de usuários cadastrados"
+>
+  <button
+        actions
+        type="button"
+        (click)="newUser()"
+        class="btn px-4 bg-primary text-primary-foreground hover:bg-primary-details gap-1"
+      >
+        <i class="fa-solid fa-plus"></i>
+        Novo usuário
+  </button>
+  <div class="grid grid-cols-1 gap-1">
+    @for(user of pagination.pagedItems(); track user.id){
+      <div class="inline-flex flex-wrap justify-end p-4 gap-3 bg-container rounded-sm border border-outline">
+        <div class="flex flex-wrap gap-3 md:flex-1 w-full">
+          <div class="flex items-center justify-center h-12 max-w-full aspect-square md:h-8 shrink-0 bg-secondary rounded-sm text-primary-foreground text-xl md:text-sm">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          <div class="flex flex-col md:flex-row md:items-center justify-center gap-1 md:gap-2 flex-wrap text-sm break-all">
+            <span class="font-semibold text-default">
+              {{user.username}}
+            </span>
+            <span class="text-neutral">
+              {{user.email}}
+            </span>
+          </div>
+        </div>
+        <app-action-buttons
+          (edit)="updateUser(user)"
+          (delete)="updateUser(user)"
+        ></app-action-buttons>
+      </div>
+    }
+  </div>
+  <app-paginator
+    [(pageIndex)]="pagination.pageIndex"
+    [totalPages]="pagination.totalPages()"
+  />
+</app-content-layout>

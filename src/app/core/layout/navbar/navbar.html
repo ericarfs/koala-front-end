@@ -1,0 +1,119 @@
+<header
+  class="md:hidden fixed top-0 inset-x-0 h-14 bg-container z-30 grid grid-cols-3 items-center px-4 shadow-md"
+  >
+  <div class="flex">
+    <button
+      type="button"
+      (click)="sidebar.toggle()"
+      class="text-default p-2 -ml-2 rounded-md hover:bg-white/10 transition cursor-pointer"
+      aria-label="Abrir menu"
+    >
+      <i class="fa-solid fa-bars text-lg"></i>
+    </button>
+  </div>
+
+  <div class="text-default font-semibold text-center">{{ activeLabel() }}</div>
+
+  <div class="flex justify-end">
+    <app-user-menu [compact]="true" />
+  </div>
+
+</header>
+
+<!-- Backdrop do drawer mobile -->
+@if (sidebar.isMobile() && sidebar.mobileOpen()) {
+  <div
+    class="fixed bg-black/50 inset-0 z-40 transition-opacity"
+    (click)="sidebar.closeMobile()"
+    aria-hidden="true"
+  ></div>
+}
+
+<!-- Sidebar -->
+<aside
+  class="h-full bg-background flex flex-col transition-all duration-300 ease-in-out z-50 border-r-1 border-outline"
+  [class.w-64]="!sidebar.collapsed()"
+  [class.w-16]="sidebar.collapsed()"
+  [class.h-full]="!sidebar.isMobile()"
+  [class.fixed]="sidebar.isMobile()"
+  [class.top-0]="sidebar.isMobile()"
+  [class.bottom-0]="sidebar.isMobile()"
+  [class.left-0]="sidebar.isMobile()"
+  [class.-translate-x-full]="sidebar.isMobile() && !sidebar.mobileOpen()"
+  [class.translate-x-0]="sidebar.isMobile() && sidebar.mobileOpen()"
+  >
+
+  <!-- Cabeçalho -->
+  <div class="p-4 shrink-0 flex items-center gap-2 min-h-[56px] relative">
+    @if (!sidebar.collapsed()) {
+      <div class="text-default font-semibold whitespace-nowrap">Smart Lab</div>
+    } @else if (!sidebar.isMobile()) {
+      <button
+        type="button"
+        (click)="sidebar.toggle()"
+        class="text-default font-semibold mx-auto -translate-x-2 cursor-pointer hover:opacity-80 transition"
+        aria-label="Expandir menu"
+        >
+        SL
+      </button>
+    }
+
+    <!-- Toggle: desktop only -->
+    @if (!sidebar.isMobile() && !sidebar.isTablet()) {
+      <button
+        type="button"
+        (click)="sidebar.toggle()"
+        class="absolute right-2 text-neutral hover:text-default transition p-1 rounded cursor-pointer"
+        [attr.aria-label]="sidebar.collapsed() ? 'Expandir menu' : 'Recolher menu'"
+        >
+        <i
+          class="fa-solid text-sm"
+          [ngClass]="sidebar.collapsed() ? 'fa-angles-right' : 'fa-angles-left'"
+        ></i>
+      </button>
+    }
+
+    <!-- Fechar: mobile only -->
+    @if (sidebar.isMobile()) {
+      <button
+        type="button"
+        (click)="sidebar.closeMobile()"
+        class="absolute right-2 text-neutral hover:text-default transition p-1 rounded cursor-pointer"
+        aria-label="Fechar menu"
+        >
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    }
+  </div>
+
+  <!-- Navegação -->
+  <nav class="flex-1 overflow-y-auto px-2 pb-4 overflow-x-hidden">
+    <ul class="flex flex-col gap-2">
+      @for (item of menuItems; track item.id) {
+        @if (item.subItems.length > 0) {
+          <li
+            app-nav-group
+            [label]="item.label"
+            [icon]="item.icon"
+            [subItems]="item.subItems"
+            [collapsed]="sidebar.collapsed()"
+            [expanded]="expandedId() === item.id"
+            (toggled)="toggleGroup(item.id)"
+          ></li>
+        } @else {
+          <li
+            app-nav-item
+            [route]="item.routerLink"
+            [label]="item.label"
+            [icon]="item.icon"
+            [collapsed]="sidebar.collapsed()"
+          ></li>
+        }
+      }
+    </ul>
+  </nav>
+
+  <div class="shrink-0 border-t border-white/10 p-2">
+    <app-user-menu />
+  </div>
+</aside>

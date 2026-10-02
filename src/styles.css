@@ -1,0 +1,138 @@
+/* You can add global styles to this file, and also import other style files */
+@import '@angular/cdk/overlay-prebuilt.css';
+@import 'tailwindcss';
+
+
+* {
+    box-sizing: border-box;
+    font-optical-sizing: auto;
+}
+
+@layer base {
+  p  { @apply text-base leading-relaxed; }
+}
+
+:root {
+  --background: var(--color-neutral-100);
+  --container: var(--color-white);
+  --backdrop: rgba(200, 200, 200, 0.8);
+
+  --border: var(--color-neutral-300);
+  --ring: var(--color-amber-600);
+
+  --primary: var(--color-amber-600);
+  --primary-foreground: var(--color-white);
+  --primary-background: var(--color-orange-200);
+  --primary-details: var(--color-amber-800);
+
+  --secondary: var(--color-teal-600);
+  --secondary-foreground: var(--color-white);
+  --secondary-details: var(--color-teal-800);
+
+  --success: var(--color-green-300);
+  --success-foreground: var(--color-green-900);
+
+  --destructive: var(--color-red-300);
+  --destructive-foreground: var(--color-red-900);
+
+  --text-default: var(--color-black);
+  --text-title: var(--color-amber-950);
+  --text-neutral: var(--color-neutral-600);
+
+  --input-bg: var(--color-neutral-50);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: var(--color-zinc-900);
+    --container: var(--color-zinc-800);
+    --backdrop: rgba(0, 0, 0, 0.8);
+
+    --border: var(--color-zinc-500);
+
+    --primary-details: var(--color-amber-500);
+    --primary-background: var(--color-yellow-800);
+
+
+    --secondary: var(--color-teal-500);
+    --secondary-foreground: var(--color-black);
+    --secondary-details: var(--color-teal-200);
+
+    --success: var(--color-green-300);
+    --success-foreground: var(--color-green-900);
+
+    --destructive: var(--color-red-300);
+    --destructive-foreground: var(--color-red-900);
+
+    --text-default: var(--color-white);
+    --text-title: var(--color-amber-50);
+    --text-neutral: var(--color-neutral-200);
+
+    --input-bg: var(--color-zinc-600);
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-container: var(--container);
+  --color-outline: var(--border);
+  --color-ring: var(--ring);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-background: var(--primary-background);
+  --color-primary-details: var(--primary-details);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary-details: var(--secondary-details);
+
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-default: var(--text-default);
+  --color-title: var(--text-title);
+  --color-neutral: var(--text-neutral);
+
+  --color-input: var(--input-bg);
+}
+
+html, body {
+    height: 100%;
+    overflow-x: hidden;
+}
+
+body{
+  font-family: "Inter", sans-serif;
+  background-color: var(--background);
+  color: var(--text-default);
+}
+
+app-root {
+  display: block;
+  height: 100%;
+}
+
+.btn{
+  @apply flex items-center justify-center w-full min-h-10 rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 disabled:opacity-60 disabled:cursor-default;
+}
+
+
+.btn:disabled{
+  cursor:default;
+}
+
+.btn:active:not(:disabled) {
+    transform: scale(0.95);
+    transition: transform .3s;
+    box-shadow: none;
+}
+
+@layer components {
+  .login-host {
+    @apply flex flex-col min-h-screen items-center break-all;
+  }
+}

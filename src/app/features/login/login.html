@@ -1,0 +1,48 @@
+<section class="flex flex-col md:mt-[15vh] mt-[10vh] mb-12 w-[97%] max-w-100">
+  <div class="bg-container rounded-md p-6 text-center shadow-sm border-2 border-outline">
+    <i class="fa fa-sitemap text-4xl text-primary" aria-hidden="true"></i>
+    <h1 class="text-2xl font-semibold mt-3 mb-1">SmartLab</h1>
+    <p class="text-sm text-neutral mb-6">Acesse sua conta</p>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col text-left">
+      <app-input
+        formControlName="username"
+        type="text"
+        label="Usuário"
+        placeholder="Insira o nome usuário"
+        class="mb-4"
+        >
+        <span class="absolute right-1.5 top-1.5 w-7 h-7 rounded-md bg-gray-100 flex items-center justify-center text-gray-500">
+          <i class="fa fa-user fa-sm" aria-hidden="true"></i>
+        </span>
+      </app-input>
+
+      <app-input-password
+        [control]="password"
+        label="Senha"
+        placeholder="Insira a senha do usuário"
+      />
+
+      @if (error()) {
+        <p class="text-destructive-foreground text-sm mt-3">{{ error() }}</p>
+      }
+
+      <button
+        type="submit"
+        [disabled]="loading()"
+        [disabled]="!loginForm.valid"
+        class="btn py-3 mt-6 bg-primary text-primary-foreground"
+        >
+        {{ loading() ? 'Entrando...' : 'Entrar' }}
+      </button>
+    </form>
+
+    <button
+      type="button"
+      (click)="onGuestLogin()"
+      class="btn mt-2 bg-transparent border-0 text-primary hover:text-primary-details text-sm cursor-pointer"
+      >
+      Entrar como convidado
+    </button>
+  </div>
+</section>

@@ -1,0 +1,142 @@
+<app-content-layout title="Dispositivo" [subtitle]="device()?.name">
+  @if (device(); as dev) {
+    <div class="flex flex-col gap-6">
+
+      <button (click)="goBack()" class="text-primary hover:text-primary-details inline-flex items-center gap-1 w-fit cursor-pointer">
+        <i class="fa-solid fa-arrow-left"></i> Voltar
+      </button>
+
+      <div class="bg-container border border-outline rounded-md p-4 flex flex-col gap-2 break-all">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <h1 class="text-2xl font-bold">{{ dev.name }}</h1>
+
+          <!-- 👇 Badge de status -->
+          <div
+            [class]="dev.available
+              ? 'bg-success text-success-foreground'
+              : 'bg-destructive text-destructive-foreground'"
+            class="inline-flex w-30 max-w-full justify-center items-center gap-1.5 py-1 text-sm font-medium rounded-full"
+          >
+            {{ dev.available ? 'Ativado' : 'Desativado' }}
+          </div>
+        </div>
+        @if (dev.description) {
+          <p class="text-sm text-neutral">{{ dev.description }}</p>
+        }
+        <div class="flex flex-wrap gap-1 mt-1">
+          @for (type of dev.types; track type.id) {
+            <span class="inline-flex items-center px-3 py-1 rounded-sm text-xs bg-neutral/10 text-neutral">
+              {{ type.name }}
+            </span>
+          }
+        </div>
+      </div>
+
+      <form [formGroup]="filterForm" class="flex flex-wrap items-end gap-4 bg-container border border-outline rounded-md p-4 break-all ">
+        <div class="flex flex-col gap-1 w-full">
+          <div class="flex flex-wrap items-center justify-between mb-1.5 break-all">
+            <span class="text-sm text-neutral font-medium">Sensores</span>
+            <span class="text-xs text-neutral">
+              {{ selectedTypes().length }}/2 selecionados
+            </span>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            @for (type of dev.types; track type.id) {
+              <button
+                type="button"
+                (click)="toggleType(type.id)"
+                [disabled]="!isTypeSelected(type.id) && selectedTypes().length >= 2"
+                [class]="isTypeSelected(type.id)
+                  ? 'bg-secondary text-secondary-foreground border-secondary shadow-sm font-medium'
+                  : 'bg-container text-default border-outline hover:border-secondary hover:text-secondary'"
+                class="group inline-flex flex-wrap items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border
+                      transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed
+                      disabled:hover:border-outline disabled:hover:text-default break-all max-w-full"
+              >
+
+                @if (isTypeSelected(type.id)) {
+                  <i class="fa-solid fa-check text-xs"></i>
+                }
+                {{ type.name }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1 w-full lg:max-w-145 ">
+          <span class="text-sm text-neutral font-medium mb-1.5">Intervalo</span>
+          <div class="flex flex-wrap border border-outline rounded-md min-h-10 overflow-hidden">
+            @for (opt of intervalOptions; track opt.id) {
+              <button
+                type="button"
+                class="flex-1 basis-1/4 md:basis-1/7 cursor-pointer px-4 py-2 text-sm transition-colors"
+                [class.bg-primary]="filterForm.value.timeBucket === opt.id"
+                [class.font-medium]="filterForm.value.timeBucket === opt.id"
+                [class.text-primary-foreground]="filterForm.value.timeBucket === opt.id"
+                (click)="setTimeBucket(opt.id)"
+              >
+                {{ opt.text }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2 max-w-full">
+          <div class="flex flex-col gap-1 max-w-full">
+            <label class="text-sm text-neutral">De</label>
+            <input type="date" class="border border-outline rounded-md px-3 py-2 bg-container text-default" formControlName="fromDate">
+          </div>
+
+          <div class="flex flex-col gap-1 max-w-full">
+            <label class="text-sm text-neutral">Até</label>
+            <input type="date" class="border border-outline rounded-md px-3 py-2 bg-container text-default" formControlName="toDate">
+          </div>
+        </div>
+
+        <div class="w-full md:w-auto">
+          <button type="button" class="btn px-4 py-2 gap-2 bg-primary text-primary-foreground" [disabled]="filterForm.invalid || selectedTypes().length === 0" (click)="search()">
+            @if (loading()) {
+              <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              <span>Buscando...</span>
+            } @else {
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <span>Pesquisar</span>
+            }
+          </button>
+        </div>
+
+      </form>
+
+      <div class="bg-container border border-outline rounded-md p-4 relative min-h-96">
+
+        <!-- Overlay de loading -->
+        @if (loading()) {
+          <div class="absolute inset-0 bg-container/80 backdrop-blur-sm rounded-md
+                      flex flex-col items-center justify-center gap-3 z-10">
+            <div class="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+            <span class="text-sm text-neutral">Buscando dados...</span>
+          </div>
+        }
+
+        @if (fields().length === 0 && !loading()) {
+          <!-- Estado vazio inicial -->
+          <div class="flex flex-col items-center justify-center py-20 gap-3 text-neutral">
+            <i class="fa-solid fa-chart-line text-5xl opacity-20"></i>
+            <p class="text-sm">Selecione ao menos um sensor e clique em Pesquisar</p>
+          </div>
+        } @else {
+          <!-- Gráfico -->
+          <app-device-chart
+            [fields]="fields()"
+            [primary]="primaryValues()"
+            [secondary]="secondaryValues()"
+          />
+        }
+      </div>
+
+    </div>
+  } @else {
+    <p class="text-xl text-default font-medium">Dispositivo não encontrado.</p>
+  }
+</app-content-layout>

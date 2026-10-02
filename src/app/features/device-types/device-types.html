@@ -1,0 +1,33 @@
+<app-content-layout
+  title="Sensores"
+  subtitle="Categorias de sensores disponiveis"
+>
+  <button
+        actions
+        type="button"
+        (click)="newSensor()"
+        class="btn px-4 bg-primary text-primary-foreground hover:bg-primary-details gap-1"
+      >
+        <i class="fa-solid fa-plus"></i>
+        Novo sensor
+  </button>
+
+  <div class="flex flex-wrap justify-center lg:justify-start gap-2 w-full">
+    @for(sensor of deviceTypes(); track sensor.id){
+      <div class="flex flex-col justify-between gap-3 md:gap-2 w-full max-w-full md:w-50 md:min-h-50 p-4 bg-container rounded-sm outline outline-outline">
+        <div class="break-all">
+          <p class="font-bold text-default">{{ sensor.name }}</p>
+        </div>
+        <div class="flex-1 break-words">
+          <p class="text-sm leading-tight">{{ sensor.description }}</p>
+        </div>
+        <app-action-buttons
+          (edit)="updateSensor(sensor)"
+          (delete)="deleteSensor(sensor.id)"
+        ></app-action-buttons>
+      </div>
+    }
+
+  </div>
+
+</app-content-layout>

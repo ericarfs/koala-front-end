@@ -1,0 +1,78 @@
+<app-content-layout
+  title="Conta"
+>
+<div class="flex flex-col flex-1 break-words gap-4">
+  <div class="w-2xl max-w-full text-center">
+    <!-----Formulário de Usuário---->
+    <form [formGroup]="userForm" class="text-left flex justify-between md:gap-2 flex-wrap">
+      @for (item of userFormItems; track $index) {
+        <app-input
+          [formControlName]="item.key"
+          [type]="item.type"
+          [label]="item.label"
+          [placeholder]="item.placeholder"
+          class="md:flex-1 w-full"
+          >
+          <span class="absolute right-1.5 top-1.5 w-7 h-7 rounded-md bg-gray-100 flex items-center justify-center text-gray-500">
+            <i [class]="`fa fa-${item.icon} fa-sm`" aria-hidden="true"></i>
+          </span>
+        </app-input>
+      }
+    </form>
+  </div>
+
+  <div class="flex flex-col w-2xl p-5 bg-container rounded-md border border-outline max-w-full gap-3">
+    <h2 class="text-2xl font-semibold">Alterar Senha</h2>
+    <!-----Formulário de Senha---->
+    <form [formGroup]="passwordForm" class="text-left">
+      <app-input-password
+        [control]="oldPassword"
+        label="Senha antiga"
+        placeholder="Insira a senha antiga"
+      />
+
+      <div class="flex justify-between gap-2 flex-wrap mt-4">
+        <app-input-password
+          [control]="newPassword"
+          label="Senha"
+          placeholder="Insira a nova senha"
+          class="md:flex-1 w-full mb-4"
+        />
+
+        <app-input-password
+          [control]="passwordConfirmation"
+          label="Confirmação de senha"
+          placeholder="Insira a confirmação"
+          class="md:flex-1 w-full"
+        />
+      </div>
+      <div class="text-sm text-default bg-transparent py-3 px-4 rounded border border-outline">
+        <p class="font-semibold mb-1">Sua senha deve conter:</p>
+        <ul class="list-disc list-inside space-y-1">
+          <li>Mínimo de 8 caracteres</li>
+          <li>Pelo menos uma letra maiúscula</li>
+          <li>Pelo menos um número</li>
+          <li>Pelo menos um caractere especial</li>
+        </ul>
+      </div>
+    </form>
+  </div>
+   <div class="w-2xl max-w-full flex justify-between gap-2 flex-wrap">
+      <button
+        type="submit"
+        [disabled]="loading()"
+        class="btn md:flex-1 w-full bg-primary text-white hover:bg-primary-details disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+        Salvar
+      </button>
+
+      <button
+        type="button"
+        (click) = "goBack()"
+        class="btn md:flex-1 w-full border border-outline text-sm font-medium hover:bg-neutral/20"
+      >
+      Cancelar
+    </button>
+  </div>
+</div>
+</app-content-layout>

@@ -1,0 +1,29 @@
+<app-content-layout
+  title="Ambientes"
+  subtitle="Espaços físicos monitorados"
+>
+  <button
+        actions
+        type="button"
+        (click)="newLocation()"
+        class="btn px-4 bg-primary text-primary-foreground hover:bg-primary-details gap-1"
+      >
+        <i class="fa-solid fa-plus"></i>
+        Novo ambiente
+  </button>
+
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-1">
+    @for(location of pagination.pagedItems(); track location.id){
+      <app-location-card
+        [location]="location"
+        [actionLabel]="actionLabel(location)"
+        (edit)="updateLocation($event)"
+        (delete)="deleteLocation($event)"
+      ></app-location-card>
+    }
+  </div>
+  <app-paginator
+    [(pageIndex)]="pagination.pageIndex"
+    [totalPages]="pagination.totalPages()"
+  />
+</app-content-layout>
