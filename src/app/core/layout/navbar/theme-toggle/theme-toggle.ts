@@ -1,0 +1,57 @@
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-theme-toggle',
+  standalone: true,
+  template: `
+    <button
+      (click)="toggleTheme()"
+      [attr.aria-label]="isDark ? 'Alternar para modo claro' : 'Alternar para modo escuro'"
+      [attr.aria-pressed]="isDark"
+      class="inline-flex items-center justify-center p-2 rounded-xl border border-outline bg-container text-default hover:bg-input transition-colors duration-200"
+      title="{{ isDark ? 'Ativar modo claro' : 'Ativar modo escuro' }}">
+
+      <span aria-hidden="true" class="text-xl">
+        {{ isDark ? '☀️' : '🌙' }}
+      </span>
+
+      <span class="sr-only">
+        {{ isDark ? 'Modo Claro' : 'Modo Escuro' }}
+      </span>
+    </button>
+  `
+})
+export class ThemeToggleComponent implements OnInit {
+  isDark = false;
+
+  // Guardamos a query de escuta do sistema operacional
+  private mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+  ngOnInit() {
+    this.syncFromDOM();
+    this.mediaQuery.addEventListener('change', this.syncFromDOM);
+  }
+
+  private syncFromDOM = () => {
+    // o script do index.html já aplicou a classe; só espelhamos no estado
+    this.isDark = document.documentElement.classList.contains('dark');
+  };
+
+  toggleTheme() {
+    this.isDark = !this.isDark;
+
+    if (this.isDark === this.mediaQuery.matches) {
+      localStorage.removeItem('theme'); // igual ao sistema: volta a seguir o SO
+    } else {
+      localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
+    }
+
+    this.updateDOM();
+  }
+
+  private updateDOM() {
+    const root = document.documentElement;
+    root.classList.toggle('dark', this.isDark);
+    root.style.colorScheme = this.isDark ? 'dark' : 'light';
+  }
+}

@@ -12,65 +12,66 @@
   p  { @apply text-base leading-relaxed; }
 }
 
-:root {
-  --background: var(--color-neutral-100);
+:root, .light {
+  --background: var(--color-slate-50);
   --container: var(--color-white);
-  --backdrop: rgba(200, 200, 200, 0.8);
+  --backdrop: rgba(15, 23, 42, 0.6);
 
-  --border: var(--color-neutral-300);
-  --ring: var(--color-amber-600);
+  --border: var(--color-slate-300);
+  --ring: var(--color-amber-700);
 
-  --primary: var(--color-amber-600);
+  --primary: var(--color-amber-700);
   --primary-foreground: var(--color-white);
   --primary-background: var(--color-orange-200);
-  --primary-details: var(--color-amber-800);
+  --primary-details: var(--color-amber-900);
 
-  --secondary: var(--color-teal-600);
+  --secondary: var(--color-teal-700);
   --secondary-foreground: var(--color-white);
   --secondary-details: var(--color-teal-800);
 
-  --success: var(--color-green-300);
-  --success-foreground: var(--color-green-900);
+  --success: var(--color-green-700);
+  --success-foreground: var(--color-white);
 
-  --destructive: var(--color-red-300);
-  --destructive-foreground: var(--color-red-900);
+  --destructive: var(--color-red-700);
+  --destructive-foreground: var(--color-white);
 
-  --text-default: var(--color-black);
+  --text-default: var(--color-slate-900);
   --text-title: var(--color-amber-950);
-  --text-neutral: var(--color-neutral-600);
+  --text-neutral: var(--color-slate-600);
 
-  --input-bg: var(--color-neutral-50);
+  --input-bg: var(--color-slate-100);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: var(--color-zinc-900);
-    --container: var(--color-zinc-800);
-    --backdrop: rgba(0, 0, 0, 0.8);
+.dark {
+  --background: var(--color-slate-900);
+  --container: var(--color-slate-800);
+  --backdrop: rgba(0, 0, 0, 0.8);
 
-    --border: var(--color-zinc-500);
+  --border: var(--color-slate-600);
+  --ring: var(--color-amber-500);
 
-    --primary-details: var(--color-amber-500);
-    --primary-background: var(--color-yellow-800);
+  --primary: var(--color-amber-600);
+  --primary-details: var(--color-amber-500);
+  --primary-background: var(--color-amber-900);
 
+  --secondary:var(--color-teal-500);
+  --secondary-foreground: var(--color-slate-900);
+  --secondary-details: var(--color-teal-100);
 
-    --secondary: var(--color-teal-500);
-    --secondary-foreground: var(--color-black);
-    --secondary-details: var(--color-teal-200);
+  --success: var(--color-green-400);
+  --success-foreground: var(--color-slate-900);
 
-    --success: var(--color-green-300);
-    --success-foreground: var(--color-green-900);
+  --destructive: var(--color-red-400);
+  --destructive-foreground: var(--color-slate-900);
 
-    --destructive: var(--color-red-300);
-    --destructive-foreground: var(--color-red-900);
+  --text-default: var(--color-slate-50);
+  --text-title: var(--color-amber-100);
+  --text-neutral: var(--color-slate-300);
 
-    --text-default: var(--color-white);
-    --text-title: var(--color-amber-50);
-    --text-neutral: var(--color-neutral-200);
-
-    --input-bg: var(--color-zinc-600);
-  }
+  --input-bg: var(--color-slate-700);
 }
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
   --color-background: var(--background);

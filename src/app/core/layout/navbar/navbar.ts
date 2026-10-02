@@ -8,12 +8,13 @@ import { SidebarStateService } from '@core/services/sidebar-state';
 import { NavItemComponent } from './nav-item/nav-item';
 import { NavGroupComponent } from './nav-group/nav-group';
 import { UserMenuComponent } from './user-menu/user-menu';
+import { ThemeToggleComponent } from './theme-toggle/theme-toggle';
 
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, NgClass, NavItemComponent, NavGroupComponent, UserMenuComponent],
+  imports: [CommonModule, NgClass, NavItemComponent, NavGroupComponent, UserMenuComponent, ThemeToggleComponent],
   templateUrl:'./navbar.html'
 })
 export class NavbarComponent {

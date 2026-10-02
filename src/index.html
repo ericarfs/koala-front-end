@@ -15,6 +15,23 @@
   href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.34.0/dist/tabler-icons.min.css"
 />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+
+<script>
+  (function () {
+    var mq = matchMedia('(prefers-color-scheme: dark)');
+
+    function apply() {
+      var t = null;
+      try { t = localStorage.getItem('theme'); } catch (e) {}
+      var dark = t === 'dark' || (t !== 'light' && mq.matches);
+      document.documentElement.classList.toggle('dark', dark);
+      document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+    }
+
+    apply();
+    mq.addEventListener('change', apply);
+  })();
+</script>
 </head>
 <body>
   <app-root></app-root>

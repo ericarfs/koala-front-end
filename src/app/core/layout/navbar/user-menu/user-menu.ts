@@ -29,7 +29,7 @@ import { RouterLink } from '@angular/router';
             Configurações de conta
           </a>
           <button type="button" (click)="auth.logout()"
-                  class="block w-full text-left px-3 py-2 text-sm text-destructive-foreground hover:bg-destructive/10 cursor-pointer rounded-sm">
+                  class="block w-full text-left px-3 py-2 text-sm text-destructive hover:bg-destructive/10 cursor-pointer rounded-sm">
             Logout
           </button>
         </div>

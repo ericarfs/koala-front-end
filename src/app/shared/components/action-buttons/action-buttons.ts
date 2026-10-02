@@ -9,7 +9,7 @@ import { PERMISSIONS } from '../../tokens/permissions';
       <div class="flex flex-wrap justify-end items-center gap-2 text-sm text-neutral min-h-4 [&>i]:cursor-pointer [&>i]:transition-colors ">
         <i class="fa-solid fa-edit hover:text-primary"
             (click)="$event.stopPropagation(); $event.preventDefault(); onEdit()"></i>
-        <i class="fa-solid fa-trash hover:text-destructive-foreground"
+        <i class="fa-solid fa-trash hover:text-destructive"
             (click)="$event.stopPropagation(); $event.preventDefault(); onDelete()"></i>
       </div>
     }
