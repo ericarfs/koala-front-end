@@ -67,6 +67,14 @@
     },
     "PAGINATION": {
       "PAGE_OF": "Página {{current}} de {{total}}"
+    },
+    "THEME": {
+      "TOGGLE_TO_LIGHT": "Alternar para modo claro",
+      "TOGGLE_TO_DARK": "Alternar para modo escuro",
+      "ACTIVATE_LIGHT": "Ativar modo claro",
+      "ACTIVATE_DARK": "Ativar modo escuro",
+      "LIGHT_MODE": "Modo Claro",
+      "DARK_MODE": "Modo Escuro"
     }
   },
 
@@ -167,5 +175,36 @@
     "DELETE": {
       "CONFIRM": "Tem certeza que deseja excluir o usuário '{{name}}'?"
     }
+  },
+
+  "ACCOUNT": {
+    "TITLE": "Conta",
+    "PROFILE": {
+      "USERNAME": "Usuário",
+      "USERNAME_PLACEHOLDER": "Insira o nome de usuário",
+      "EMAIL": "Email",
+      "EMAIL_PLACEHOLDER": "Insira o email"
+    },
+    "CHANGE_PASSWORD": {
+      "TITLE": "Alterar Senha",
+      "OLD_PASSWORD": "Senha antiga",
+      "OLD_PASSWORD_PLACEHOLDER": "Insira a senha antiga",
+      "NEW_PASSWORD": "Senha",
+      "NEW_PASSWORD_PLACEHOLDER": "Insira a nova senha",
+      "CONFIRM_PASSWORD": "Confirmação de senha",
+      "CONFIRM_PASSWORD_PLACEHOLDER": "Insira a confirmação",
+      "RULES_TITLE": "Sua senha deve conter:",
+      "RULES": {
+        "MIN_LENGTH": "Mínimo de 8 caracteres",
+        "UPPERCASE": "Pelo menos uma letra maiúscula",
+        "NUMBER": "Pelo menos um número",
+        "SPECIAL_CHAR": "Pelo menos um caractere especial"
+      }
+    }
+  },
+
+  "USER_MENU": {
+    "ACCOUNT_SETTINGS": "Configurações de conta",
+    "LOGOUT": "Sair"
   }
 }

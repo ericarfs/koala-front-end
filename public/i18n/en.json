@@ -67,6 +67,14 @@
     },
     "PAGINATION": {
       "PAGE_OF": "Page {{current}} of {{total}}"
+    },
+    "THEME": {
+      "TOGGLE_TO_LIGHT": "Switch to light mode",
+      "TOGGLE_TO_DARK": "Switch to dark mode",
+      "ACTIVATE_LIGHT": "Activate light mode",
+      "ACTIVATE_DARK": "Activate dark mode",
+      "LIGHT_MODE": "Light Mode",
+      "DARK_MODE": "Dark Mode"
     }
   },
 
@@ -167,5 +175,36 @@
     "DELETE": {
       "CONFIRM": "Are you sure you want to delete the user '{{name}}'?"
     }
+  },
+
+  "ACCOUNT": {
+    "TITLE": "Account",
+    "PROFILE": {
+      "USERNAME": "Username",
+      "USERNAME_PLACEHOLDER": "Enter username",
+      "EMAIL": "Email",
+      "EMAIL_PLACEHOLDER": "Enter user email"
+    },
+    "CHANGE_PASSWORD": {
+      "TITLE": "Change Password",
+      "OLD_PASSWORD": "Old password",
+      "OLD_PASSWORD_PLACEHOLDER": "Enter old password",
+      "NEW_PASSWORD": "Password",
+      "NEW_PASSWORD_PLACEHOLDER": "Enter new password",
+      "CONFIRM_PASSWORD": "Password confirmation",
+      "CONFIRM_PASSWORD_PLACEHOLDER": "Enter confirmation",
+      "RULES_TITLE": "Your password must contain:",
+      "RULES": {
+        "MIN_LENGTH": "Minimum 8 characters",
+        "UPPERCASE": "At least one uppercase letter",
+        "NUMBER": "At least one number",
+        "SPECIAL_CHAR": "At least one special character"
+      }
+    }
+  },
+
+  "USER_MENU": {
+    "ACCOUNT_SETTINGS": "Account settings",
+    "LOGOUT": "Logout"
   }
 }

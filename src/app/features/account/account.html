@@ -1,5 +1,5 @@
 <app-content-layout
-  title="Conta"
+  [title]="'ACCOUNT.TITLE' | translate"
 >
 <div class="flex flex-col flex-1 break-words gap-4">
   <div class="w-2xl max-w-full text-center">
@@ -9,8 +9,8 @@
         <app-input
           [formControlName]="item.key"
           [type]="item.type"
-          [label]="item.label"
-          [placeholder]="item.placeholder"
+          [label]="item.labelKey"
+          [placeholder]="item.placeholderKey"
           class="md:flex-1 w-full"
           >
           <span class="absolute right-1.5 top-1.5 w-7 h-7 rounded-md bg-gray-100 flex items-center justify-center text-gray-500">
@@ -22,37 +22,41 @@
   </div>
 
   <div class="flex flex-col w-2xl p-5 bg-container rounded-md border border-outline max-w-full gap-3">
-    <h2 class="text-2xl font-semibold">Alterar Senha</h2>
+    <h2 class="text-2xl font-semibold">
+      {{ 'ACCOUNT.CHANGE_PASSWORD.TITLE' | translate }}
+    </h2>
     <!-----Formulário de Senha---->
     <form [formGroup]="passwordForm" class="text-left">
       <app-input-password
         [control]="oldPassword"
-        label="Senha antiga"
-        placeholder="Insira a senha antiga"
+        label="ACCOUNT.CHANGE_PASSWORD.OLD_PASSWORD"
+        placeholder="ACCOUNT.CHANGE_PASSWORD.OLD_PASSWORD_PLACEHOLDER"
       />
 
       <div class="flex justify-between gap-2 flex-wrap mt-4">
         <app-input-password
           [control]="newPassword"
-          label="Senha"
-          placeholder="Insira a nova senha"
+          label="ACCOUNT.CHANGE_PASSWORD.NEW_PASSWORD"
+          placeholder="ACCOUNT.CHANGE_PASSWORD.NEW_PASSWORD_PLACEHOLDER"
           class="md:flex-1 w-full mb-4"
         />
 
         <app-input-password
           [control]="passwordConfirmation"
-          label="Confirmação de senha"
-          placeholder="Insira a confirmação"
-          class="md:flex-1 w-full"
+          label="ACCOUNT.CHANGE_PASSWORD.CONFIRM_PASSWORD"
+          placeholder="ACCOUNT.CHANGE_PASSWORD.CONFIRM_PASSWORD_PLACEHOLDER"
+          class="md:flex-1 w-full mb-4"
         />
       </div>
       <div class="text-sm text-default bg-transparent py-3 px-4 rounded border border-outline">
-        <p class="font-semibold mb-1">Sua senha deve conter:</p>
+        <p class="font-semibold mb-1">
+          {{ 'ACCOUNT.CHANGE_PASSWORD.RULES_TITLE' | translate }}
+        </p>
         <ul class="list-disc list-inside space-y-1">
-          <li>Mínimo de 8 caracteres</li>
-          <li>Pelo menos uma letra maiúscula</li>
-          <li>Pelo menos um número</li>
-          <li>Pelo menos um caractere especial</li>
+          <li>{{ 'ACCOUNT.CHANGE_PASSWORD.RULES.MIN_LENGTH' | translate }}</li>
+          <li>{{ 'ACCOUNT.CHANGE_PASSWORD.RULES.UPPERCASE' | translate }}</li>
+          <li>{{ 'ACCOUNT.CHANGE_PASSWORD.RULES.NUMBER' | translate }}</li>
+          <li>{{ 'ACCOUNT.CHANGE_PASSWORD.RULES.SPECIAL_CHAR' | translate }}</li>
         </ul>
       </div>
     </form>
@@ -63,7 +67,7 @@
         [disabled]="loading()"
         class="btn md:flex-1 w-full bg-primary text-white hover:bg-primary-details disabled:opacity-50 disabled:cursor-not-allowed"
         >
-        Salvar
+        {{ 'COMMON.ACTIONS.SAVE' | translate }}
       </button>
 
       <button
@@ -71,7 +75,7 @@
         (click) = "goBack()"
         class="btn md:flex-1 w-full border border-outline text-sm font-medium hover:bg-neutral/20"
       >
-      Cancelar
+      {{ 'COMMON.ACTIONS.CANCEL' | translate }}
     </button>
   </div>
 </div>

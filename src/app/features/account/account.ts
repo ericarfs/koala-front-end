@@ -5,6 +5,7 @@ import { Location } from '@angular/common';
 import { ContentLayoutComponent } from '@shared/layouts/content/content';
 import { InputComponent } from '@shared/components/input/input';
 import { InputPasswordComponent } from '@shared/components/input/input-password';
+import { TranslatePipe } from '@ngx-translate/core';
 
 
 interface UserForm {
@@ -19,7 +20,7 @@ interface PasswordForm {
 }
 
 @Component({
-  imports: [ReactiveFormsModule, ContentLayoutComponent, InputComponent, InputPasswordComponent],
+  imports: [ReactiveFormsModule, ContentLayoutComponent, InputComponent, InputPasswordComponent, TranslatePipe],
   selector: 'app-account',
   styleUrl: './account.css',
   templateUrl: './account.html',
@@ -39,8 +40,20 @@ export class Account {
   protected readonly error = signal<string | null>(null);
 
   readonly userFormItems = [
-    { key: 'username', label: 'Usuário', placeholder: 'Insira o nome usuário', type: 'text', icon:'user' },
-    { key: 'email', label: 'Email', placeholder: 'Insira o email usuário', type: 'email', icon:'envelope'  },
+    {
+      key: 'username',
+      labelKey: 'ACCOUNT.PROFILE.USERNAME',
+      placeholderKey: 'ACCOUNT.PROFILE.USERNAME_PLACEHOLDER',
+      type: 'text',
+      icon: 'user'
+    },
+    {
+      key: 'email',
+      labelKey: 'ACCOUNT.PROFILE.EMAIL',
+      placeholderKey: 'ACCOUNT.PROFILE.EMAIL_PLACEHOLDER',
+      type: 'email',
+      icon: 'envelope'
+    },
   ] as const;
 
   constructor(

@@ -1,11 +1,12 @@
-import { AuthService } from '../../../auth/services/auth';
+import { AuthService } from '@core/auth/services/auth';
 import { Component, ElementRef, HostListener, Input, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-user-menu',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, TranslatePipe],
   template: `
     <div class="relative">
       <button
@@ -26,11 +27,11 @@ import { RouterLink } from '@angular/router';
              [class]="compact ? 'right-0 top-full mt-2' : 'left-0 bottom-full mb-2'">
           <a routerLink="/account" (click)="open.set(false)"
              class="block px-3 py-2 text-sm text-default hover:bg-neutral/20 rounded-sm">
-            Configurações de conta
+            {{ 'USER_MENU.ACCOUNT_SETTINGS' | translate }}
           </a>
           <button type="button" (click)="auth.logout()"
                   class="block w-full text-left px-3 py-2 text-sm text-destructive hover:bg-destructive/10 cursor-pointer rounded-sm">
-            Logout
+            {{ 'USER_MENU.LOGOUT' | translate }}
           </button>
         </div>
       }
