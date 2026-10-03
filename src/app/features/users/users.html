@@ -11,33 +11,39 @@
         <i class="fa-solid fa-plus"></i>
         {{'USERS.ADD.TITLE' | translate}}
   </button>
-  <div class="grid grid-cols-1 gap-1">
-    @for(user of pagination.pagedItems(); track user.id){
-      <div class="inline-flex flex-wrap justify-end p-4 gap-3 bg-container rounded-sm border border-outline">
-        <div class="flex flex-wrap gap-3 md:flex-1 w-full">
-          <div class="flex items-center justify-center h-12 max-w-full aspect-square md:h-8 shrink-0 bg-secondary rounded-sm text-primary-foreground text-xl md:text-sm">
-            <i class="fa-solid fa-user"></i>
+  @if (allUsers().length === 0) {
+    <p class="text-neutral text-xl">
+      {{'USERS.LIST.EMPTY' | translate}}
+    </p>
+  } @else {
+    <div class="grid grid-cols-1 gap-1">
+      @for(user of pagination.pagedItems(); track user.id){
+        <div class="inline-flex flex-wrap justify-end p-4 gap-3 bg-container rounded-sm border border-outline">
+          <div class="flex flex-wrap gap-3 md:flex-1 w-full">
+            <div class="flex items-center justify-center h-12 max-w-full aspect-square md:h-8 shrink-0 bg-secondary rounded-sm text-primary-foreground text-xl md:text-sm">
+              <i class="fa-solid fa-user"></i>
+            </div>
+            <div class="flex flex-col md:flex-row md:items-center justify-center gap-1 md:gap-2 flex-wrap text-sm break-all">
+              <span class="font-semibold text-default">
+                {{user.username}}
+              </span>
+              <span class="text-neutral">
+                {{user.email}}
+              </span>
+            </div>
           </div>
-          <div class="flex flex-col md:flex-row md:items-center justify-center gap-1 md:gap-2 flex-wrap text-sm break-all">
-            <span class="font-semibold text-default">
-              {{user.username}}
-            </span>
-            <span class="text-neutral">
-              {{user.email}}
-            </span>
-          </div>
+          <app-action-buttons
+            [deleteMessageKey]="'USERS.DELETE.CONFIRM'"
+            [deleteMessageParams]="{ name: user.username }"
+            (edit)="updateUser(user)"
+            (delete)="deleteUser(user.id)"
+          ></app-action-buttons>
         </div>
-        <app-action-buttons
-          [deleteMessageKey]="'USERS.DELETE.CONFIRM'"
-          [deleteMessageParams]="{ name: user.username }"
-          (edit)="updateUser(user)"
-          (delete)="deleteUser(user.id)"
-        ></app-action-buttons>
-      </div>
-    }
-  </div>
-  <app-paginator
-    [(pageIndex)]="pagination.pageIndex"
-    [totalPages]="pagination.totalPages()"
-  />
+      }
+    </div>
+    <app-paginator
+      [(pageIndex)]="pagination.pageIndex"
+      [totalPages]="pagination.totalPages()"
+    />
+  }
 </app-content-layout>

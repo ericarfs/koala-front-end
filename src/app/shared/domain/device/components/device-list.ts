@@ -17,7 +17,7 @@ import { TranslatePipe } from '@ngx-translate/core';
   imports: [CommonModule, DeviceCardComponent, PaginatorComponent, TranslatePipe],
   template: `
     @if (devices().length === 0) {
-      <p class="text-neutral">
+      <p class="text-neutral text-lg">
         {{'DEVICES.LIST.EMPTY' | translate}}
       </p>
     } @else {

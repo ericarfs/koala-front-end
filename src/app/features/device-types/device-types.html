@@ -11,25 +11,29 @@
         <i class="fa-solid fa-plus"></i>
        {{'SENSORS.ADD.TITLE' | translate}}
   </button>
-
-  <div class="flex flex-wrap justify-center lg:justify-start gap-2 w-full">
-    @for(sensor of deviceTypes(); track sensor.id){
-      <div class="flex flex-col justify-between gap-3 md:gap-2 w-full max-w-full md:w-50 md:min-h-50 p-4 bg-container rounded-sm outline outline-outline">
-        <div class="break-all">
-          <p class="font-bold text-default">{{ sensor.name }}</p>
+  @if (deviceTypes().length === 0) {
+    <p class="text-neutral text-xl">
+      {{'SENSORS.LIST.EMPTY' | translate}}
+    </p>
+  } @else {
+    <div class="flex flex-wrap justify-center lg:justify-start gap-2 w-full">
+      @for(sensor of deviceTypes(); track sensor.id){
+        <div class="flex flex-col justify-between gap-3 md:gap-2 w-full max-w-full md:w-50 md:min-h-50 p-4 bg-container rounded-sm outline outline-outline">
+          <div class="break-all">
+            <p class="font-bold text-default">{{ sensor.name }}</p>
+          </div>
+          <div class="flex-1 break-words">
+            <p class="text-sm leading-tight">{{ sensor.description }}</p>
+          </div>
+          <app-action-buttons
+            [deleteMessageKey]="'SENSORS.DELETE.CONFIRM'"
+            [deleteMessageParams]="{ name: sensor.name }"
+            (edit)="updateSensor(sensor)"
+            (delete)="deleteSensor(sensor)"
+          ></app-action-buttons>
         </div>
-        <div class="flex-1 break-words">
-          <p class="text-sm leading-tight">{{ sensor.description }}</p>
-        </div>
-        <app-action-buttons
-          [deleteMessageKey]="'SENSORS.DELETE.CONFIRM'"
-          [deleteMessageParams]="{ name: sensor.name }"
-          (edit)="updateSensor(sensor)"
-          (delete)="deleteSensor(sensor)"
-        ></app-action-buttons>
-      </div>
-    }
+      }
 
-  </div>
-
+    </div>
+  }
 </app-content-layout>
