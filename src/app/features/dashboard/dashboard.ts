@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, viewChildren } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ChartSeriesData, DeviceChartComponent } from '@shared/domain/device/components/device-chart';
-import { getDescendantIds } from '@shared/domain/location/location-tree';
+import { getDescendantIds, getPath } from '@shared/domain/location/location-tree';
 import { LocationTreeSelectComponent } from '@shared/domain/location/location-tree-select';
 import { Device } from '@shared/interfaces/device';
 import { ContentLayoutComponent } from '@shared/layouts/content/content';
@@ -13,6 +13,7 @@ import { DeviceMappingService } from '@shared/domain/device/services/device-mapp
 import { DashboardFilterInterface, DashboardService } from '@shared/domain/device/services/device-metrics';
 import { forkJoin, map, of, switchMap } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
+import { ChartExportItem, PdfExportService } from '@shared/services/pdf-export';
 
 
 
@@ -25,7 +26,13 @@ import { TranslatePipe } from '@ngx-translate/core';
 export class Dashboard {
   private readonly mappingService = inject(DeviceMappingService);
   private readonly dashboardService = inject(DashboardService);
+  private readonly pdfService = inject(PdfExportService);
 
+  readonly charts = viewChildren(DeviceChartComponent);
+
+  readonly locationName = signal('');
+  readonly chartTitle = signal('');
+  readonly chartSubtitle = signal('');
   readonly loading = signal(false);
 
   deviceTypeOptions = DEVICE_TYPES_MOCK;
@@ -60,6 +67,7 @@ export class Dashboard {
 
   private updateAvailableDevices(): void {
     const locationId = this.filterForm.value.location;
+    console.log(locationId)
     const types = this.selectedTypes();
 
     if (locationId == null || types.length !== 1) {
@@ -129,6 +137,13 @@ export class Dashboard {
 
     this.loading.set(true);
 
+    const locationId = this.filterForm.value.location;
+    if (!locationId) return;
+
+    const locName = getPath(locationId, LOCATIONS_MOCK)
+
+    this.locationName.set(locName);
+
     const start = fromDate ? new Date(fromDate) : null;
     const end = toDate ? new Date(toDate) : new Date();
     end.setHours(23, 59, 59);
@@ -140,10 +155,14 @@ export class Dashboard {
       timeBucket,
     };
 
+    this.chartTitle.set(locName);
+
     // Regra 1: dois tipos de sensor
     if (types.length > 1) {
       const req1 = this.dashboardService.filter({ ...baseFilter, idDeviceType: types[0], idDevice: null } as DashboardFilterInterface);
       const req2 = this.dashboardService.filter({ ...baseFilter, idDeviceType: types[1], idDevice: null } as DashboardFilterInterface);
+
+      this.chartSubtitle.set(`${this.typeName(types[0])} × ${this.typeName(types[1])}`);
 
       forkJoin([req1, req2]).subscribe(([r1, r2]) => {
         this.fields.set(r1.map(v => v.time_interval));
@@ -169,6 +188,11 @@ export class Dashboard {
         )
       );
 
+      const devCount = devices.length;
+      this.chartSubtitle.set(
+        `${this.typeName(types[0])} — ${devCount} dispositivo${devCount > 1 ? 's' : ''}`
+      );
+
       forkJoin([avgReq, ...deviceReqs]).subscribe(([avgRes, ...deviceResults]) => {
         this.fields.set(avgRes.map(v => v.time_interval));
         this.primaryValues.set({
@@ -183,6 +207,7 @@ export class Dashboard {
       return;
     }
 
+    this.chartSubtitle.set(this.typeName(types[0]));
     // Regra 2: um tipo, sem dispositivos
     this.dashboardService
       .filter({ ...baseFilter, idDeviceType: types[0], idDevice: null } as DashboardFilterInterface)
@@ -193,5 +218,29 @@ export class Dashboard {
         this.deviceSeries.set([]);
         this.loading.set(false);
       });
+  }
+
+  async exportarPDF(): Promise<void> {
+    const title = this.chartTitle();
+    const subtitle = this.chartSubtitle();
+    const locName = this.locationName();
+
+    // Se nada foi buscado ainda, sai
+    if (!title) return;
+
+    const items: ChartExportItem[] = this.charts().flatMap(chart => {
+      const dataUrl = chart.getImageDataURL();
+      if (!dataUrl) return [];
+      return [{
+        title,
+        subtitle,
+        imageDataUrl: dataUrl,
+      }];
+    });
+
+    if (items.length === 0) return;
+
+    const fileName = `graficos-${locName || 'dashboard'}-${Date.now()}.pdf`;
+    await this.pdfService.export(items, fileName);
   }
 }

@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal, viewChildren } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -11,6 +11,9 @@ import { DashboardFilterInterface, DashboardResponseInterface, DashboardService 
 import { DeviceWithTypes } from '@shared/interfaces/device';
 import { DEVICES_MOCK } from '../../../../mocks/devices';
 import { TranslatePipe } from '@ngx-translate/core';
+import { ChartExportItem, PdfExportService } from '@shared/services/pdf-export';
+import { LOCATIONS_MOCK } from '../../../../mocks/locations';
+import { getPath } from '@shared/domain/location/location-tree';
 
 
 
@@ -22,18 +25,27 @@ import { TranslatePipe } from '@ngx-translate/core';
 })
 export class DeviceDetails {
   private readonly route = inject(ActivatedRoute);
+  private readonly routerLocation = inject(Location);
   private readonly mappingService = inject(DeviceMappingService);
   private readonly dashboardService = inject(DashboardService);
+  private readonly pdfService = inject(PdfExportService);
+
+  readonly charts = viewChildren(DeviceChartComponent);
 
   private readonly id = toSignal(
     this.route.paramMap.pipe(map(p => Number(p.get('id')))),
     { initialValue: NaN }
   );
 
+  readonly locationName = signal('');
+  readonly deviceName = signal('');
+  readonly chartTitle = signal('');
+  readonly chartSubtitle = signal('');
+
   readonly loading = signal(false);
   readonly device = signal<DeviceWithTypes | null>(null);
 
-  constructor(private location: Location) {
+  constructor() {
     effect(() => {
       const id = this.id();
       const found = DEVICES_MOCK.find(d => d.id === id);
@@ -105,6 +117,20 @@ export class DeviceDetails {
 
     this.loading.set(true);
 
+    const locName = this.getLocationName(device);
+    const deviceName = device.name ?? '';
+
+    const primaryType = device.types.find(t => t.id === types[0]);
+    const secondaryType = types[1] != null ? device.types.find(t => t.id === types[1]) : undefined;
+
+    let chartTitle = primaryType?.name ?? '';
+    if (secondaryType) chartTitle += ` × ${secondaryType.name}`;
+
+    this.locationName.set(locName);
+    this.deviceName.set(deviceName);
+    this.chartTitle.set(`${locName} — ${deviceName}`);
+    this.chartSubtitle.set(chartTitle);
+
     const { timeBucket, fromDate, toDate } = this.filterForm.getRawValue();
     const start = fromDate ? new Date(fromDate) : null;
     const end = toDate ? new Date(toDate) : new Date();
@@ -117,9 +143,6 @@ export class DeviceDetails {
       endDate: end,
       timeBucket,
     };
-
-    const primaryType = device.types.find(t => t.id === types[0]);
-    const secondaryType = types[1] != null ? device.types.find(t => t.id === types[1]) : undefined;
 
     const primaryReq = this.dashboardService.filter({ ...baseFilter, idDeviceType: types[0] } as DashboardFilterInterface);
     const secondaryReq = types[1] != null
@@ -140,6 +163,25 @@ export class DeviceDetails {
   }
 
   goBack(){
-    this.location.back();
+    this.routerLocation.back();
+  }
+
+  getLocationName = (device: DeviceWithTypes) =>
+    device.id_enviroment != null ? getPath(device.id_enviroment, LOCATIONS_MOCK) : '-';
+
+  async exportarPDF(): Promise<void> {
+    const title = this.chartTitle();
+    const subtitle = this.chartSubtitle();
+    const locName = this.locationName();
+
+    if (!title) return;
+
+    const items: ChartExportItem[] = this.charts().flatMap(chart => {
+      const dataUrl = chart.getImageDataURL();
+      if (!dataUrl) return [];
+      return [{ title, subtitle, imageDataUrl: dataUrl }];
+    });
+
+    await this.pdfService.export(items, `graficos-${locName}-${Date.now()}.pdf`);
   }
 }

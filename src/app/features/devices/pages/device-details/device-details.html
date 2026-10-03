@@ -150,7 +150,15 @@
             [fields]="fields()"
             [primary]="primaryValues()"
             [secondary]="secondaryValues()"
+            [title]="chartTitle()"
+            [subtitle]="chartSubtitle()"
           />
+          <button
+            (click)="exportarPDF()"
+            class="btn bg-primary text-white px-4 py-2 rounded max-w-40">
+            <i class="fa-solid fa-file-pdf mr-2"></i>
+            {{'COMMON.ACTIONS.SAVE' | translate}} PDF
+          </button>
         }
       </div>
 

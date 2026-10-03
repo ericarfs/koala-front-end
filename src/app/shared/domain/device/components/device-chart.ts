@@ -1,6 +1,6 @@
 import {
-  Component, ElementRef, Input, OnChanges, OnDestroy, SimpleChanges,
-  ViewChild, AfterViewInit, NgZone, inject
+  Component, ElementRef, OnDestroy, AfterViewInit, NgZone,
+  inject, input, viewChild, effect, untracked,
 } from '@angular/core';
 import * as echarts from 'echarts';
 
@@ -13,47 +13,63 @@ export interface ChartSeriesData {
 @Component({
   selector: 'app-device-chart',
   standalone: true,
-  template: `<div #chartEl class="w-full h-96"></div>`,
+  template: `
+    <div class="flex flex-col gap-2">
+    @if (title()) {
+      <div class="flex flex-col">
+        <h3 class="text-base font-semibold text-default">{{ title() }}</h3>
+        @if (subtitle()) {
+          <p class="text-sm text-neutral">{{ subtitle() }}</p>
+        }
+      </div>
+    }
+    <div #chartEl class="w-full h-96"></div>
+  </div>
+  `,
 })
-export class DeviceChartComponent implements OnChanges, OnDestroy, AfterViewInit {
-  @ViewChild('chartEl', { static: true }) chartEl!: ElementRef<HTMLDivElement>;
+export class DeviceChartComponent implements OnDestroy, AfterViewInit {
+  private readonly chartEl = viewChild.required<ElementRef<HTMLDivElement>>('chartEl');
 
-  @Input() deviceSeries: ChartSeriesData[] = [];
-  @Input() fields: Date[] = [];
-  @Input() primary: ChartSeriesData = { title: '', values: [] };
-  @Input() secondary: ChartSeriesData = { title: '', values: [] };
-
+  readonly deviceSeries = input<ChartSeriesData[]>([]);
+  readonly fields = input<Date[]>([]);
+  readonly primary = input<ChartSeriesData>({ title: '', values: [] });
+  readonly secondary = input<ChartSeriesData>({ title: '', values: [] });
+  readonly locationName = input('');
+  readonly title = input('');
+  readonly subtitle = input('');
 
   private chart?: echarts.ECharts;
   private resizeObserver?: ResizeObserver;
   private themeObserver?: MutationObserver;
-  private readonly colors = ['#5470c6', '#91cc75'];
   private readonly zone = inject(NgZone);
   private lastRenderedDay = '';
+  private viewInitialized = false;
 
-  ngOnChanges(_changes: SimpleChanges): void {
-    if (this.chart) {
-      this.render();
-    }
-  }
+  constructor() {
+    effect(() => {
+      this.deviceSeries();
+      this.fields();
+      this.primary();
+      this.secondary();
+      this.locationName();
+      this.title();
 
-  private cssVar(name: string): string {
-    return getComputedStyle(document.documentElement)
-      .getPropertyValue(name)
-      .trim();
+      if (this.viewInitialized) {
+        untracked(() => this.render());
+      }
+    });
   }
 
   ngAfterViewInit(): void {
-    this.chart = echarts.init(this.chartEl.nativeElement);
+    this.chart = echarts.init(this.chartEl().nativeElement);
+    this.viewInitialized = true;
     this.render();
 
-    // Resize
     this.resizeObserver = new ResizeObserver(() => {
       this.zone.runOutsideAngular(() => this.chart?.resize());
     });
-    this.resizeObserver.observe(this.chartEl.nativeElement);
+    this.resizeObserver.observe(this.chartEl().nativeElement);
 
-    // 👇 Theme observer com requestAnimationFrame + subtree
     this.themeObserver = new MutationObserver(() => {
       requestAnimationFrame(() => {
         this.zone.runOutsideAngular(() => this.render());
@@ -66,76 +82,103 @@ export class DeviceChartComponent implements OnChanges, OnDestroy, AfterViewInit
     });
   }
 
+  private cssVar(name: string): string {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(name)
+      .trim();
+  }
+
   private render(): void {
-    if (!this.chart || this.fields.length === 0) return;
+    const fields = this.fields();
+    if (!this.chart || fields.length === 0) return;
+
     this.lastRenderedDay = '';
 
     const labelColor = this.cssVar('--color-default');
-    const hasSecondary = this.secondary.values.some(v => v !== null && v !== undefined);
-    const hasDeviceSeries = this.deviceSeries.length > 0;
+    const primary = this.primary();
+    const secondary = this.secondary();
+    const deviceSeries = this.deviceSeries();
+
+    const hasSecondary = secondary.values.some(v => v !== null && v !== undefined);
+    const hasDeviceSeries = deviceSeries.length > 0;
 
     const colorPalette = ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272'];
     let colorIndex = 0;
 
-    const series: any[] = [this.buildSeries(this.primary, 0, colorPalette[colorIndex++])];
+    const series: any[] = [this.buildSeries(primary, 0, colorPalette[colorIndex++])];
 
     if (hasSecondary) {
-      series.push(this.buildSeries(this.secondary, 1, colorPalette[colorIndex++]));
+      series.push(this.buildSeries(secondary, 1, colorPalette[colorIndex++]));
     }
 
-    this.deviceSeries.forEach(s => {
+    deviceSeries.forEach(s => {
       series.push(this.buildSeries(s, 0, colorPalette[colorIndex % colorPalette.length]));
       colorIndex++;
     });
 
-    const isSmall = window.innerWidth < 768;
-
     const yAxis: any[] = hasSecondary
       ? [
-          { type: 'value', position: 'left', name: this.primary.title },
-          { type: 'value', position: 'right', name: this.secondary.title, splitLine: { show: false } },
+          { id: 'left',  type: 'value', position: 'left',  name: primary.title },
+          { id: 'right', type: 'value', position: 'right', name: secondary.title, splitLine: { show: false } },
         ]
-      : [{ type: 'value', name: this.primary.title }];
+      : [{ id: 'left', type: 'value', name: primary.title }];
 
-    this.chart.setOption({
-      animationDuration: 200,
-      animationEasing: 'cubicOut',
-      textStyle: { color: labelColor },
-      grid: { left: '12%', right: '12%', top: '10%', bottom: '20%', containLabel: true },
-      tooltip: { trigger: 'axis' },
-      legend: {
-        show: hasSecondary || hasDeviceSeries,
-        bottom: '0%',
-        itemGap: 12,
-        itemWidth: 14,
-        itemHeight: 10,
-        textStyle: { color: labelColor, fontSize: 11 },
-        data: series.map(s => s.name),
-      },
-      xAxis: {
-        type: 'time',
-        axisLabel: {
-          color: labelColor,
-          hideOverlap: true,
-          showMaxLabel: 6,
-          rotate: isSmall ? 45 : 0,
-          formatter: (value: number) => this.formatXAxisLabel(value),
+    this.chart.setOption(
+      {
+        animationDuration: 500,
+        animationEasing: 'cubicOut',
+        textStyle: { color: labelColor },
+        grid: {
+          left: '12%',
+          right: '12%',
+          top: '10%',
+          bottom: '20%',
+          containLabel: true,
         },
-        axisLine: { lineStyle: { color: labelColor, opacity: 0.3 } },
+        tooltip: { trigger: 'axis' },
+        legend: {
+          show: hasSecondary || hasDeviceSeries,
+          bottom: '0%',
+          itemGap: 12,
+          itemWidth: 14,
+          itemHeight: 10,
+          textStyle: { color: labelColor, fontSize: 11 },
+          data: series.map(s => s.name),
+        },
+        xAxis: {
+          type: 'time',
+          axisLabel: {
+            color: labelColor,
+            hideOverlap: true,
+            showMaxLabel: 6,
+            rotate: window.innerWidth < 768 ? 45 : 0,
+            formatter: (value: number) => this.formatXAxisLabel(value),
+          },
+          axisLine: { lineStyle: { color: labelColor, opacity: 0.3 } },
+        },
+        yAxis: yAxis.map(axis => ({
+          ...axis,
+          nameLocation: 'middle',
+          nameGap: 45,
+          nameRotate: 90,
+          nameTextStyle: { color: labelColor },
+          axisLabel: { color: labelColor },
+          axisLine: { lineStyle: { color: labelColor, opacity: 0.3 } },
+          splitLine: { lineStyle: { color: labelColor, opacity: 0.15 } },
+        })),
+        series,
       },
-      yAxis: yAxis.map(axis => ({
-        ...axis,
-        nameLocation: 'middle',
-        nameGap: 45,
-        nameRotate: 90,
-        nameTextStyle: { color: labelColor },
-        axisLabel: { ...axis.axisLabel, color: labelColor },
-        axisLine: { lineStyle: { color: labelColor, opacity: 0.3 } },
-        splitLine: { ...axis.splitLine, lineStyle: { color: labelColor, opacity: 0.15 } },
-      })),
-      series,
-    },
-    { replaceMerge: ['series', 'yAxis', 'xAxis', 'legend'] });
+      { notMerge: true }
+    );
+  }
+
+  getImageDataURL(): string | null {
+    if (!this.chart) return null;
+    return this.chart.getDataURL({
+      type: 'png',
+      pixelRatio: 2,
+      backgroundColor: '#ffffff',
+    });
   }
 
   private formatXAxisLabel(value: number): string {
@@ -179,13 +222,15 @@ export class DeviceChartComponent implements OnChanges, OnDestroy, AfterViewInit
   }
 
   private getDateRange(): number {
-    if (this.fields.length < 2) return 0;
-    const min = Math.min(...this.fields.map(f => new Date(f).getTime()));
-    const max = Math.max(...this.fields.map(f => new Date(f).getTime()));
+    const fields = this.fields();
+    if (fields.length < 2) return 0;
+    const min = Math.min(...fields.map(f => new Date(f).getTime()));
+    const max = Math.max(...fields.map(f => new Date(f).getTime()));
     return max - min;
   }
 
   private buildSeries(data: ChartSeriesData, yAxisIndex: number, color: string): any {
+    const fields = this.fields();
     const s: any = {
       id: `${data.title}-${yAxisIndex}`,
       name: data.title,
@@ -195,7 +240,7 @@ export class DeviceChartComponent implements OnChanges, OnDestroy, AfterViewInit
       connectNulls: false,
       yAxisIndex,
       itemStyle: { color },
-      data: this.fields.map((f, i) => [new Date(f).toISOString(), data.values[i] ?? null]),
+      data: fields.map((f, i) => [new Date(f).toISOString(), data.values[i] ?? null]),
     };
     if (data.dashed) s.lineStyle = { type: 'dashed' };
     return s;
