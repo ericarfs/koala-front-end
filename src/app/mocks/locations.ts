@@ -18,26 +18,23 @@ export const LOCATIONS_MOCK: Location[] = [
   // Campus Ribeirão Preto
   { id: 14, name: 'Campus Ribeirão Preto', parentId: 1 },
 
-
   // Campus Piracicaba
   { id: 21, name: 'Campus Piracicaba', parentId: 1 },
-
 
   // Campus Pirassununga
   { id: 24, name: 'Campus Pirassununga', parentId: 1 },
 
-
   // Campus Bauru
   { id: 27, name: 'Campus Bauru', parentId: 1 },
-
 
   // Campus Lorena
   { id: 30, name: 'Campus Lorena', parentId: 1 },
 
-
   // Cidade Universitária (São Paulo)
   { id: 32, name: 'Cidade Universitária (São Paulo)', parentId: 1 },
 
+  // Externo (usado pelos devices 15, 16 e 17)
+  { id: 7,  name: 'Externo', description: 'Dispositivos externos', parentId: null },
 
   // Fora da USP (raízes)
   { id: 38, name: 'Bath',    description: 'Sensores Inglaterra', parentId: null },
