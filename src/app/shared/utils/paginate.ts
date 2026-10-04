@@ -6,10 +6,16 @@ export function paginate<T>(
 ) {
   const size = typeof pageSize === 'number' ? () => pageSize : pageSize;
 
-  // Volta para 0 automaticamente sempre que `items` mudar
-  const pageIndex = linkedSignal<T[], number>({
-    source: items,
-    computation: () => 0,
+  const pageIndex = linkedSignal<
+    { items: T[]; size: number },
+    number
+  >({
+    source: () => ({ items: items(), size: size() }),
+    computation: (src, prev) => {
+      if (!prev || prev.source.items !== src.items) return 0;
+      const firstItem = prev.value * prev.source.size;
+      return Math.floor(firstItem / src.size);
+    },
   });
 
   const totalPages = computed(() =>

@@ -17,6 +17,7 @@ import { paginate } from '@shared/utils/paginate';
 import { getLocationStats, LocationStats } from '@shared/domain/location/location-stats';
 import { DEVICE_MAPPINGS_MOCK } from '../../../../mocks/device-mapping';
 import { DEVICE_TYPES_MOCK } from '../../../../mocks/device-types';
+import { mediaQuery } from '@shared/utils/media-query';
 
 
 
@@ -70,7 +71,16 @@ export class LocationDetails {
   readonly showDevices = computed(() => this.children().length === 0 || this.devices().length > 0);
 
   pageSize = input(3);
-  pagination = paginate(this.children, this.pageSize);
+  private isSmall = mediaQuery('(max-width: 767px)');
+  private isMid     = mediaQuery('(max-width: 1279px)');
+
+  effectivePageSize = computed(() => {
+    if (this.isSmall()) return 1;
+    if (this.isMid()) return Math.min(2, this.pageSize());
+    return this.pageSize();
+  });
+
+  pagination = paginate(this.children, this.effectivePageSize);
 
   actionLabel = (loc: Location) => getActionLabel(loc.id, this.store.items());
 

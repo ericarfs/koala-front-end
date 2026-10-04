@@ -21,7 +21,7 @@
         <app-location-tree-select formControlName="currentLocation"></app-location-tree-select>
       </div>
     </form>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-1">
+    <div class="flex w-full md:w-160 gap-1">
       @for(location of pagination.pagedItems(); track location.id){
         <app-location-card
           [location]="location"
