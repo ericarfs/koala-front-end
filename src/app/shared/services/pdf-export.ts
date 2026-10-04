@@ -49,7 +49,7 @@ export class PdfExportService {
 
       cursorY += 4;
 
-      // 👇 Esperar a imagem carregar
+      // Esperar a imagem carregar
       const dimensions = await this.getImageDimensions(chart.imageDataUrl);
       if (!dimensions) continue;
 

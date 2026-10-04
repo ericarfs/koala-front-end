@@ -44,6 +44,7 @@ export class DeviceChartComponent implements OnDestroy, AfterViewInit {
   private readonly zone = inject(NgZone);
   private lastRenderedDay = '';
   private viewInitialized = false;
+  private exportMode = false;
 
   constructor() {
     effect(() => {
@@ -94,7 +95,9 @@ export class DeviceChartComponent implements OnDestroy, AfterViewInit {
 
     this.lastRenderedDay = '';
 
-    const labelColor = this.cssVar('--color-default');
+
+
+    const labelColor = this.exportMode ? '#212529' : this.cssVar('--color-default');
     const primary = this.primary();
     const secondary = this.secondary();
     const deviceSeries = this.deviceSeries();
@@ -174,11 +177,19 @@ export class DeviceChartComponent implements OnDestroy, AfterViewInit {
 
   getImageDataURL(): string | null {
     if (!this.chart) return null;
-    return this.chart.getDataURL({
+    this.exportMode = true;
+    this.render();
+
+    const dataUrl = this.chart.getDataURL({
       type: 'png',
       pixelRatio: 2,
       backgroundColor: '#ffffff',
     });
+
+    this.exportMode = false;
+    this.render();
+
+    return dataUrl;
   }
 
   private formatXAxisLabel(value: number): string {
