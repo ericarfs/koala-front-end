@@ -155,6 +155,11 @@
       "VIEW_DEVICES": "Ver dispositivos",
       "VIEW_DEVICES_COUNT": "Ver {{count}} dispositivos",
       "NOT_FOUND": "Ambiente não encontrado."
+    },
+    "STATS": {
+      "DEVICES": "dispositivos",
+      "ONLINE": "online",
+      "OFFLINE": "offline"
     }
   },
 

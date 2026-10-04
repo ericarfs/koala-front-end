@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { delay, map, of } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -12,13 +12,18 @@ import { FormDialogService } from '@shared/components/form-dialog/form-dialog.se
 import { DEVICES_MOCK } from '../../../../mocks/devices';
 import { Location } from '@shared/interfaces/location';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { PaginatorComponent } from '@shared/components/pagination/paginator';
+import { paginate } from '@shared/utils/paginate';
+import { getLocationStats, LocationStats } from '@shared/domain/location/location-stats';
+import { DEVICE_MAPPINGS_MOCK } from '../../../../mocks/device-mapping';
+import { DEVICE_TYPES_MOCK } from '../../../../mocks/device-types';
 
 
 
 @Component({
   selector: 'app-location-details',
   standalone: true,
-  imports: [CommonModule, RouterLink, ContentLayoutComponent, DeviceListComponent, LocationCardComponent, TranslatePipe],
+  imports: [CommonModule, RouterLink, ContentLayoutComponent, DeviceListComponent, LocationCardComponent, PaginatorComponent, TranslatePipe],
   templateUrl: './location-details.html',
   host: {
     class: 'block flex-1',
@@ -35,11 +40,37 @@ export class LocationDetails {
     { initialValue: NaN }
   );
 
+  readonly statsById = computed<Map<number, LocationStats>>(() => {
+    const locations = this.store.items();
+    const source = {
+      devices: DEVICES_MOCK,
+      mappings: DEVICE_MAPPINGS_MOCK,
+      types: DEVICE_TYPES_MOCK,
+    };
+
+    const ids = new Set<number>();
+    const current = this.id();
+    if (!Number.isNaN(current)) ids.add(current);
+    for (const c of this.children()) ids.add(c.id);
+
+    const map = new Map<number, LocationStats>();
+    for (const id of ids) {
+      map.set(id, getLocationStats(id, locations, source));
+    }
+    return map;
+  });
+
+  statsFor = (loc: Location): LocationStats | null =>
+    this.statsById().get(loc.id) ?? null;
+
   readonly location   = computed(() => this.store.items().find((l) => l.id === this.id()) ?? null);
   readonly breadcrumb = computed(() => getAncestors(this.id(), this.store.items()));
   readonly children   = computed(() => getChildren(this.id(), this.store.items()));
   readonly devices    = computed(() => DEVICES_MOCK.filter((d) => d.id_enviroment === this.id()));
   readonly showDevices = computed(() => this.children().length === 0 || this.devices().length > 0);
+
+  pageSize = input(3);
+  pagination = paginate(this.children, this.pageSize);
 
   actionLabel = (loc: Location) => getActionLabel(loc.id, this.store.items());
 

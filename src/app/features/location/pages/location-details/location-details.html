@@ -35,17 +35,22 @@
           <h2 class="text-lg font-semibold">
             {{ 'LOCATIONS.DETAILS.SUB_LOCATIONS' | translate:{ count: children().length } }}
           </h2>
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-1">
-            @for (child of children(); track child.id) {
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-1">
+            @for (child of pagination.pagedItems(); track child.id) {
               <app-location-card
                 [location]="child"
                 [actionLabel]="actionLabel(child)"
+                [stats]="statsFor(child)"
                 (edit)="updateLocation(child)"
                 (delete)="deleteLocation(child)"
               ></app-location-card>
             }
           </div>
         </div>
+        <app-paginator
+          [(pageIndex)]="pagination.pageIndex"
+          [totalPages]="pagination.totalPages()"
+        />
       }
 
       @if (showDevices()) {

@@ -155,6 +155,11 @@
       "VIEW_DEVICES": "View devices",
       "VIEW_DEVICES_COUNT": "View {{count}} devices",
       "NOT_FOUND": "Location not found."
+    },
+    "STATS": {
+      "DEVICES": "devices",
+      "ONLINE": "online",
+      "OFFLINE": "offline"
     }
   },
 

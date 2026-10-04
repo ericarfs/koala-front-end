@@ -1,4 +1,4 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, effect, inject, input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { delay, of, tap } from 'rxjs';
 import { ContentLayoutComponent } from '@shared/layouts/content/content';
@@ -10,10 +10,17 @@ import { getChildren } from '@shared/domain/location/location-tree';
 import { paginate } from '@shared/utils/paginate';
 import { Location } from '@shared/interfaces/location';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { LocationTreeSelectComponent } from '@shared/domain/location/location-tree-select';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { DEVICES_MOCK } from '../../../../mocks/devices';
+import { DEVICE_MAPPINGS_MOCK } from '../../../../mocks/device-mapping';
+import { DEVICE_TYPES_MOCK } from '../../../../mocks/device-types';
+import { getLocationStats, LocationStats } from '@shared/domain/location/location-stats';
 
 
 @Component({
-  imports: [ContentLayoutComponent, LocationCardComponent, PaginatorComponent, TranslatePipe],
+  imports: [ReactiveFormsModule, ContentLayoutComponent, LocationCardComponent, PaginatorComponent, LocationTreeSelectComponent, TranslatePipe],
   selector: 'app-location-list',
   styleUrl: './location-list.css',
   templateUrl: './location-list.html',
@@ -26,14 +33,57 @@ export class LocationList {
 
   readonly store = inject(LocationStore);
 
-  readonly locations = computed(() => getChildren(null, this.store.items()));
+  readonly statsById = computed<Map<number, LocationStats>>(() => {
+    const locations = this.store.items();
+    const source = {
+      devices: DEVICES_MOCK,
+      mappings: DEVICE_MAPPINGS_MOCK,
+      types: DEVICE_TYPES_MOCK,
+    };
+
+    const map = new Map<number, LocationStats>();
+    for (const loc of this.locations()) {
+      map.set(loc.id, getLocationStats(loc.id, locations, source));
+    }
+    return map;
+  });
+
+  statsFor = (loc: Location): LocationStats | null =>
+    this.statsById().get(loc.id) ?? null;
+
+  searchForms = new FormGroup({
+    currentLocation: new FormControl<number | null>(null),
+  });
+
+  private filters = toSignal(this.searchForms.valueChanges, {
+    initialValue: this.searchForms.value,
+  });
+
+  readonly locations = computed<Location[]>(() => {
+    const all = this.store.items();
+    const { currentLocation } = this.filters();
+
+    if (currentLocation == null) return getChildren(null, all);
+
+    const found = all.find((l) => l.id === Number(currentLocation));
+    return found ? [found] : [];
+  });
+
   actionLabel = (loc: Location) => {
     const count = getChildren(loc.id, this.store.items()).length;
-    return `${count} locais`;
+    if (count === 0) return 'Ver dispositivos';
+    return count === 1 ? '1 local' : `${count} locais`;
   };
 
-  pageSize = input(8);
+  pageSize = input(1);
   pagination = paginate(this.locations, this.pageSize);
+
+  constructor() {
+    effect(() => {
+      this.filters();
+      this.pagination.pageIndex.set(0);
+    });
+  }
 
   openLocationDialog(location?: Location): void {
     const editingId = location?.id ?? null;
