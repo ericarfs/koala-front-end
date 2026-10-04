@@ -75,6 +75,14 @@
       "ACTIVATE_DARK": "Ativar modo escuro",
       "LIGHT_MODE": "Modo Claro",
       "DARK_MODE": "Modo Escuro"
+    },
+      "FONT_SIZE": {
+      "NORMAL": "normal",
+      "LARGE": "grande",
+      "EXTRA_LARGE": "muito grande",
+      "ARIA_LABEL": "Tamanho da fonte: {{size}}. Clique para alterar",
+      "TITLE": "Tamanho da fonte: {{size}}",
+      "SR_ONLY": "Alterar tamanho da fonte"
     }
   },
 
@@ -96,7 +104,7 @@
     "LIST": {
       "TITLE": "Sensores",
       "SUBTITLE": "Categorias de sensores disponíveis",
-      "EMPTY": "Nenhum sensor cadastrado"
+      "EMPTY": "Nenhum sensor encontrado."
     },
     "ADD": {
       "TITLE": "Novo sensor",
@@ -115,7 +123,7 @@
     "LIST": {
       "TITLE": "Dispositivos",
       "SUBTITLE": "Todos os dispositivos cadastrados",
-      "EMPTY": "Nenhum dispositivo cadastrado"
+      "EMPTY": "Nenhum dispositivo encontrado."
     },
     "ADD": {
       "TITLE": "Novo dispositivo",
@@ -136,7 +144,7 @@
     "LIST": {
       "TITLE": "Ambientes",
       "SUBTITLE": "Espaços físicos monitorados",
-      "EMPTY": "Nenhum ambiente cadastrado"
+      "EMPTY": "Nenhum ambiente encontrado."
     },
     "ADD": {
       "TITLE": "Novo ambiente",
@@ -167,7 +175,7 @@
     "LIST": {
       "TITLE": "Usuários",
       "SUBTITLE": "Lista de usuários cadastrados",
-      "EMPTY": "Nenhum usuário cadastrado"
+      "EMPTY": "Nenhum usuário encontrado."
     },
     "ADD": {
       "TITLE": "Novo usuário",

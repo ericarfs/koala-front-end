@@ -20,7 +20,7 @@ import { TranslateService } from '@ngx-translate/core';
       class="appearance-none bg-transparent text-neutral cursor-pointer
             focus:outline-none focus-visible:ring-2 focus-visible:ring-primary
             rounded w-full h-full text-center text-base leading-none
-            border-0 p-2 m-0"
+            border-0 px-2 py-3 m-0"
       [attr.aria-label]="currentLangName()"
       [attr.title]="currentLangName()"
     >

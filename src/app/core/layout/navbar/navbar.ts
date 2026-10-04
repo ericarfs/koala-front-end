@@ -1,3 +1,4 @@
+import { FontSizeToggleComponent } from './font-size-toggle/font-size-toggle';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
@@ -15,7 +16,7 @@ import { LanguageSelectorComponent } from './language-selector/language-selector
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, NgClass, NavItemComponent, NavGroupComponent, UserMenuComponent, ThemeToggleComponent, LanguageSelectorComponent],
+  imports: [CommonModule, NgClass, NavItemComponent, NavGroupComponent, UserMenuComponent, FontSizeToggleComponent, ThemeToggleComponent, LanguageSelectorComponent],
   templateUrl:'./navbar.html'
 })
 export class NavbarComponent {

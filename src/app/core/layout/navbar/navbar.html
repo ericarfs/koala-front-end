@@ -112,8 +112,9 @@
       }
     </ul>
   </nav>
-  <div class="px-2 flex flex-wrap justify-start gap-2"
+  <div class="px-2 flex flex-wrap justify-start items-center gap-2"
       [class.md:justify-center]="sidebar.collapsed()">
+    <app-font-size-toggle/>
     <app-theme-toggle/>
     <app-language-selector/>
   </div>

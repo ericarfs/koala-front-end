@@ -75,6 +75,14 @@
       "ACTIVATE_DARK": "Activate dark mode",
       "LIGHT_MODE": "Light Mode",
       "DARK_MODE": "Dark Mode"
+    },
+    "FONT_SIZE": {
+      "NORMAL": "normal",
+      "LARGE": "large",
+      "EXTRA_LARGE": "extra large",
+      "ARIA_LABEL": "Font size: {{size}}. Click to change",
+      "TITLE": "Font size: {{size}}",
+      "SR_ONLY": "Change font size"
     }
   },
 
@@ -96,7 +104,7 @@
     "LIST": {
       "TITLE": "Sensors",
       "SUBTITLE": "Available sensor categories",
-      "EMPTY": "No device type registered"
+      "EMPTY": "No device type found."
     },
     "ADD": {
       "TITLE": "New sensor",
@@ -115,7 +123,7 @@
     "LIST": {
       "TITLE": "Devices",
       "SUBTITLE": "All registered devices",
-      "EMPTY": "No device registered"
+      "EMPTY": "No device found."
     },
     "ADD": {
       "TITLE": "New device",
@@ -136,7 +144,7 @@
     "LIST": {
       "TITLE": "Locations",
       "SUBTITLE": "Monitored physical spaces",
-      "EMPTY": "No location registered"
+      "EMPTY": "No location found."
     },
     "ADD": {
       "TITLE": "New location",
@@ -167,7 +175,7 @@
     "LIST": {
       "TITLE": "Users",
       "SUBTITLE": "Registered users list",
-      "EMPTY": "No user registered"
+      "EMPTY": "No user found."
     },
     "ADD": {
       "TITLE": "New user",

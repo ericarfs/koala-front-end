@@ -34,7 +34,7 @@ export const LOCATIONS_MOCK: Location[] = [
   { id: 32, name: 'Cidade Universitária (São Paulo)', parentId: 1 },
 
   // Externo (usado pelos devices 15, 16 e 17)
-  { id: 7,  name: 'Externo', description: 'Dispositivos externos', parentId: null },
+  { id: 7,  name: 'Externo', description: 'Dispositivos externos', parentId: 3 },
 
   // Fora da USP (raízes)
   { id: 38, name: 'Bath',    description: 'Sensores Inglaterra', parentId: null },
