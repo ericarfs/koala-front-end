@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { PERMISSIONS } from '@shared/tokens/permissions';
 
 @Component({
@@ -9,7 +9,7 @@ import { PERMISSIONS } from '@shared/tokens/permissions';
     <header class="flex flex-col gap-1 pb-4 border-b border-outline">
       <div class="flex flex-wrap items-center md:justify-between gap-3">
         <h1 class="text-3xl md:text-4xl font-bold text-default truncate min-w-0">
-              {{ title }}
+              {{ title() }}
         </h1>
 
         @if (permissions.isAdmin()) {
@@ -19,9 +19,9 @@ import { PERMISSIONS } from '@shared/tokens/permissions';
         }
       </div>
 
-      @if (subtitle) {
+      @if (subtitle()) {
         <p class="text-neutral break-all">
-          {{ subtitle }}
+          {{ subtitle() }}
         </p>
       }
     </header>
@@ -33,8 +33,8 @@ import { PERMISSIONS } from '@shared/tokens/permissions';
   },
 })
 export class ContentLayout {
-  @Input() title!: string;
-  @Input() subtitle?: string;
+  title = input<string>();
+  subtitle = input<string>();
 
   protected readonly permissions = inject(PERMISSIONS);
 }

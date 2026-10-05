@@ -1,5 +1,5 @@
 import { MenuItem } from '../../../extensions/extension-registry';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -13,23 +13,23 @@ import { TranslatePipe } from '@ngx-translate/core';
     type="button"
     (click)="toggle()"
     class="relative group flex items-center rounded-md text-default hover:bg-neutral/20 w-full transition"
-    [ngClass]="collapsed ? 'justify-center px-2 py-2' : 'gap-3 px-3 py-2'"
-    [attr.aria-expanded]="expanded"
+    [ngClass]="collapsed() ? 'justify-center px-2 py-2' : 'gap-3 px-3 py-2'"
+    [attr.aria-expanded]="expanded()"
     >
-    <i [ngClass]="icon" class="text-lg w-5 text-center shrink-0"></i>
+    <i [ngClass]="icon()" class="text-lg w-5 text-center shrink-0"></i>
 
-    @if (!collapsed) {
-      <span class="flex-1 text-left whitespace-nowrap">{{ labelKey | translate }}</span>
+    @if (!collapsed()) {
+      <span class="flex-1 text-left whitespace-nowrap">{{ labelKey() | translate }}</span>
       <i
         class="fa-solid fa-chevron-down text-xs transition-transform duration-200"
-        [class.rotate-180]="expanded"
+        [class.rotate-180]="expanded()"
       ></i>
     }
   </button>
 
-  @if (expanded && !collapsed) {
+  @if (expanded() && !collapsed()) {
     <ul class="flex flex-col gap-0.5 mt-1 ml-4">
-      @for (sub of subItems; track sub.id) {
+      @for (sub of subItems(); track sub.id) {
         <li>
           <a
             [routerLink]="sub.routerLink"
@@ -54,13 +54,13 @@ import { TranslatePipe } from '@ngx-translate/core';
   `
 })
 export class NavGroup {
-  @Input({ required: true }) labelKey!: string;
-  @Input({ required: true }) icon!: string;
-  @Input({ required: true }) subItems!: MenuItem[];
-  @Input() expanded = false;
-  @Input() collapsed = false;
+  labelKey = input.required<string>();
+  icon = input.required<string>();
+  subItems = input.required<MenuItem[]>();
+  expanded = input(false);
+  collapsed = input(false);
 
-  @Output() toggled = new EventEmitter<void>();
+  toggled = output<void>();
 
   toggle(): void {
     this.toggled.emit();

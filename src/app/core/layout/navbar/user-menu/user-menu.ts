@@ -1,5 +1,5 @@
 import { AuthService } from '@core/auth/services/auth';
-import { Component, ElementRef, HostListener, Input, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, inject, signal, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 
@@ -17,14 +17,14 @@ import { TranslatePipe } from '@ngx-translate/core';
         <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-semibold shrink-0">
           {{ initial() }}
         </div>
-        @if (!compact) {
+        @if (!compact()) {
           <span class="text-sm font-semibold text-default truncate">{{ auth.user()?.username }}</span>
         }
       </button>
 
       @if (open()) {
         <div class="absolute z-50 bg-container rounded-md border border-outline p-1 min-w-60"
-             [class]="compact ? 'right-0 top-full mt-2' : 'left-0 bottom-full mb-2'">
+             [class]="compact() ? 'right-0 top-full mt-2' : 'left-0 bottom-full mb-2'">
           <a routerLink="/account" (click)="open.set(false)"
              class="block px-3 py-2 text-sm text-default hover:bg-neutral/20 rounded-sm">
             {{ 'USER_MENU.ACCOUNT_SETTINGS' | translate }}
@@ -39,7 +39,7 @@ import { TranslatePipe } from '@ngx-translate/core';
   `,
 })
 export class UserMenu {
-  @Input() compact = false;
+  compact = input(false);
 
   protected readonly auth = inject(AuthService);
   protected readonly open = signal(false);
