@@ -9,12 +9,13 @@ import { NavItem } from './nav-item/nav-item';
 import { NavGroup } from './nav-group/nav-group';
 import { UserMenu } from './user-menu/user-menu';
 import { InterfacePreferences } from '@shared/components/interface-preferences/interface-preferences';
+import { TranslatePipe } from '@ngx-translate/core';
 
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, NgClass, NavItem, NavGroup, UserMenu, InterfacePreferences],
+  imports: [CommonModule, NgClass, NavItem, NavGroup, UserMenu, InterfacePreferences, TranslatePipe],
   templateUrl:'./navbar.html'
 })
 export class Navbar {
