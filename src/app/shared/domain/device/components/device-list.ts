@@ -1,6 +1,6 @@
 import { DeviceCard } from './device-card';
 import { CommonModule } from '@angular/common';
-import { Component, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { combineLatest, map, of, switchMap } from 'rxjs';
 import { Device, DeviceWithTypes } from '@shared/interfaces/device';
@@ -8,6 +8,7 @@ import { Paginator} from '@shared/components/pagination/paginator';
 import { paginate } from '@shared/utils/paginate';
 import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
 import { TranslatePipe } from '@ngx-translate/core';
+import { mediaQuery } from '@shared/utils/media-query';
 
 
 
@@ -21,7 +22,7 @@ import { TranslatePipe } from '@ngx-translate/core';
         {{'DEVICES.LIST.EMPTY' | translate}}
       </p>
     } @else {
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-1">
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-1">
         @for (device of pagination.pagedItems(); track device.id) {
           <app-device-card
             [device]="device"
@@ -69,7 +70,14 @@ export class DeviceList {
   );
 
   pageSize = input(9);
-  pagination = paginate(this.enrichedDevices, this.pageSize);
+  private isMid     = mediaQuery('(max-width: 1279px)');
+
+  effectivePageSize = computed(() => {
+    if (this.isMid()) return Math.min(6, this.pageSize());
+    return this.pageSize();
+  });
+
+  pagination = paginate(this.enrichedDevices, this.effectivePageSize);
 
   resolveLocationName = input<(device: Device) => string | undefined>();
 
