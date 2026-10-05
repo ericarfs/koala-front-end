@@ -8,6 +8,9 @@ export const CORE_ROUTES: Route[] = [
   { path: 'login',
     loadComponent: () => import('./features/login/login').then((m) => m.Login),
     canActivate: [noAuthGuard] },
+  { path: 'guest',
+    loadComponent: () => import('./features/guest/guest').then((m) => m.Guest),
+    canActivate: [noAuthGuard] },
   {
     path: '',
     component: MainLayoutComponent,
