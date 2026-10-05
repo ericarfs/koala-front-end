@@ -1,11 +1,11 @@
-import { ContentLayoutComponent } from './../../../../shared/layouts/content/content';
+import { ContentLayout } from '@shared/layouts/content/content';
 import { Component, computed } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { of } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { DeviceListComponent } from '@shared/domain/device/components/device-list';
-import { InputComponent } from '@shared/components/input/input';
-import { LocationTreeSelectComponent } from '@shared/domain/location/location-tree-select';
+import { DeviceList } from '@shared/domain/device/components/device-list';
+import { Input } from '@shared/components/input/input';
+import { LocationTreeSelect } from '@shared/domain/location/location-tree-select';
 import { DEVICES_MOCK } from '../../../../mocks/devices';
 import { Device } from '@shared/interfaces/device';
 import { getDescendantIds, getPath } from '@shared/domain/location/location-tree';
@@ -17,7 +17,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-devices-list',
   standalone: true,
-  imports: [ReactiveFormsModule, ContentLayoutComponent, DeviceListComponent, InputComponent, LocationTreeSelectComponent, TranslatePipe],
+  imports: [ReactiveFormsModule, ContentLayout, DeviceList, Input, LocationTreeSelect, TranslatePipe],
   styleUrl: './devices-list.css',
   templateUrl: './devices-list.html',
   host: {

@@ -6,7 +6,7 @@ import * as echarts from 'echarts';
 
 export interface ChartSeriesData {
   title: string;
-  values: Array<number | null>;
+  values: (number | null)[];
   dashed?: boolean;
 }
 
@@ -27,7 +27,7 @@ export interface ChartSeriesData {
   </div>
   `,
 })
-export class DeviceChartComponent implements OnDestroy, AfterViewInit {
+export class DeviceChart implements OnDestroy, AfterViewInit {
   private readonly chartEl = viewChild.required<ElementRef<HTMLDivElement>>('chartEl');
 
   readonly deviceSeries = input<ChartSeriesData[]>([]);

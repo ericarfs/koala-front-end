@@ -1,13 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MffService } from '../../services/mff.service';
-import { ContentLayoutComponent } from '@shared/layouts/content/content';
+import { ContentLayout } from '@shared/layouts/content/content';
 
 
 @Component({
-  selector: 'koala-mff-dashboard',
+  selector: 'app-mff-dashboard',
   standalone: true,
-  imports: [CommonModule, ContentLayoutComponent],
+  imports: [CommonModule, ContentLayout],
   template: `
   <app-content-layout
     title="Dashboard"
@@ -16,6 +16,6 @@ import { ContentLayoutComponent } from '@shared/layouts/content/content';
   </app-content-layout>
   `,
 })
-export class MffDashboardComponent {
+export class MffDashboard {
   protected readonly service = inject(MffService);
 }

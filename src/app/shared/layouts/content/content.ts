@@ -32,7 +32,7 @@ import { PERMISSIONS } from '@shared/tokens/permissions';
     class: 'block h-full',
   },
 })
-export class ContentLayoutComponent {
+export class ContentLayout {
   @Input() title!: string;
   @Input() subtitle?: string;
 

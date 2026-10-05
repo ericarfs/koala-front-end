@@ -38,7 +38,7 @@ import { TranslatePipe } from '@ngx-translate/core';
     </div>
   `,
 })
-export class UserMenuComponent {
+export class UserMenu {
   @Input() compact = false;
 
   protected readonly auth = inject(AuthService);

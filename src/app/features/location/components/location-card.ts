@@ -1,17 +1,15 @@
-import { Component, inject, input, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { delay, of } from 'rxjs';
-import { FormDialogService } from '../../../shared/components/form-dialog/form-dialog.service';
-import { Location } from '../../../shared/interfaces/location';
-import { ActionButtonsComponent } from '../../../shared/components/action-buttons/action-buttons';
+import { Location } from '@shared/interfaces/location';
 import { LocationStats } from '@shared/domain/location/location-stats';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
+import { ActionButtons } from '@shared/components/action-buttons/action-buttons';
 
 @Component({
   selector: 'app-location-card',
   standalone: true,
-  imports: [CommonModule, RouterLink, ActionButtonsComponent, TranslatePipe],
+  imports: [CommonModule, RouterLink, ActionButtons, TranslatePipe],
   host: { class: 'contents' },
   template: `
     <a [routerLink]="['/location', location().id]"
@@ -51,7 +49,7 @@ import { CommonModule } from '@angular/common';
                 <span class="text-xs text-neutral">{{ 'LOCATIONS.STATS.DEVICES' | translate }}</span>
               </div>
 
-              @if (s.avgTemperature != null) {
+              @if (s.avgTemperature !== null) {
                 <div class="inline-flex items-center gap-1.5 text-sm font-semibold">
                   <i class="fa-solid fa-temperature-half text-orange-400"></i>
                   {{ s.avgTemperature | number:'1.0-1' }} °C
@@ -101,7 +99,7 @@ import { CommonModule } from '@angular/common';
     </a>
   `,
 })
-export class LocationCardComponent {
+export class LocationCard {
   readonly stats = input<LocationStats | null >(null);
 
   readonly location = input.required<Location>();

@@ -27,7 +27,7 @@ interface FlatNode {
   imports: [CommonModule, TranslatePipe],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
-    useExisting: forwardRef(() => LocationTreeSelectComponent),
+    useExisting: forwardRef(() => LocationTreeSelect),
     multi: true,
   }],
   template: `
@@ -103,7 +103,7 @@ interface FlatNode {
     </div>
   `,
 })
-export class LocationTreeSelectComponent implements ControlValueAccessor {
+export class LocationTreeSelect implements ControlValueAccessor {
   private readonly el = inject(ElementRef<HTMLElement>);
 
   readonly open = signal(false);

@@ -2,9 +2,9 @@ import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
-import { ContentLayoutComponent } from '@shared/layouts/content/content';
-import { InputComponent } from '@shared/components/input/input';
-import { InputPasswordComponent } from '@shared/components/input/input-password';
+import { ContentLayout } from '@shared/layouts/content/content';
+import { Input } from '@shared/components/input/input';
+import { InputPassword } from '@shared/components/input/input-password';
 import { TranslatePipe } from '@ngx-translate/core';
 
 
@@ -20,7 +20,7 @@ interface PasswordForm {
 }
 
 @Component({
-  imports: [ReactiveFormsModule, ContentLayoutComponent, InputComponent, InputPasswordComponent, TranslatePipe],
+  imports: [ReactiveFormsModule, ContentLayout, Input, InputPassword, TranslatePipe],
   selector: 'app-account',
   styleUrl: './account.css',
   templateUrl: './account.html',

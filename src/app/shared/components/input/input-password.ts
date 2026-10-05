@@ -1,11 +1,11 @@
-import { InputComponent } from './input';
+import { Input } from './input';
 import { Component, input, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-input-password',
   standalone: true,
-  imports: [ReactiveFormsModule, InputComponent],
+  imports: [ReactiveFormsModule, Input],
   template: `
     <app-input
       [formControl]="control()"
@@ -30,7 +30,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
     </app-input>
   `,
 })
-export class InputPasswordComponent {
+export class InputPassword {
   // 👇 Recebe o FormControl direto
   control = input.required<FormControl>();
   label = input.required<string>();

@@ -1,26 +1,25 @@
 import { Component, computed, effect, inject, input } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { delay, of, tap } from 'rxjs';
-import { ContentLayoutComponent } from '@shared/layouts/content/content';
-import { LocationCardComponent } from '../../components/location-card';
-import { PaginatorComponent } from '@shared/components/pagination/paginator';
+import { LocationCard } from '@features/location/components/location-card';
+import { ContentLayout } from '@shared/layouts/content/content';
+import { Paginator } from '@shared/components/pagination/paginator';
 import { FormDialogService } from '@shared/components/form-dialog/form-dialog.service';
 import { LocationStore } from '@shared/domain/location/location-store';
 import { getChildren } from '@shared/domain/location/location-tree';
 import { paginate } from '@shared/utils/paginate';
 import { Location } from '@shared/interfaces/location';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { LocationTreeSelectComponent } from '@shared/domain/location/location-tree-select';
+import { TranslatePipe } from '@ngx-translate/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DEVICES_MOCK } from '../../../../mocks/devices';
 import { DEVICE_MAPPINGS_MOCK } from '../../../../mocks/device-mapping';
 import { DEVICE_TYPES_MOCK } from '../../../../mocks/device-types';
 import { getLocationStats, LocationStats } from '@shared/domain/location/location-stats';
+import { LocationTreeSelect } from '@shared/domain/location/location-tree-select';
 
 
 @Component({
-  imports: [ReactiveFormsModule, ContentLayoutComponent, LocationCardComponent, PaginatorComponent, LocationTreeSelectComponent, TranslatePipe],
+  imports: [ReactiveFormsModule, ContentLayout, LocationCard, Paginator, LocationTreeSelect, TranslatePipe],
   selector: 'app-location-list',
   styleUrl: './location-list.css',
   templateUrl: './location-list.html',

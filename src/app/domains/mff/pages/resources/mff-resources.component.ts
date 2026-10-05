@@ -1,12 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MffService } from '../../services/mff.service';
-import { ContentLayoutComponent } from '@shared/layouts/content/content';
+import { ContentLayout } from '@shared/layouts/content/content';
 
 @Component({
-  selector: 'koala-mff-resources',
+  selector: 'app-mff-resources',
   standalone: true,
-  imports: [CommonModule, ContentLayoutComponent],
+  imports: [CommonModule, ContentLayout],
   template: `
   <app-content-layout
     title="Recursos"
@@ -14,7 +14,7 @@ import { ContentLayoutComponent } from '@shared/layouts/content/content';
   </app-content-layout>
   `,
 })
-export class MffResourcesComponent {
+export class MffResources {
   private readonly svc = inject(MffService);
   protected readonly resources = this.svc.resources;
 }

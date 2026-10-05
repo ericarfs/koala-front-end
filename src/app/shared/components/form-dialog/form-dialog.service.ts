@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Dialog } from '@angular/cdk/dialog';
 import { Overlay } from '@angular/cdk/overlay';
 import { FormDialogData } from './entity-form-dialog/entity-form-dialog.types';
-import { FormDialogComponent } from './entity-form-dialog/entity-form-dialog';
+import { FormDialog } from './entity-form-dialog/entity-form-dialog';
 
 @Injectable({ providedIn: 'root' })
 export class FormDialogService {
@@ -10,8 +10,8 @@ export class FormDialogService {
   private readonly overlay = inject(Overlay);
 
   open<T = unknown>(data: FormDialogData<T>) {
-  return this.dialog.open<FormDialogComponent, FormDialogData<T>>(
-    FormDialogComponent,
+  return this.dialog.open<FormDialog, FormDialogData<T>>(
+    FormDialog,
       {
         width: '480px',
         maxWidth: '90vw',

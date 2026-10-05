@@ -4,8 +4,8 @@ import { ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { delay, forkJoin, map, of } from 'rxjs';
-import { ContentLayoutComponent } from '@shared/layouts/content/content';
-import { ChartSeriesData, DeviceChartComponent } from '@shared/domain/device/components/device-chart';
+import { ContentLayout } from '@shared/layouts/content/content';
+import { ChartSeriesData, DeviceChart } from '@shared/domain/device/components/device-chart';
 import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
 import { DashboardFilterInterface, DashboardResponseInterface, DashboardService } from '@shared/domain/device/services/device-metrics';
 import { DeviceWithTypes } from '@shared/interfaces/device';
@@ -20,7 +20,7 @@ import { getPath } from '@shared/domain/location/location-tree';
 @Component({
   selector: 'app-device-details',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ContentLayoutComponent, DeviceChartComponent, TranslatePipe],
+  imports: [CommonModule, ReactiveFormsModule, ContentLayout, DeviceChart, TranslatePipe],
   templateUrl: './device-details.html',
 })
 export class DeviceDetails {
@@ -30,7 +30,7 @@ export class DeviceDetails {
   private readonly dashboardService = inject(DashboardService);
   private readonly pdfService = inject(PdfExportService);
 
-  readonly charts = viewChildren(DeviceChartComponent);
+  readonly charts = viewChildren(DeviceChart);
 
   private readonly id = toSignal(
     this.route.paramMap.pipe(map(p => Number(p.get('id')))),

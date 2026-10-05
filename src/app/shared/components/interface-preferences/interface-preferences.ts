@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
-import { FontSizeToggleComponent } from './font-size-toggle/font-size-toggle';
-import { LanguageSelectorComponent } from './language-selector/language-selector';
-import { ThemeToggleComponent } from './theme-toggle/theme-toggle';
+import { FontSizeToggle } from './font-size-toggle/font-size-toggle';
+import { LanguageSelector } from './language-selector/language-selector';
+import { ThemeToggle } from './theme-toggle/theme-toggle';
+
 
 @Component({
-  imports: [FontSizeToggleComponent, LanguageSelectorComponent, ThemeToggleComponent],
+  imports: [FontSizeToggle, LanguageSelector, ThemeToggle],
   selector: 'app-interface-preferences',
   template:`
     <div class="px-2 flex flex-wrap justify-start items-center gap-2">

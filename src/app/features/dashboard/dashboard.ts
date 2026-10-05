@@ -1,17 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal, viewChildren } from '@angular/core';
+import { Component, inject, signal, viewChildren } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ChartSeriesData, DeviceChartComponent } from '@shared/domain/device/components/device-chart';
+import { ChartSeriesData, DeviceChart } from '@shared/domain/device/components/device-chart';
 import { getDescendantIds, getPath } from '@shared/domain/location/location-tree';
-import { LocationTreeSelectComponent } from '@shared/domain/location/location-tree-select';
+import { LocationTreeSelect } from '@shared/domain/location/location-tree-select';
 import { Device } from '@shared/interfaces/device';
-import { ContentLayoutComponent } from '@shared/layouts/content/content';
+import { ContentLayout } from '@shared/layouts/content/content';
 import { DEVICE_TYPES_MOCK } from '../../mocks/device-types';
 import { DEVICES_MOCK } from '../../mocks/devices';
 import { LOCATIONS_MOCK } from '../../mocks/locations';
 import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
 import { DashboardFilterInterface, DashboardService } from '@shared/domain/device/services/device-metrics';
-import { forkJoin, map, of, switchMap } from 'rxjs';
+import { forkJoin, map } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ChartExportItem, PdfExportService } from '@shared/services/pdf-export';
 
@@ -20,7 +20,7 @@ import { ChartExportItem, PdfExportService } from '@shared/services/pdf-export';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ContentLayoutComponent, DeviceChartComponent, LocationTreeSelectComponent, TranslatePipe],
+  imports: [CommonModule, ReactiveFormsModule, ContentLayout, DeviceChart, LocationTreeSelect, TranslatePipe],
   templateUrl: './dashboard.html',
 })
 export class Dashboard {
@@ -28,7 +28,7 @@ export class Dashboard {
   private readonly dashboardService = inject(DashboardService);
   private readonly pdfService = inject(PdfExportService);
 
-  readonly charts = viewChildren(DeviceChartComponent);
+  readonly charts = viewChildren(DeviceChart);
 
   readonly locationName = signal('');
   readonly chartTitle = signal('');

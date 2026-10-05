@@ -3,13 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { delay, of, tap } from 'rxjs';
 import { DeviceType } from '../../shared/interfaces/device-type';
 import { DEVICE_TYPES_MOCK } from '../../mocks/device-types';
-import { ActionButtonsComponent } from '@shared/components/action-buttons/action-buttons';
+import { ActionButtons } from '@shared/components/action-buttons/action-buttons';
 import { FormDialogService } from '@shared/components/form-dialog/form-dialog.service';
-import { ContentLayoutComponent } from '@shared/layouts/content/content';
+import { ContentLayout } from '@shared/layouts/content/content';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
-  imports: [ContentLayoutComponent, ActionButtonsComponent, TranslatePipe],
+  imports: [ContentLayout, ActionButtons, TranslatePipe],
   selector: 'app-device-type',
   styleUrl: './device-types.css',
   templateUrl: './device-types.html',

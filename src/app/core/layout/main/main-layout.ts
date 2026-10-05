@@ -1,4 +1,4 @@
-import { NavbarComponent } from '../navbar/navbar';
+import { Navbar } from '../navbar/navbar';
 import { Component, computed, inject } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
@@ -10,7 +10,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, NgClass, TranslatePipe],
+  imports: [RouterOutlet, Navbar, NgClass, TranslatePipe],
   template: `
     <div class="flex h-screen w-full max-w-[2560px] mx-auto overflow-hidden">
       <app-navbar></app-navbar>
@@ -30,7 +30,7 @@ import { TranslatePipe } from '@ngx-translate/core';
     </div>
   `,
 })
-export class MainLayoutComponent {
+export class MainLayout {
   private readonly router = inject(Router);
   private readonly menuItems = inject(ExtensionRegistryService).getMenuItems();
 

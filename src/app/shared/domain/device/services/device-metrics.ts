@@ -28,7 +28,7 @@ interface MockProfile {
 
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
-  url: string = `${environment.apiUrl}datastream`;
+  url = `${environment.apiUrl}datastream`;
 
   // 👇 Chave: quando o backend real existir, vire para false
   private readonly USE_MOCK = true;
@@ -47,18 +47,18 @@ export class DashboardService {
 
   constructor(private http: HttpClient) {}
 
-  filter(filter: DashboardFilterInterface): Observable<Array<DashboardResponseInterface>> {
+  filter(filter: DashboardFilterInterface): Observable<DashboardResponseInterface[]> {
     if (this.USE_MOCK) {
       return this.mockFilter(filter);
     }
-    return this.http.post<Array<DashboardResponseInterface>>(`${this.url}/filter`, filter);
+    return this.http.post<DashboardResponseInterface[]>(`${this.url}/filter`, filter);
   }
 
   // ==========================================================================
   // MOCK
   // ==========================================================================
 
-  private mockFilter(filter: DashboardFilterInterface): Observable<Array<DashboardResponseInterface>> {
+  private mockFilter(filter: DashboardFilterInterface): Observable<DashboardResponseInterface[]> {
     const profile = this.profiles[filter.idDeviceType] ?? { base: 20, variance: 5 };
 
     const end = filter.endDate ?? new Date();

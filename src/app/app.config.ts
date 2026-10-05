@@ -4,7 +4,7 @@ import { provideRouter, Router } from '@angular/router';
 import { CORE_ROUTES } from './app.routes';
 import { provideHttpClient, withInterceptors,  } from '@angular/common/http';
 import { ExtensionRegistryService } from './core/extensions/extension-registry';
-import { MainLayoutComponent } from './core/layout/main/main-layout';
+import { MainLayout } from './core/layout/main/main-layout';
 import { provideKoalaModule } from './core/extensions/koala-module-extensions.token';
 import { mffModuleDefinition } from './domains/mff/mff.module-definition';
 import { AuthService } from './core/auth/services/auth';
@@ -33,7 +33,7 @@ export const appConfig: ApplicationConfig = {
       const router = inject(Router);
       const registry = inject(ExtensionRegistryService);
 
-      const mainLayoutRoute = CORE_ROUTES.find((r) => r.component === MainLayoutComponent);
+      const mainLayoutRoute = CORE_ROUTES.find((r) => r.component === MainLayout);
 
       if (mainLayoutRoute && mainLayoutRoute.children) {
         mainLayoutRoute.children = [

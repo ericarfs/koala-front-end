@@ -100,7 +100,7 @@ import { finalize } from 'rxjs';
     </div>
   `,
 })
-export class ControlDialogComponent {
+export class ControlDialog {
   private readonly dialogRef = inject<DialogRef<ControlResult>>(DialogRef);
   protected readonly data = inject<ControlData>(DIALOG_DATA);
 

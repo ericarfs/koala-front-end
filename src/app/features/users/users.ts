@@ -1,9 +1,9 @@
 import { Component, inject, input, signal } from '@angular/core';
-import { ActionButtonsComponent } from '@shared/components/action-buttons/action-buttons';
+import { ActionButtons } from '@shared/components/action-buttons/action-buttons';
 import { FormDialogService } from '@shared/components/form-dialog/form-dialog.service';
-import { PaginatorComponent } from '@shared/components/pagination/paginator';
+import { Paginator } from '@shared/components/pagination/paginator';
 import { UserBasic } from '@shared/interfaces/user';
-import { ContentLayoutComponent } from '@shared/layouts/content/content';
+import { ContentLayout } from '@shared/layouts/content/content';
 import { USERS_MOCK } from '../../mocks/users';
 import { paginate } from '@shared/utils/paginate';
 import { delay, of, tap } from 'rxjs';
@@ -11,7 +11,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 
 @Component({
-  imports: [ContentLayoutComponent, ActionButtonsComponent, PaginatorComponent, TranslatePipe],
+  imports: [ContentLayout, ActionButtons, Paginator, TranslatePipe],
   selector: 'app-users',
   styleUrl: './users.css',
   templateUrl: './users.html',

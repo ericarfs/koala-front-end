@@ -4,15 +4,15 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { delay, map, of } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getActionLabel, getAncestors, getChildren } from '../../../../shared/domain/location/location-tree';
-import { ContentLayoutComponent } from '@shared/layouts/content/content';
-import { DeviceListComponent } from '@shared/domain/device/components/device-list';
-import { LocationCardComponent } from '../../components/location-card';
+import { ContentLayout } from '@shared/layouts/content/content';
+import { DeviceList } from '@shared/domain/device/components/device-list';
+import { LocationCard } from '@features/location/components/location-card';
 import { LocationStore } from '@shared/domain/location/location-store';
 import { FormDialogService } from '@shared/components/form-dialog/form-dialog.service';
 import { DEVICES_MOCK } from '../../../../mocks/devices';
 import { Location } from '@shared/interfaces/location';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { PaginatorComponent } from '@shared/components/pagination/paginator';
+import { Paginator} from '@shared/components/pagination/paginator';
 import { paginate } from '@shared/utils/paginate';
 import { getLocationStats, LocationStats } from '@shared/domain/location/location-stats';
 import { DEVICE_MAPPINGS_MOCK } from '../../../../mocks/device-mapping';
@@ -24,7 +24,7 @@ import { mediaQuery } from '@shared/utils/media-query';
 @Component({
   selector: 'app-location-details',
   standalone: true,
-  imports: [CommonModule, RouterLink, ContentLayoutComponent, DeviceListComponent, LocationCardComponent, PaginatorComponent, TranslatePipe],
+  imports: [CommonModule, RouterLink, ContentLayout, DeviceList, LocationCard, Paginator, TranslatePipe],
   templateUrl: './location-details.html',
   host: {
     class: 'block flex-1',

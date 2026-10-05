@@ -38,7 +38,7 @@ import { TranslateService } from '@ngx-translate/core';
   </div>
   `
 })
-export class LanguageSelectorComponent {
+export class LanguageSelector {
   collapsed = localStorage.getItem('sidebar-collapsed') === 'true';
 
   public readonly availableLangs = ['en', 'pt'];

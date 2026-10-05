@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ActionButtonsComponent } from '../../../components/action-buttons/action-buttons';
+import { ActionButtons } from '@shared/components/action-buttons/action-buttons';
 import { DeviceWithTypes } from '@shared/interfaces/device';
 
 @Component({
   selector: 'app-device-card',
   standalone: true,
-  imports: [CommonModule, RouterLink, ActionButtonsComponent],
+  imports: [CommonModule, RouterLink, ActionButtons],
   template: `
     <a [routerLink]="['/devices', device.id]"
       class="flex flex-col gap-3 p-4 bg-container border border-outline rounded-sm cursor-pointer hover:border-primary transition-colors">
@@ -62,7 +62,7 @@ import { DeviceWithTypes } from '@shared/interfaces/device';
   `,
   host: { class: 'contents' },
 })
-export class DeviceCardComponent {
+export class DeviceCard {
   @Input({ required: true }) device!: DeviceWithTypes;
   @Input() locationName?: string;
 }

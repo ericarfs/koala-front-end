@@ -9,14 +9,14 @@ export const MFF_ROUTES: Routes = [
         path: 'dashboard',
         loadComponent: () =>
           import('./pages/dashboard/mff-dashboard.component').then(
-            (m) => m.MffDashboardComponent
+            (m) => m.MffDashboard
           ),
       },
       {
         path: 'resources',
         loadComponent: () =>
           import('./pages/resources/mff-resources.component').then(
-            (m) => m.MffResourcesComponent
+            (m) => m.MffResources
           ),
       },
     ],

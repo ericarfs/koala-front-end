@@ -1,4 +1,3 @@
-// paginator.component.ts
 import { Component, input, model } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 
@@ -38,7 +37,7 @@ import { TranslatePipe } from '@ngx-translate/core';
     class: 'contents',
   }
 })
-export class PaginatorComponent {
+export class Paginator {
   pageIndex = model.required<number>();
   totalPages = input.required<number>();
 }

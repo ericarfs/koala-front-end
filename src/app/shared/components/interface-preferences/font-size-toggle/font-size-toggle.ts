@@ -27,7 +27,7 @@ const STORAGE_KEY = 'font-scale';
     </button>
   `,
 })
-export class FontSizeToggleComponent implements OnInit {
+export class FontSizeToggle implements OnInit {
   labelKeys = LABEL_KEYS;
   index = 0;
 

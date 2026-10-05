@@ -1,10 +1,10 @@
-import { DeviceCardComponent } from './device-card';
+import { DeviceCard } from './device-card';
 import { CommonModule } from '@angular/common';
 import { Component, inject, input } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { combineLatest, map, of, switchMap } from 'rxjs';
 import { Device, DeviceWithTypes } from '@shared/interfaces/device';
-import { PaginatorComponent } from '@shared/components/pagination/paginator';
+import { Paginator} from '@shared/components/pagination/paginator';
 import { paginate } from '@shared/utils/paginate';
 import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -14,7 +14,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-device-list',
   standalone: true,
-  imports: [CommonModule, DeviceCardComponent, PaginatorComponent, TranslatePipe],
+  imports: [CommonModule, DeviceCard, Paginator, TranslatePipe],
   template: `
     @if (devices().length === 0) {
       <p class="text-neutral text-lg">
@@ -40,7 +40,7 @@ import { TranslatePipe } from '@ngx-translate/core';
     class: 'contents',
   },
 })
-export class DeviceListComponent {
+export class DeviceList {
   private readonly mappingService = inject(DeviceMappingService);
 
   devices = input.required<Device[]>();

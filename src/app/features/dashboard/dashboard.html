@@ -5,14 +5,14 @@
     <form [formGroup]="filterForm" class="flex flex-col gap-4 bg-container border border-outline rounded-md p-4 break-all">
       <div class="flex flex-wrap gap-4">
         <div class="flex flex-col gap-1 w-full lg:w-auto md:min-w-75">
-          <label class="text-sm text-neutral font-medium mb-1.5">
+          <label for="location" class="text-sm text-neutral font-medium mb-1.5">
             {{'MONITORING.FILTERS.LOCATION' | translate}}
           </label>
           <app-location-tree-select formControlName="location"></app-location-tree-select>
         </div>
 
         <div class="flex flex-col gap-1 w-full lg:max-w-140">
-          <label class="text-sm text-neutral font-medium mb-1.5">
+          <label for="timeBucket" class="text-sm text-neutral font-medium mb-1.5">
             {{'MONITORING.FILTERS.INTERVAL' | translate}}
           </label>
           <div class="flex flex-wrap border border-outline rounded-md min-h-10 overflow-hidden">
@@ -32,14 +32,14 @@
 
         <div class="flex flex-wrap gap-2 max-w-full ">
           <div class="flex flex-col gap-1 max-w-full">
-            <label class="text-sm text-medium text-neutral mb-1">
+            <label for="fromDate" class="text-sm text-medium text-neutral mb-1">
               {{'MONITORING.DATE_RANGE.FROM' | translate}}
             </label>
             <input type="date" class="border border-outline rounded-md px-3 py-2 bg-container text-default" formControlName="fromDate">
           </div>
 
           <div class="flex flex-col gap-1 max-w-full">
-            <label class="text-sm text-neutral text-medium mb-1">
+            <label for="toDate" class="text-sm text-neutral text-medium mb-1">
               {{'MONITORING.DATE_RANGE.TO' | translate}}
             </label>
             <input type="date" class="border border-outline rounded-md px-3 py-2 bg-container text-default" formControlName="toDate">

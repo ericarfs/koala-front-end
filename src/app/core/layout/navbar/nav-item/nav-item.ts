@@ -23,7 +23,7 @@ import { TranslatePipe } from '@ngx-translate/core';
   </a>
   `
 })
-export class NavItemComponent {
+export class NavItem {
   @Input({ required: true }) route!: string;
   @Input({ required: true }) label!: string;
   @Input({ required: true }) icon!: string;

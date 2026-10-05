@@ -23,7 +23,7 @@ import { TranslatePipe } from '@ngx-translate/core';
     </button>
   `
 })
-export class ThemeToggleComponent implements OnInit {
+export class ThemeToggle implements OnInit {
   isDark = false;
 
   // Guardamos a query de escuta do sistema operacional

@@ -5,19 +5,19 @@ import { filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ExtensionRegistryService } from '@core/extensions/extension-registry';
 import { SidebarStateService } from '@core/services/sidebar-state';
-import { NavItemComponent } from './nav-item/nav-item';
-import { NavGroupComponent } from './nav-group/nav-group';
-import { UserMenuComponent } from './user-menu/user-menu';
+import { NavItem } from './nav-item/nav-item';
+import { NavGroup } from './nav-group/nav-group';
+import { UserMenu } from './user-menu/user-menu';
 import { InterfacePreferences } from '@shared/components/interface-preferences/interface-preferences';
 
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, NgClass, NavItemComponent, NavGroupComponent, UserMenuComponent, InterfacePreferences],
+  imports: [CommonModule, NgClass, NavItem, NavGroup, UserMenu, InterfacePreferences],
   templateUrl:'./navbar.html'
 })
-export class NavbarComponent {
+export class Navbar {
   private readonly registry = inject(ExtensionRegistryService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
@@ -38,7 +38,7 @@ export class NavbarComponent {
     .subscribe((e) => {
       const url = e.urlAfterRedirects;
 
-      type Flat = { label: string; routerLink: string; groupId?: string };
+      interface Flat { label: string; routerLink: string; groupId?: string };
       const flat: Flat[] = [];
 
       for (const item of this.menuItems) {

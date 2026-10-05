@@ -1,6 +1,6 @@
 import { Route } from '@angular/router';
 import { authGuard, noAuthGuard } from './core/auth/guards/auth.guards';
-import { MainLayoutComponent } from './core/layout/main/main-layout';
+import { MainLayout } from './core/layout/main/main-layout';
 import { adminGuard } from './core/auth/guards/admin.guard';
 
 export const CORE_ROUTES: Route[] = [
@@ -13,7 +13,7 @@ export const CORE_ROUTES: Route[] = [
     canActivate: [noAuthGuard] },
   {
     path: '',
-    component: MainLayoutComponent,
+    component: MainLayout,
     canActivate: [authGuard],
     children: [
       { path: 'dashboard',

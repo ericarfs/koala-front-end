@@ -1,10 +1,9 @@
 import { Component, inject, signal, viewChildren } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { InterfacePreferences } from '@shared/components/interface-preferences/interface-preferences';
-import { ChartSeriesData, DeviceChartComponent } from '@shared/domain/device/components/device-chart';
-import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
+import { ChartSeriesData, DeviceChart } from '@shared/domain/device/components/device-chart';
 import { DashboardFilterInterface, DashboardService } from '@shared/domain/device/services/device-metrics';
-import { ContentLayoutComponent } from '@shared/layouts/content/content';
+import { ContentLayout } from '@shared/layouts/content/content';
 import { ChartExportItem, PdfExportService } from '@shared/services/pdf-export';
 import { DEVICE_TYPES_MOCK } from '../../mocks/device-types';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -13,10 +12,10 @@ import { LOCATIONS_MOCK } from '../../mocks/locations';
 import { forkJoin } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
-import { LocationTreeSelectComponent } from '@shared/domain/location/location-tree-select';
+import { LocationTreeSelect } from '@shared/domain/location/location-tree-select';
 
 @Component({
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, ContentLayoutComponent, DeviceChartComponent, LocationTreeSelectComponent, InterfacePreferences ,TranslatePipe],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, ContentLayout, DeviceChart, LocationTreeSelect, InterfacePreferences ,TranslatePipe],
   selector: 'app-guest',
   styleUrl: './guest.css',
   templateUrl: './guest.html',
@@ -25,7 +24,7 @@ export class Guest {
   private readonly dashboardService = inject(DashboardService);
   private readonly pdfService = inject(PdfExportService);
 
-  readonly charts = viewChildren(DeviceChartComponent);
+  readonly charts = viewChildren(DeviceChart);
 
   readonly locationName = signal('');
   readonly chartTitle = signal('');

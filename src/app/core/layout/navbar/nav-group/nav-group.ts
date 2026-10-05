@@ -53,7 +53,7 @@ import { TranslatePipe } from '@ngx-translate/core';
   }
   `
 })
-export class NavGroupComponent {
+export class NavGroup {
   @Input({ required: true }) labelKey!: string;
   @Input({ required: true }) icon!: string;
   @Input({ required: true }) subItems!: MenuItem[];

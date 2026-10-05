@@ -1,17 +1,16 @@
-import { InputComponent } from '../../input/input';
 import { FormDialogData } from './entity-form-dialog.types';
-// form-dialog.component.ts
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
-import { Observable, finalize } from 'rxjs';
+import { finalize } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
+import { Input } from '@shared/components/input/input';
 
 
 @Component({
   selector: 'app-form-dialog',
   standalone: true,
-  imports: [FormsModule, InputComponent, TranslatePipe],
+  imports: [FormsModule, Input, TranslatePipe],
   template: `
   <div class="bg-container border-2 border-outline rounded-md shadow-xl w-full max-w-md
               max-h-[90vh] gap-4 flex flex-col overflow-hidden">
@@ -62,7 +61,7 @@ import { TranslatePipe } from '@ngx-translate/core';
   </div>
 `,
 })
-export class FormDialogComponent {
+export class FormDialog {
   private readonly dialogRef = inject<DialogRef<void>>(DialogRef);
   protected readonly data = inject<FormDialogData>(DIALOG_DATA);
 
