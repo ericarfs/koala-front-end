@@ -60,7 +60,8 @@
       "LOADING": "Loading...",
       "SENDING": "Sending...",
       "SEARCHING": "Searching...",
-      "EMPTY": "No items found"
+      "EMPTY": "No items found",
+      "ERROR":"Could not load the data. Please try again."
     },
     "VALIDATION": {
       "REQUIRED": "This field is required"

@@ -14,6 +14,10 @@ import { PERMISSIONS } from './shared/tokens/permissions';
 import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 
+import { environment } from '../environments/environment';
+import { MetricsService } from '@shared/domain/monitoring/services/metrics';
+import { MockMetricsService } from '@shared/domain/monitoring/services/metrics.mock';
+
 export const appConfig: ApplicationConfig = {
   providers: [
     { provide: PERMISSIONS, useExisting: AuthService },
@@ -45,5 +49,8 @@ export const appConfig: ApplicationConfig = {
 
       router.resetConfig([...CORE_ROUTES]);
     }),
+    (environment.useMock
+      ? [{ provide: MetricsService, useClass: MockMetricsService }]
+      : []),
   ]
 };

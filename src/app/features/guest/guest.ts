@@ -1,155 +1,59 @@
-import { Component, inject, signal, viewChildren } from '@angular/core';
+
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { InterfacePreferences } from '@shared/components/interface-preferences/interface-preferences';
-import { ChartSeriesData, DeviceChart } from '@shared/domain/device/components/device-chart';
-import { DashboardFilterInterface, DashboardService } from '@shared/domain/device/services/device-metrics';
 import { ContentLayout } from '@shared/layouts/content/content';
-import { ChartExportItem, PdfExportService } from '@shared/services/pdf-export';
 import { DEVICE_TYPES_MOCK } from '../../mocks/device-types';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { getPath } from '@shared/domain/location/location-tree';
 import { LOCATIONS_MOCK } from '../../mocks/locations';
-import { forkJoin } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import { LocationTreeSelect } from '@shared/domain/location/location-tree-select';
+import { ChartDataStore } from '@shared/domain/monitoring/stores/chart-data-store';
+import { ChartPanel } from '@shared/domain/monitoring/components/chart-panel';
+import { ChipSelect } from '@shared/domain/monitoring/components/chip-select';
+import { DEFAULT_TIME_BUCKET, TIME_BUCKET_OPTIONS, TimeBucket } from '@shared/domain/monitoring/models/time-bucket';
 
 @Component({
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, ContentLayout, DeviceChart, LocationTreeSelect, InterfacePreferences ,TranslatePipe],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, ContentLayout, LocationTreeSelect, InterfacePreferences ,TranslatePipe, ChartPanel, ChipSelect],
+  providers: [ChartDataStore],
   selector: 'app-guest',
   styleUrl: './guest.css',
   templateUrl: './guest.html',
 })
 export class Guest {
-  private readonly dashboardService = inject(DashboardService);
-  private readonly pdfService = inject(PdfExportService);
+  readonly store = inject(ChartDataStore);
 
-  readonly charts = viewChildren(DeviceChart);
+  readonly deviceTypeOptions = DEVICE_TYPES_MOCK;
+  readonly intervalOptions = TIME_BUCKET_OPTIONS;
 
-  readonly locationName = signal('');
-  readonly chartTitle = signal('');
-  readonly chartSubtitle = signal('');
-  readonly loading = signal(false);
-
-  deviceTypeOptions = DEVICE_TYPES_MOCK;
-
-  // ---------- Form ----------
-  filterForm = new FormGroup({
+  readonly filterForm = new FormGroup({
     location: new FormControl<number | null>(null, Validators.required),
-    timeBucket: new FormControl('5 minutes', { nonNullable: true, validators: Validators.required }),
+    timeBucket: new FormControl<TimeBucket>(DEFAULT_TIME_BUCKET, {
+      nonNullable: true,
+      validators: Validators.required,
+    }),
   });
 
-  selectedTypes = signal<number[]>([]);
+  readonly selectedTypes = signal<number[]>([]);
+  readonly chartTitle = signal('');
+  readonly chartSubtitle = signal('');
 
-  intervalOptions = [
-    { id: '30 seconds', text: '30s' },
-    { id: '1 minute', text: '1min' },
-    { id: '5 minutes', text: '5min' },
-    { id: '15 minutes', text: '15min' },
-    { id: '30 minutes', text: '30min' },
-    { id: '1 hour', text: '1h' },
-    { id: '2 hours', text: '2h' },
-  ];
+  search(): void {
+    const { location, timeBucket } = this.filterForm.getRawValue();
+    const types = this.selectedTypes().map(id => ({ id, name: this.typeName(id) }));
+    if (location == null || types.length === 0 || this.filterForm.invalid) return;
 
+    // Textos do cabeçalho do gráfico (não dependem da resposta da API)
+    this.chartTitle.set(getPath(location, LOCATIONS_MOCK));
+    this.chartSubtitle.set(types.map(t => t.name).join(' × '));
 
-  isTypeSelected(id: number): boolean {
-    return this.selectedTypes().includes(id);
+    // O store decide quantas consultas fazer e monta as séries
+    this.store.load({ base: { idEnviroment: location, timeBucket }, types });
   }
-
-  toggleType(id: number): void {
-    this.selectedTypes.update(list => {
-      if (list.includes(id)) return list.filter(t => t !== id);
-      if (list.length >= 2) return list;
-      return [...list, id];
-    });
-  }
-
-  setTimeBucket(value: string): void {
-    this.filterForm.patchValue({ timeBucket: value });
-  }
-
-  // ---------- Gráfico ----------
-  fields = signal<Date[]>([]);
-  primaryValues = signal<ChartSeriesData>({ title: '', values: [] });
-  secondaryValues = signal<ChartSeriesData>({ title: '', values: [] });
-  deviceSeries = signal<ChartSeriesData[]>([]);
 
   private typeName(id: number): string {
     return DEVICE_TYPES_MOCK.find(t => t.id === id)?.name ?? '';
-  }
-
-  search(): void {
-    const { location, timeBucket} = this.filterForm.getRawValue();
-    const types = this.selectedTypes();
-    if (location == null || types.length === 0 || this.filterForm.invalid) return;
-
-    this.loading.set(true);
-
-    const locationId = this.filterForm.value.location;
-    if (!locationId) return;
-
-    const locName = getPath(locationId, LOCATIONS_MOCK)
-
-    this.locationName.set(locName);
-
-    const baseFilter = {
-      idEnviroment: location,
-      timeBucket,
-    };
-
-    this.chartTitle.set(locName);
-
-    // Regra 1: dois tipos de sensor
-    if (types.length > 1) {
-      const req1 = this.dashboardService.filter({ ...baseFilter, idDeviceType: types[0], idDevice: null } as DashboardFilterInterface);
-      const req2 = this.dashboardService.filter({ ...baseFilter, idDeviceType: types[1], idDevice: null } as DashboardFilterInterface);
-
-      this.chartSubtitle.set(`${this.typeName(types[0])} × ${this.typeName(types[1])}`);
-
-      forkJoin([req1, req2]).subscribe(([r1, r2]) => {
-        this.fields.set(r1.map(v => v.time_interval));
-        this.primaryValues.set({ title: this.typeName(types[0]), values: r1.map(v => v.avg_value) });
-        this.secondaryValues.set({ title: this.typeName(types[1]), values: r2.map(v => v.avg_value) });
-        this.deviceSeries.set([]);
-        this.loading.set(false);
-      });
-      return;
-    }
-
-    this.chartSubtitle.set(this.typeName(types[0]));
-    // Regra 2: um tipo, sem dispositivos
-    this.dashboardService
-      .filter({ ...baseFilter, idDeviceType: types[0], idDevice: null } as DashboardFilterInterface)
-      .subscribe(res => {
-        this.fields.set(res.map(v => v.time_interval));
-        this.primaryValues.set({ title: this.typeName(types[0]), values: res.map(v => v.avg_value) });
-        this.secondaryValues.set({ title: '', values: [] });
-        this.deviceSeries.set([]);
-        this.loading.set(false);
-      });
-  }
-
-  async exportarPDF(): Promise<void> {
-    const title = this.chartTitle();
-    const subtitle = this.chartSubtitle();
-    const locName = this.locationName();
-
-    // Se nada foi buscado ainda, sai
-    if (!title) return;
-
-    const items: ChartExportItem[] = this.charts().flatMap(chart => {
-      const dataUrl = chart.getImageDataURL();
-      if (!dataUrl) return [];
-      return [{
-        title,
-        subtitle,
-        imageDataUrl: dataUrl,
-      }];
-    });
-
-    if (items.length === 0) return;
-
-    const fileName = `graficos-${locName || 'dashboard'}-${Date.now()}.pdf`;
-    await this.pdfService.export(items, fileName);
   }
 }

@@ -22,7 +22,7 @@
                 class="flex-1 basis-1/4 md:basis-1/7 cursor-pointer px-4 py-2 text-sm transition-colors"
                 [class.bg-primary]="filterForm.value.timeBucket === opt.id"
                 [class.text-primary-foreground]="filterForm.value.timeBucket === opt.id"
-                (click)="setTimeBucket(opt.id)"
+                (click)="filterForm.controls.timeBucket.setValue(opt.id)"
               >
                 {{ opt.text }}
               </button>
@@ -30,87 +30,38 @@
           </div>
         </div>
 
-        <div class="flex flex-wrap gap-2 max-w-full ">
+        <div class="flex flex-wrap gap-2 max-w-full">
           <div class="flex flex-col gap-1 max-w-full">
-            <label for="fromDate" class="text-sm text-medium text-neutral mb-1">
-              {{'MONITORING.DATE_RANGE.FROM' | translate}}
+            <label for="fromDate" class="text-sm text-neutral font-medium mb-1">
+              {{ 'MONITORING.DATE_RANGE.FROM' | translate }}
             </label>
             <input type="date" class="border border-outline rounded-md px-3 py-2 bg-container text-default" formControlName="fromDate">
           </div>
 
           <div class="flex flex-col gap-1 max-w-full">
-            <label for="toDate" class="text-sm text-neutral text-medium mb-1">
-              {{'MONITORING.DATE_RANGE.TO' | translate}}
+            <label for="toDate" class="text-sm text-neutral font-medium mb-1">
+              {{ 'MONITORING.DATE_RANGE.TO' | translate }}
             </label>
             <input type="date" class="border border-outline rounded-md px-3 py-2 bg-container text-default" formControlName="toDate">
           </div>
         </div>
       </div>
 
-      <div class="flex flex-col gap-1 w-full">
-        <div class="flex flex-wrap items-center justify-between mb-1.5 break-all">
-          <span class="text-sm text-neutral font-medium">
-            {{'MONITORING.FILTERS.DEVICE_TYPES' | translate}}
-          </span>
-          <span class="text-xs text-neutral">
-            {{ 'MONITORING.FILTERS.SELECTED_COUNT' | translate:{
-              selected: selectedTypes().length, total: 2 } }}
-          </span>
-        </div>
-        <div class="flex flex-wrap gap-2">
-          @for (type of deviceTypeOptions; track type.id) {
-            <button
-              type="button"
-              (click)="toggleType(type.id)"
-              [disabled]="!isTypeSelected(type.id) && selectedTypes().length >= 2"
-              [class]="isTypeSelected(type.id)
-                ? 'bg-secondary text-secondary-foreground border-secondary font-medium'
-                : 'bg-container text-default border-outline hover:border-secondary hover:text-secondary'"
-              class="group inline-flex flex-wrap items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border
-                      transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed
-                      disabled:hover:border-outline disabled:hover:text-default break-all max-w-full"
-            >
-              @if (isTypeSelected(type.id)) {
-                <i class="fa-solid fa-check text-xs"></i>
-              }
-              {{ type.name }}
-            </button>
-          }
-        </div>
-      </div>
+      <app-chip-select
+        label="MONITORING.FILTERS.DEVICE_TYPES"
+        [options]="deviceTypeOptions"
+        [max]="2"
+        [selected]="selectedTypes()"
+        (selectedChange)="onTypesChange($event)"
+      />
 
       @if (selectedTypes().length === 1 && availableDevices().length > 0) {
-        <div class="flex flex-col gap-1">
-          <div class="flex justify-between mb-1.5 break-all">
-            <span class="text-sm text-neutral font-medium ">
-              {{'MONITORING.FILTERS.DEVICES' | translate}}
-            </span>
-            <span class="text-xs text-neutral">
-              {{ 'MONITORING.FILTERS.SELECTED_COUNT' | translate:{
-              selected: selectedDevices().length, total: 5 } }}
-            </span>
-          </div>
-          <div class="flex flex-wrap gap-2">
-            @for (device of availableDevices(); track device.id) {
-              <button
-                type="button"
-                (click)="toggleDevice(device.id!)"
-                [disabled]="!isDeviceSelected(device.id!) && selectedDevices().length >= 5"
-                [class]="isDeviceSelected(device.id!)
-                  ? 'bg-secondary text-secondary-foreground border-secondary font-medium'
-                  : 'bg-container text-default border-outline hover:border-secondary hover:text-secondary'"
-                class="inline-flex flex-wrap items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border
-                      transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed
-                      disabled:hover:border-outline disabled:hover:text-default break-all max-w-full"
-              >
-                @if (isDeviceSelected(device.id!)) {
-                  <i class="fa-solid fa-check text-xs"></i>
-                }
-                {{ device.name }}
-              </button>
-            }
-          </div>
-        </div>
+        <app-chip-select
+          label="MONITORING.FILTERS.DEVICES"
+          [options]="availableDevices()"
+          [max]="5"
+          [(selected)]="selectedDevices"
+        />
       }
 
       <button
@@ -119,56 +70,23 @@
         [disabled]="filterForm.invalid || selectedTypes().length === 0"
         (click)="search()"
       >
-        @if (loading()) {
+        @if (store.loading()) {
           <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-          <span>
-            {{'COMMON.STATES.SEARCHING' | translate}}
-          </span>
+          <span>{{ 'COMMON.STATES.SEARCHING' | translate }}</span>
         } @else {
           <i class="fa-solid fa-magnifying-glass"></i>
-          <span>
-            {{'COMMON.ACTIONS.SEARCH' | translate}}
-          </span>
+          <span>{{ 'COMMON.ACTIONS.SEARCH' | translate }}</span>
         }
       </button>
     </form>
 
-    <div class="bg-container border border-outline rounded-md p-4 relative min-h-96">
-      @if (loading()) {
-        <div class="absolute inset-0 bg-container/80 backdrop-blur-sm rounded-md flex flex-col items-center justify-center gap-3 z-10">
-          <div class="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-          <span class="text-sm text-neutral">
-            {{'COMMON.STATES.SEARCHING' | translate}}
-          </span>
-        </div>
-      }
-
-      @if (fields().length === 0 && !loading()) {
-        <div class="flex flex-col items-center justify-center py-20 gap-3 text-neutral">
-          <i class="fa-solid fa-chart-line text-5xl opacity-20"></i>
-          <p class="text-sm">
-            {{'MONITORING.EMPTY.DASHBOARD' | translate}}
-          </p>
-        </div>
-      } @else {
-        <app-device-chart
-          [fields]="fields()"
-          [primary]="primaryValues()"
-          [secondary]="secondaryValues()"
-          [deviceSeries]="deviceSeries()"
-          [title]="chartTitle()"
-          [subtitle]="chartSubtitle()"
-        />
-        <button
-          (click)="exportarPDF()"
-          [disabled]="!chartTitle() || loading()"
-          class="btn bg-primary text-white px-4 py-2 rounded max-w-40"
-        >
-          <i class="fa-solid fa-file-pdf mr-2"></i>
-          {{'COMMON.ACTIONS.SAVE' | translate}} PDF
-        </button>
-      }
-    </div>
+    <app-chart-panel
+      [data]="store.data()"
+      [loading]="store.loading()"
+      [error]="store.error()"
+      [title]="chartTitle()"
+      [subtitle]="chartSubtitle()"
+    />
 
   </div>
 </app-content-layout>

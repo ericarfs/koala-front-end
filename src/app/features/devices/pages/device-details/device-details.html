@@ -12,7 +12,6 @@
         <div class="flex flex-wrap items-center justify-between gap-3">
           <h1 class="text-2xl font-bold">{{ dev.name }}</h1>
 
-          <!-- 👇 Badge de status -->
           <div
             [class]="dev.available
               ? 'bg-success text-success-foreground'
@@ -34,44 +33,17 @@
         </div>
       </div>
 
-      <form [formGroup]="filterForm" class="flex flex-wrap items-end gap-4 bg-container border border-outline rounded-md p-4 break-all ">
-        <div class="flex flex-col gap-1 w-full">
-          <div class="flex flex-wrap items-center justify-between mb-1.5 break-all">
-            <span class="text-sm text-neutral font-medium">
-              {{'MONITORING.FILTERS.DEVICE_TYPES' | translate}}
-            </span>
-            <span class="text-xs text-neutral">
-              {{ 'MONITORING.FILTERS.SELECTED_COUNT' | translate:{
-              selected: selectedTypes().length, total: 2 } }}
-            </span>
-          </div>
+      <form [formGroup]="filterForm" class="flex flex-wrap items-end gap-4 bg-container border border-outline rounded-md p-4 break-all">
+        <app-chip-select
+          label="MONITORING.FILTERS.DEVICE_TYPES"
+          [options]="dev.types"
+          [max]="2"
+          [(selected)]="selectedTypes"
+        />
 
-          <div class="flex flex-wrap gap-2">
-            @for (type of dev.types; track type.id) {
-              <button
-                type="button"
-                (click)="toggleType(type.id)"
-                [disabled]="!isTypeSelected(type.id) && selectedTypes().length >= 2"
-                [class]="isTypeSelected(type.id)
-                  ? 'bg-secondary text-secondary-foreground border-secondary shadow-sm font-medium'
-                  : 'bg-container text-default border-outline hover:border-secondary hover:text-secondary'"
-                class="group inline-flex flex-wrap items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border
-                      transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed
-                      disabled:hover:border-outline disabled:hover:text-default break-all max-w-full"
-              >
-
-                @if (isTypeSelected(type.id)) {
-                  <i class="fa-solid fa-check text-xs"></i>
-                }
-                {{ type.name }}
-              </button>
-            }
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-1 w-full lg:max-w-145 ">
+        <div class="flex flex-col gap-1 w-full lg:max-w-145">
           <span class="text-sm text-neutral font-medium mb-1.5">
-            {{'MONITORING.FILTERS.INTERVAL' | translate}}
+            {{ 'MONITORING.FILTERS.INTERVAL' | translate }}
           </span>
           <div class="flex flex-wrap border border-outline rounded-md min-h-10 overflow-hidden">
             @for (opt of intervalOptions; track opt.id) {
@@ -81,7 +53,7 @@
                 [class.bg-primary]="filterForm.value.timeBucket === opt.id"
                 [class.font-medium]="filterForm.value.timeBucket === opt.id"
                 [class.text-primary-foreground]="filterForm.value.timeBucket === opt.id"
-                (click)="setTimeBucket(opt.id)"
+                (click)="filterForm.controls.timeBucket.setValue(opt.id)"
               >
                 {{ opt.text }}
               </button>
@@ -92,76 +64,45 @@
         <div class="flex flex-wrap gap-2 max-w-full">
           <div class="flex flex-col gap-1 max-w-full">
             <label for="fromDate" class="text-sm text-neutral">
-              {{'MONITORING.DATE_RANGE.FROM' | translate}}
+              {{ 'MONITORING.DATE_RANGE.FROM' | translate }}
             </label>
-            <input type="date" class="border border-outline rounded-md px-3 py-2 bg-container text-default" formControlName="fromDate">
+            <input id="fromDate" type="date" class="border border-outline rounded-md px-3 py-2 bg-container text-default" formControlName="fromDate">
           </div>
 
           <div class="flex flex-col gap-1 max-w-full">
             <label for="toDate" class="text-sm text-neutral">
-              {{'MONITORING.DATE_RANGE.TO' | translate}}
+              {{ 'MONITORING.DATE_RANGE.TO' | translate }}
             </label>
-            <input type="date" class="border border-outline rounded-md px-3 py-2 bg-container text-default" formControlName="toDate">
+            <input id="toDate" type="date" class="border border-outline rounded-md px-3 py-2 bg-container text-default" formControlName="toDate">
           </div>
         </div>
 
         <div class="w-full md:w-auto">
-          <button type="button" class="btn px-4 py-2 gap-2 bg-primary text-primary-foreground" [disabled]="filterForm.invalid || selectedTypes().length === 0" (click)="search()">
-            @if (loading()) {
+          <button
+            type="button"
+            class="btn px-4 py-2 gap-2 bg-primary text-primary-foreground"
+            [disabled]="filterForm.invalid || selectedTypes().length === 0"
+            (click)="search()"
+          >
+            @if (store.loading()) {
               <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-              <span>
-                {{'COMMON.STATES.SEARCHING' | translate}}
-              </span>
+              <span>{{ 'COMMON.STATES.SEARCHING' | translate }}</span>
             } @else {
               <i class="fa-solid fa-magnifying-glass"></i>
-              <span>
-                {{'COMMON.ACTIONS.SEARCH' | translate}}
-              </span>
+              <span>{{ 'COMMON.ACTIONS.SEARCH' | translate }}</span>
             }
           </button>
         </div>
-
       </form>
 
-      <div class="bg-container border border-outline rounded-md p-4 relative min-h-96">
-
-        <!-- Overlay de loading -->
-        @if (loading()) {
-          <div class="absolute inset-0 bg-container/80 backdrop-blur-sm rounded-md
-                      flex flex-col items-center justify-center gap-3 z-10">
-            <div class="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-            <span class="text-sm text-neutral">
-              {{'COMMON.STATES.SEARCHING' | translate}}
-            </span>
-          </div>
-        }
-
-        @if (fields().length === 0 && !loading()) {
-          <!-- Estado vazio inicial -->
-          <div class="flex flex-col items-center justify-center py-20 gap-3 text-neutral">
-            <i class="fa-solid fa-chart-line text-5xl opacity-20"></i>
-            <p class="text-sm">
-              {{'MONITORING.EMPTY.DEVICES' | translate}}
-            </p>
-          </div>
-        } @else {
-          <!-- Gráfico -->
-          <app-device-chart
-            [fields]="fields()"
-            [primary]="primaryValues()"
-            [secondary]="secondaryValues()"
-            [title]="chartTitle()"
-            [subtitle]="chartSubtitle()"
-          />
-          <button
-            (click)="exportarPDF()"
-            class="btn bg-primary text-white px-4 py-2 rounded max-w-40">
-            <i class="fa-solid fa-file-pdf mr-2"></i>
-            {{'COMMON.ACTIONS.SAVE' | translate}} PDF
-          </button>
-        }
-      </div>
-
+      <app-chart-panel
+        emptyKey="MONITORING.EMPTY.DEVICES"
+        [data]="store.data()"
+        [loading]="store.loading()"
+        [error]="store.error()"
+        [title]="chartTitle()"
+        [subtitle]="chartSubtitle()"
+      />
     </div>
   } @else {
     <p class="text-xl text-default font-medium">

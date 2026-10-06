@@ -67,6 +67,7 @@ export class AuthService implements PermissionsProvider{
       );
   }*/
 
+  //login falso para teste
   login(username: string, password: string): Observable<LoginResponse> {
     // Mock do token — pode ser um JWT fake ou uma string qualquer
     const mockResponse: LoginResponse = {

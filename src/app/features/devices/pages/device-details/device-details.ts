@@ -1,187 +1,112 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, effect, inject, signal, viewChildren } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { delay, forkJoin, map, of } from 'rxjs';
+import { map } from 'rxjs';
 import { ContentLayout } from '@shared/layouts/content/content';
-import { ChartSeriesData, DeviceChart } from '@shared/domain/device/components/device-chart';
 import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
-import { DashboardFilterInterface, DashboardResponseInterface, DashboardService } from '@shared/domain/device/services/device-metrics';
 import { DeviceWithTypes } from '@shared/interfaces/device';
 import { DEVICES_MOCK } from '../../../../mocks/devices';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ChartExportItem, PdfExportService } from '@shared/services/pdf-export';
 import { LOCATIONS_MOCK } from '../../../../mocks/locations';
 import { getPath } from '@shared/domain/location/location-tree';
+import { ChartDataStore } from '@shared/domain/monitoring/stores/chart-data-store';
+import { ChartPanel } from '@shared/domain/monitoring/components/chart-panel';
+import { ChipSelect } from '@shared/domain/monitoring/components/chip-select';
+import { DEFAULT_TIME_BUCKET, TIME_BUCKET_OPTIONS, TimeBucket } from '@shared/domain/monitoring/models/time-bucket';
 
 
 
 @Component({
   selector: 'app-device-details',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ContentLayout, DeviceChart, TranslatePipe],
+  imports: [CommonModule, ReactiveFormsModule, ContentLayout, TranslatePipe, ChipSelect, ChartPanel],
+  providers: [ChartDataStore],
   templateUrl: './device-details.html',
 })
 export class DeviceDetails {
-  private readonly route = inject(ActivatedRoute);
+   private readonly route = inject(ActivatedRoute);
   private readonly routerLocation = inject(Location);
   private readonly mappingService = inject(DeviceMappingService);
-  private readonly dashboardService = inject(DashboardService);
-  private readonly pdfService = inject(PdfExportService);
-
-  readonly charts = viewChildren(DeviceChart);
+  readonly store = inject(ChartDataStore);
 
   private readonly id = toSignal(
     this.route.paramMap.pipe(map(p => Number(p.get('id')))),
-    { initialValue: NaN }
+    { initialValue: NaN },
   );
 
-  readonly locationName = signal('');
-  readonly deviceName = signal('');
+  readonly intervalOptions = TIME_BUCKET_OPTIONS;
+  readonly device = signal<DeviceWithTypes | null>(null);
+
+  readonly filterForm = new FormGroup({
+    timeBucket: new FormControl<TimeBucket>(DEFAULT_TIME_BUCKET, {
+      nonNullable: true,
+      validators: Validators.required,
+    }),
+    fromDate: new FormControl<string | null>(null, Validators.required),
+    toDate: new FormControl<string | null>(null),
+  });
+
+  readonly selectedTypes = signal<number[]>([]);
   readonly chartTitle = signal('');
   readonly chartSubtitle = signal('');
 
-  readonly loading = signal(false);
-  readonly device = signal<DeviceWithTypes | null>(null);
-
   constructor() {
     effect(() => {
-      const id = this.id();
-      const found = DEVICES_MOCK.find(d => d.id === id);
+      const found = DEVICES_MOCK.find(d => d.id === this.id());
+
+      // Trocou de dispositivo (mesma rota, outro id): limpa seleção e gráfico
+      this.selectedTypes.set([]);
+      this.store.reset();
+
       if (!found) {
         this.device.set(null);
         return;
       }
 
-      // Popula com types vazio primeiro (pra renderizar nome/descrição já)
+      // Renderiza nome/descrição já, e completa com os tipos quando chegarem
       this.device.set({ ...found, types: [] });
-
-      // Depois complementa com os types (podem vir do cache ou da API)
       this.mappingService.getTypesForDevice(found.id!).subscribe(types => {
         this.device.set({ ...found, types });
       });
     });
   }
 
-  selectedTypes = signal<number[]>([]);
-
-  filterForm = new FormGroup({
-    timeBucket: new FormControl('5 minutes', { nonNullable: true, validators: Validators.required }),
-    fromDate: new FormControl<string | null>(null, Validators.required),
-    toDate: new FormControl<string | null>(null),
-  });
-
-  intervalOptions = [
-    { id: '30 seconds', text: '30s' },
-    { id: '1 minute', text: '1min' },
-    { id: '5 minutes', text: '5min' },
-    { id: '15 minutes', text: '15min' },
-    { id: '30 minutes', text: '30min' },
-    { id: '1 hour', text: '1h' },
-    { id: '2 hours', text: '2h' },
-  ];
-
-  fields = signal<Date[]>([]);
-  primaryValues = signal<ChartSeriesData>({ title: '', values: [] });
-  secondaryValues = signal<ChartSeriesData>({ title: '', values: [] });
-
-  isTypeSelected(id: number): boolean {
-    return this.selectedTypes().includes(id);
-  }
-
-  toggleType(id: number): void {
-    this.selectedTypes.update(list => {
-      const isSelected = list.includes(id);
-
-      if (isSelected) {
-        return list.filter(t => t !== id);
-      }
-
-      if (list.length >= 2) {
-        return list;
-      }
-
-      return [...list, id];
-    });
-  }
-
-  setTimeBucket(value: string): void {
-    this.filterForm.patchValue({ timeBucket: value });
-  }
-
   search(): void {
     const device = this.device();
-    const types = this.selectedTypes();
-    if (!device || types.length === 0 || this.filterForm.invalid) return;
+    if (!device || this.filterForm.invalid) return;
 
-    this.loading.set(true);
-
-    const locName = this.getLocationName(device);
-    const deviceName = device.name ?? '';
-
-    const primaryType = device.types.find(t => t.id === types[0]);
-    const secondaryType = types[1] != null ? device.types.find(t => t.id === types[1]) : undefined;
-
-    let chartTitle = primaryType?.name ?? '';
-    if (secondaryType) chartTitle += ` × ${secondaryType.name}`;
-
-    this.locationName.set(locName);
-    this.deviceName.set(deviceName);
-    this.chartTitle.set(`${locName} — ${deviceName}`);
-    this.chartSubtitle.set(chartTitle);
+    // Mantém a ordem de seleção: o primeiro vai no eixo esquerdo
+    const types = this.selectedTypes().flatMap(id => {
+      const type = device.types.find(t => t.id === id);
+      return type ? [{ id: type.id, name: type.name }] : [];
+    });
+    if (types.length === 0) return;
 
     const { timeBucket, fromDate, toDate } = this.filterForm.getRawValue();
     const start = fromDate ? new Date(fromDate) : null;
     const end = toDate ? new Date(toDate) : new Date();
     end.setHours(23, 59, 59);
 
-    const baseFilter = {
-      idEnviroment: device.id_enviroment!,
-      idDevice: device.id!,
-      startDate: start,
-      endDate: end,
-      timeBucket,
-    };
+    const locName = device.id_enviroment != null ? getPath(device.id_enviroment, LOCATIONS_MOCK) : '-';
+    this.chartTitle.set(`${locName} — ${device.name ?? ''}`);
+    this.chartSubtitle.set(types.map(t => t.name).join(' × '));
 
-    const primaryReq = this.dashboardService.filter({ ...baseFilter, idDeviceType: types[0] } as DashboardFilterInterface);
-    const secondaryReq = types[1] != null
-      ? this.dashboardService.filter({ ...baseFilter, idDeviceType: types[1] } as DashboardFilterInterface)
-      : of([] as DashboardResponseInterface[]);
-
-    forkJoin([primaryReq, secondaryReq])
-    .pipe(delay(300))
-    .subscribe(([primaryRes, secondaryRes]) => {
-      this.fields.set(primaryRes.map(r => r.time_interval));
-      this.primaryValues.set({ title: primaryType?.name ?? '', values: primaryRes.map(r => r.avg_value) });
-      this.secondaryValues.set({
-        title: secondaryType?.name ?? '',
-        values: secondaryRes.map(r => r.avg_value),
-      });
-      this.loading.set(false);
+    // idDevice vai no "base": vale para todas as consultas (1 ou 2 tipos)
+    this.store.load({
+      base: {
+        idEnviroment: device.id_enviroment!,
+        idDevice: device.id!,
+        startDate: start,
+        endDate: end,
+        timeBucket,
+      },
+      types,
     });
   }
 
-  goBack(){
+  goBack(): void {
     this.routerLocation.back();
-  }
-
-  getLocationName = (device: DeviceWithTypes) =>
-    device.id_enviroment != null ? getPath(device.id_enviroment, LOCATIONS_MOCK) : '-';
-
-  async exportarPDF(): Promise<void> {
-    const title = this.chartTitle();
-    const subtitle = this.chartSubtitle();
-    const locName = this.locationName();
-
-    if (!title) return;
-
-    const items: ChartExportItem[] = this.charts().flatMap(chart => {
-      const dataUrl = chart.getImageDataURL();
-      if (!dataUrl) return [];
-      return [{ title, subtitle, imageDataUrl: dataUrl }];
-    });
-
-    await this.pdfService.export(items, `graficos-${locName}-${Date.now()}.pdf`);
   }
 }

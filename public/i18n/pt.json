@@ -60,7 +60,8 @@
       "LOADING": "Carregando...",
       "SENDING": "Enviando...",
       "SEARCHING": "Buscando...",
-      "EMPTY": "Nenhum item encontrado"
+      "EMPTY": "Nenhum item encontrado",
+      "ERROR":"Não foi possível carregar os dados. Tente novamente."
     },
     "VALIDATION": {
       "REQUIRED": "Este campo é obrigatório"
