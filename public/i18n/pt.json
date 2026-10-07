@@ -43,7 +43,10 @@
       "BACK": "Voltar",
       "CLOSE": "Fechar",
       "SEARCH": "Pesquisar",
-      "CONFIRM_DELETE":"Tem certeza que deseja excluir?"
+      "CONFIRM_DELETE":"Tem certeza que deseja excluir?",
+      "LOGIN":"Entrar",
+      "GUEST_LOGIN":"Entrar como convidado",
+      "ACCESS":"Acesse sua conta"
     },
     "FORM": {
       "NAME": "Nome",
@@ -54,6 +57,7 @@
       "DESCRIPTION_PLACEHOLDER": "Opcional",
       "EMAIL": "E-mail",
       "PASSWORD": "Senha",
+      "PASSWORD_PLACEHOLDER": "Insira a senha",
       "CONFIRM_PASSWORD": "Confirmar senha",
       "FILE":{
         "TITLE":"Arquivo",
@@ -65,6 +69,7 @@
       }
     },
     "STATES": {
+      "LOGIN":"Entrando...",
       "LOADING": "Carregando...",
       "SENDING": "Enviando...",
       "SEARCHING": "Buscando...",
@@ -167,6 +172,7 @@
       "CONFIRM": "Tem certeza que deseja excluir o ambiente '{{name}}'?"
     },
     "DETAILS": {
+      "LOCATIONS":"locais",
       "SUB_LOCATIONS": "Sub-ambientes ({{count}})",
       "SUB_LOCATIONS_COUNT": "{{count}} locais",
       "VIEW_DEVICES": "Ver dispositivos",

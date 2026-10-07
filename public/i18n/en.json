@@ -43,7 +43,10 @@
       "BACK": "Back",
       "CLOSE": "Close",
       "SEARCH": "Search",
-      "CONFIRM_DELETE": "Are you sure you want to delete?"
+      "CONFIRM_DELETE": "Are you sure you want to delete?",
+      "LOGIN":"Login",
+      "GUEST_LOGIN":"Login as guest",
+      "ACCESS":"Access your account"
     },
     "FORM": {
       "NAME": "Name",
@@ -54,9 +57,19 @@
       "DESCRIPTION_PLACEHOLDER": "Optional",
       "EMAIL": "Email",
       "PASSWORD": "Password",
-      "CONFIRM_PASSWORD": "Confirm password"
+      "PASSWORD_PLACEHOLDER": "Enter the password",
+      "CONFIRM_PASSWORD": "Confirm password",
+      "FILE":{
+        "TITLE":"File",
+        "DRAG_FILE":"Drag the file here",
+        "OR":"or",
+        "CHOOSE_FILE":"Choose a file",
+        "NO_FILE":"No file selected",
+        "HELPER":"Clique here to change the file"
+      }
     },
     "STATES": {
+      "LOGIN":"Logging in...",
       "LOADING": "Loading...",
       "SENDING": "Sending...",
       "SEARCHING": "Searching...",
@@ -159,6 +172,7 @@
       "CONFIRM": "Are you sure you want to delete the location '{{name}}'?"
     },
     "DETAILS": {
+      "LOCATIONS":"locations",
       "SUB_LOCATIONS": "Sub-locations ({{count}})",
       "SUB_LOCATIONS_COUNT": "{{count}} locations",
       "VIEW_DEVICES": "View devices",
@@ -220,5 +234,13 @@
   "USER_MENU": {
     "ACCOUNT_SETTINGS": "Account settings",
     "LOGOUT": "Logout"
+  },
+
+  "OTA":{
+    "TITLE": "OTA Update",
+    "NAME":"Update name",
+    "NAME_HELPER":"Enter the name",
+    "COMPILER":"Compiler",
+    "COMPILER_HELPER":"Select the compiler"
   }
 }
