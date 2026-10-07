@@ -17,6 +17,7 @@ import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { environment } from '../environments/environment';
 import { MetricsService } from '@shared/domain/monitoring/services/metrics';
 import { MockMetricsService } from '@shared/domain/monitoring/services/metrics.mock';
+import { airconModuleDefinition } from './domains/aircon/aircon.module-definition';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -32,6 +33,7 @@ export const appConfig: ApplicationConfig = {
       })
     }),
     provideKoalaModule(mffModuleDefinition),
+    provideKoalaModule(airconModuleDefinition),
 
     provideAppInitializer(() => {
       const router = inject(Router);

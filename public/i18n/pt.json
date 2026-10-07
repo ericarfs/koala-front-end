@@ -54,7 +54,15 @@
       "DESCRIPTION_PLACEHOLDER": "Opcional",
       "EMAIL": "E-mail",
       "PASSWORD": "Senha",
-      "CONFIRM_PASSWORD": "Confirmar senha"
+      "CONFIRM_PASSWORD": "Confirmar senha",
+      "FILE":{
+        "TITLE":"Arquivo",
+        "DRAG_FILE":"Arraste o arquivo aqui",
+        "OR":"ou",
+        "CHOOSE_FILE":"Selecione um arquivo",
+        "NO_FILE":"Nenhum arquivo escolhido",
+        "HELPER":"Clique aqui para trocar o arquivo"
+      }
     },
     "STATES": {
       "LOADING": "Carregando...",
@@ -220,5 +228,13 @@
   "USER_MENU": {
     "ACCOUNT_SETTINGS": "Configurações de conta",
     "LOGOUT": "Sair"
+  },
+
+  "OTA":{
+    "TITLE": "Atualização OTA",
+    "NAME":"Nome da atualização",
+    "NAME_HELPER":"Digite o nome",
+    "COMPILER":"Compilador",
+    "COMPILER_HELPER":"Selecione o compilador"
   }
 }

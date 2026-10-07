@@ -1,0 +1,56 @@
+<app-content-layout
+    title="Atualização OTA"
+  >
+
+  <div class="flex flex-col gap-6">
+    <form [formGroup]="otaForm" class="flex flex-col justify-center gap-4 bg-container border border-outline rounded-md p-4 break-all">
+      @for (item of otaFormItems; track $index) {
+        <app-input
+          [formControlName]="item.key"
+          [type]="item.type"
+          [label]="item.labelKey"
+          [placeholder]="item.placeholderKey"
+          class="md:flex-1 w-full"
+          >
+          <span class="absolute right-1.5 top-1.5 w-7 h-7 rounded-md bg-gray-100 flex items-center justify-center text-gray-500">
+            <i [class]="`fa fa-${item.icon} fa-sm`" aria-hidden="true"></i>
+          </span>
+        </app-input>
+      }
+      <div class="flex flex-col gap-1">
+        <span class="text-sm text-neutral font-medium mb-1.5">
+          {{ 'OTA.COMPILER' | translate }}
+        </span>
+        <div class="flex flex-wrap border border-outline rounded-md overflow-hidden min-h-10">
+          @for (status of compilerOptions; track status.value; let first = $first) {
+            <button
+              type="button"
+              class="flex-1 cursor-pointer px-4 py-2 text-xs md:text-sm transition-colors"
+              [class.bg-primary]="otaForm.value.compiler === status.value"
+              [class.font-medium]="otaForm.value.compiler === status.value"
+              [class.text-primary-foreground]="otaForm.value.compiler === status.value"
+              (click)="setCompiler(status.value)"
+            >
+             {{ status.label }}
+            </button>
+          }
+        </div>
+      </div>
+
+      @if (logText()) {
+        <p class="text-destructive text-sm mt-3">{{ logText() | translate}}</p>
+      }
+
+      <div class="w-full flex justify-center gap-2 flex-wrap mt-4">
+        <button
+          type="submit"
+          [disabled]="loading()"
+          (click)="uploadOta()"
+          class="btn bg-primary max-w-60 text-white hover:bg-primary-details disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+          {{ 'COMMON.ACTIONS.SAVE' | translate }}
+        </button>
+      </div>
+    </form>
+  </div>
+</app-content-layout>
