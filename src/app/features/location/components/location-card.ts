@@ -1,10 +1,13 @@
-import { Component, input, output } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Location } from '@shared/interfaces/location';
 import { LocationStats } from '@shared/domain/location/location-stats';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import { ActionButtons } from '@shared/components/action-buttons/action-buttons';
+import { DialogService } from '@shared/components/dialogs/dialogs.service';
+import { LocationStore, MutationError } from '@shared/domain/location/location-store';
+import { finalize, of, switchMap, throwError } from 'rxjs';
 
 @Component({
   selector: 'app-location-card',
@@ -12,7 +15,12 @@ import { ActionButtons } from '@shared/components/action-buttons/action-buttons'
   imports: [CommonModule, RouterLink, ActionButtons, TranslatePipe],
   host: { class: 'contents' },
   template: `
-    <a [routerLink]="['/location', location().id]"
+    <a
+      [routerLink]="deleting() ? null : ['/location', location().id]"
+      [class.pointer-events-none]="deleting()"
+      [class.opacity-50]="deleting()"
+      [attr.aria-disabled]="deleting()"
+      [attr.tabindex]="deleting() ? -1 : null"
       class="group flex flex-col justify-start gap-2 w-full max-w-full  min-h-120 p-4 bg-container rounded-sm cursor-pointer outline outline-outline shadow-primary-background/80 hover:outline-primary hover:shadow-lg hover:transition-all">
 
       <div class="flex flex-wrap justify-between items-center gap-2 text-sm text-neutral min-h-6">
@@ -24,6 +32,7 @@ import { ActionButtons } from '@shared/components/action-buttons/action-buttons'
           [deleteMessageParams]="{ name: location().name }"
           (edit)="onEdit()"
           (delete)="onDelete()"
+          [deleting]="deleting()"
         ></app-action-buttons>
       </div>
 
@@ -78,7 +87,7 @@ import { ActionButtons } from '@shared/components/action-buttons/action-buttons'
             </div>
           </div>
 
-          <!-- 2. Sensores por tipo (sem ícones) -->
+          <!-- 2. Sensores por tipo -->
           @if (s.byType.length) {
             <div class="grid grid-cols-1 min-[340px]:grid-cols-2 gap-0.5 py-2">
               @for (t of s.byType; track t.type.id) {
@@ -100,19 +109,91 @@ import { ActionButtons } from '@shared/components/action-buttons/action-buttons'
   `,
 })
 export class LocationCard {
+  private readonly formDialog = inject(DialogService);
+
+  private readonly store = inject(LocationStore);
+
   readonly stats = input<LocationStats | null >(null);
 
   readonly location = input.required<Location>();
   readonly actionLabel = input('Ver dispositivos');
 
-  readonly edit = output<Location>();
-  readonly delete = output<Location>();
+  readonly deleting = signal(false);
 
   onEdit(): void {
-    this.edit.emit(this.location());
+    const location = this.location();
+    const editingId = location.id;
+
+    this.formDialog
+      .open<Location>({
+        title: 'LOCATIONS.EDIT.TITLE',
+        subtitle: 'LOCATIONS.EDIT.SUBTITLE',
+        submitLabel: 'COMMON.ACTIONS.SAVE',
+        fields: [
+        {
+          key: 'name',
+          label: 'COMMON.FORM.NAME',
+          placeholder: 'COMMON.FORM.NAME_PLACEHOLDER',
+          required: true
+        },
+        {
+          key: 'description',
+          label: 'COMMON.FORM.DESCRIPTION',
+          placeholder: 'COMMON.FORM.DESCRIPTION_PLACEHOLDER',
+          type: 'textarea',
+          rows: 4
+        },
+        ],
+        initialValues: { name: location.name, description: location.description },
+        onSubmit: (values) => {
+          const v = values as { name: string; description?: string };
+
+          const patch: Partial<Location> = {
+            name: v.name,
+            description: v.description ?? '',
+          };
+
+          return this.store.update(editingId, patch).pipe(
+            switchMap((res) =>
+              res.ok
+              ? of(res.data)
+              : throwError(() => this.toErrorMessage(res.reason)),
+            ),
+          );
+
+        },
+      })
+    .closed.subscribe();
   }
 
+   private toErrorMessage(reason: MutationError): string {
+      switch (reason) {
+        case 'MAX_DEPTH_EXCEEDED':
+          return 'LOCATIONS.ERRORS.MAX_DEPTH';
+        case 'INVALID_PARENT':
+          return 'LOCATIONS.ERRORS.INVALID_PARENT';
+      }
+    }
+
   onDelete(): void {
-    this.delete.emit(this.location());
+    const id = this.location().id;
+    if (id == null) return;
+
+    this.deleting.set(true);
+    this.store.remove(id)
+      .pipe(finalize(() => this.deleting.set(false)))
+      .subscribe({
+        next: (res) => {
+          if (!res.ok) {
+            // toast / snackbar de erro
+            return;
+          }
+          // toast de sucesso, ou nada
+        },
+        error: (err) => {
+          console.error(err);
+          // toast de erro
+        },
+      });
   }
 }

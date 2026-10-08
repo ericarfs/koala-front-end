@@ -4,7 +4,7 @@ import { delay, of, tap } from 'rxjs';
 import { DeviceType } from '../../shared/interfaces/device-type';
 import { DEVICE_TYPES_MOCK } from '../../mocks/device-types';
 import { ActionButtons } from '@shared/components/action-buttons/action-buttons';
-import { FormDialogService } from '@shared/components/form-dialog/form-dialog.service';
+import { DialogService } from '@shared/components/dialogs/dialogs.service';
 import { ContentLayout } from '@shared/layouts/content/content';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
@@ -16,7 +16,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 })
 export class DeviceTypes {
   private readonly http = inject(HttpClient);
-  private readonly formDialog = inject(FormDialogService);
+  private readonly formDialog = inject(DialogService);
   private readonly translate = inject(TranslateService);
 
   readonly deviceTypes = signal<DeviceType[]>(DEVICE_TYPES_MOCK);;

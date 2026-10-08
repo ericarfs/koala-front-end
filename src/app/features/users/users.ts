@@ -1,6 +1,6 @@
 import { Component, inject, input, signal } from '@angular/core';
 import { ActionButtons } from '@shared/components/action-buttons/action-buttons';
-import { FormDialogService } from '@shared/components/form-dialog/form-dialog.service';
+import { DialogService } from '@shared/components/dialogs/dialogs.service';
 import { Paginator } from '@shared/components/pagination/paginator';
 import { UserBasic } from '@shared/interfaces/user';
 import { ContentLayout } from '@shared/layouts/content/content';
@@ -20,7 +20,7 @@ import { TranslatePipe } from '@ngx-translate/core';
   },
 })
 export class Users {
-  private readonly formDialog = inject(FormDialogService);
+  private readonly formDialog = inject(DialogService);
   readonly allUsers = signal<UserBasic[]>(USERS_MOCK);
 
   pageSize = input(8);

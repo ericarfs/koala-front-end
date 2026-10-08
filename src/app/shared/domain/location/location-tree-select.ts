@@ -1,4 +1,3 @@
-import { LOCATIONS_MOCK } from '../../../mocks/locations';
 import {
   Component, ElementRef, HostListener, computed, effect, forwardRef, inject, signal,
 } from '@angular/core';

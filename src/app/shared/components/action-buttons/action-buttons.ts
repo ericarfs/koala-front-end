@@ -1,6 +1,8 @@
 import { Component, inject, input, output } from '@angular/core';
 import { PERMISSIONS } from '../../tokens/permissions';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { DialogService } from '../dialogs/dialogs.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   imports: [TranslatePipe],
@@ -20,10 +22,16 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
         <button
           type="button"
           class="hover:text-destructive"
+          [disabled]="deleting()"
           (click)="$event.stopPropagation(); $event.preventDefault(); onDelete()"
           [attr.aria-label]="'COMMON.ACTIONS.DELETE' | translate"
         >
-          <i class="fa-solid fa-trash"></i>
+          @if(deleting()){
+            <i class="fa-solid fa-spinner fa-spin"></i>
+          }
+          @else {
+            <i class="fa-solid fa-trash"></i>
+          }
         </button>
       </div>
     }
@@ -32,9 +40,12 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 export class ActionButtons {
   protected readonly permissions = inject(PERMISSIONS);
   protected readonly translate = inject(TranslateService);
+  private readonly confirmDialog = inject(DialogService);
 
-  edit = output<void>();
-  delete = output<void>();
+  readonly deleting = input(false);
+
+  readonly edit = output<void>();
+  readonly delete = output<void>();
 
   deleteMessageKey = input('COMMON.ACTIONS.CONFIRM_DELETE');
   deleteMessageParams = input<Record<string, unknown>>({});
@@ -43,9 +54,16 @@ export class ActionButtons {
     this.edit.emit();
   }
 
-  onDelete(): void {
+  async onDelete(): Promise<void> {
     const msg = this.translate.instant(this.deleteMessageKey(), this.deleteMessageParams());
-    if (!confirm(msg)) return;
+    const dialogRef = this.confirmDialog
+      .openConfirm({
+        title: 'COMMON.ACTIONS.DELETE',
+        message: msg,
+      })
+
+    const confirmed = await firstValueFrom(dialogRef.closed);
+    if (!confirmed) return;
     this.delete.emit();
   }
 }

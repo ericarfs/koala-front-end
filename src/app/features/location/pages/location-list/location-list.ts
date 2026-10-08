@@ -1,10 +1,10 @@
 import { Component, computed, effect, inject, input } from '@angular/core';
-import { delay, of, tap } from 'rxjs';
+import { of, switchMap, throwError } from 'rxjs';
 import { LocationCard } from '@features/location/components/location-card';
 import { ContentLayout } from '@shared/layouts/content/content';
 import { Paginator } from '@shared/components/pagination/paginator';
-import { FormDialogService } from '@shared/components/form-dialog/form-dialog.service';
-import { LocationStore } from '@shared/domain/location/location-store';
+import { DialogService } from '@shared/components/dialogs/dialogs.service';
+import { LocationStore, MutationError } from '@shared/domain/location/location-store';
 import { getChildren } from '@shared/domain/location/location-tree';
 import { paginate } from '@shared/utils/paginate';
 import { Location } from '@shared/interfaces/location';
@@ -28,7 +28,7 @@ import { LocationTreeSelect } from '@shared/domain/location/location-tree-select
   },
 })
 export class LocationList {
-  private readonly formDialog = inject(FormDialogService);
+  private readonly formDialog = inject(DialogService);
 
   readonly store = inject(LocationStore);
 
@@ -84,15 +84,16 @@ export class LocationList {
     });
   }
 
-  openLocationDialog(location?: Location): void {
-    const editingId = location?.id ?? null;
-    const isEdit = editingId != null;
+  newLocation(): void {
+    this.openDialog();
+  }
 
+  private openDialog(): void {
     this.formDialog
       .open<Location>({
-        title: isEdit ? 'LOCATIONS.EDIT.TITLE' : 'LOCATIONS.ADD.TITLE',
-        subtitle: isEdit ? 'LOCATIONS.EDIT.SUBTITLE' : 'LOCATIONS.ADD.SUBTITLE',
-        submitLabel: isEdit ? 'COMMON.ACTIONS.SAVE' : 'COMMON.ACTIONS.CREATE',
+        title: 'LOCATIONS.ADD.TITLE',
+        subtitle: 'LOCATIONS.ADD.SUBTITLE',
+        submitLabel: 'COMMON.ACTIONS.CREATE',
         fields: [
           {
             key: 'name',
@@ -108,24 +109,9 @@ export class LocationList {
             rows: 4
           },
         ],
-        initialValues: location
-          ? { name: location.name, description: location.description }
-          : undefined,
+
         onSubmit: (values) => {
           const v = values as { name: string; description?: string };
-
-          if (editingId != null) {
-            const patch: Partial<Location> = {
-              name: v.name,
-              description: v.description ?? '',
-            };
-            const updated: Location = { ...location!, ...patch, id: editingId };
-
-            return of(updated).pipe(
-              delay(3000),
-              tap(() => this.store.update(editingId, patch)),
-            );
-          }
 
           const created: Location = {
             id: this.store.nextId(),
@@ -134,24 +120,24 @@ export class LocationList {
             parentId: null,
           };
 
-          return of(created).pipe(
-            delay(3000),
-            tap((c) => this.store.add(c)),
+          return this.store.add(created).pipe(
+            switchMap((res) =>
+              res.ok
+                ? of(res.data)
+                : throwError(() => this.toErrorMessage(res.reason)),
+            ),
           );
         },
       })
       .closed.subscribe();
   }
 
-  newLocation(): void {
-    this.openLocationDialog();
-  }
-
-  updateLocation(location: Location): void {
-    this.openLocationDialog(location);
-  }
-
-  deleteLocation(location: Location): void {
-    this.store.remove(location.id!);
+  private toErrorMessage(reason: MutationError): string {
+    switch (reason) {
+      case 'MAX_DEPTH_EXCEEDED':
+        return 'LOCATIONS.ERRORS.MAX_DEPTH';
+      case 'INVALID_PARENT':
+        return 'LOCATIONS.ERRORS.INVALID_PARENT';
+    }
   }
 }

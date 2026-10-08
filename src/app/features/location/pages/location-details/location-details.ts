@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { delay, map, of } from 'rxjs';
+import { map, of, switchMap, throwError } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getActionLabel, getAncestors, getChildren } from '../../../../shared/domain/location/location-tree';
 import { ContentLayout } from '@shared/layouts/content/content';
 import { DeviceList } from '@shared/domain/device/components/device-list';
 import { LocationCard } from '@features/location/components/location-card';
-import { LocationStore } from '@shared/domain/location/location-store';
-import { FormDialogService } from '@shared/components/form-dialog/form-dialog.service';
+import { LocationStore, MutationError } from '@shared/domain/location/location-store';
+import { DialogService } from '@shared/components/dialogs/dialogs.service';
 import { DEVICES_MOCK } from '../../../../mocks/devices';
 import { Location } from '@shared/interfaces/location';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -33,7 +33,7 @@ import { mediaQuery } from '@shared/utils/media-query';
 export class LocationDetails {
   private readonly route = inject(ActivatedRoute);
   private readonly store = inject(LocationStore);
-  private readonly formDialog = inject(FormDialogService);
+  private readonly formDialog = inject(DialogService);
   private readonly translate = inject(TranslateService);
 
   private readonly id = toSignal(
@@ -85,28 +85,15 @@ export class LocationDetails {
   actionLabel = (loc: Location) => getActionLabel(loc.id, this.store.items());
 
   newLocation(): void {
-    this.openDialog(null, this.id());
+    this.openDialog(this.id());
   }
 
-  updateLocation(location: Location): void {
-    this.openDialog(location);
-  }
-
-  deleteLocation(location: Location): void {
-    const message = this.translate.instant('LOCATIONS.DELETE.CONFIRM');
-    if (!confirm(message)) return;
-    this.store.remove(location.id!);
-  }
-
-  private openDialog(location: Location | null, parentId: number | null = null): void {
-    const editingId = location?.id ?? null;
-    const isEdit = editingId != null;
-
+  private openDialog(parentId: number | null = null): void {
     this.formDialog
       .open<Location>({
-        title: isEdit ? 'LOCATIONS.EDIT.TITLE' : 'LOCATIONS.ADD.TITLE',
-        subtitle: isEdit ? 'LOCATIONS.EDIT.SUBTITLE' : 'LOCATIONS.ADD.SUBTITLE',
-        submitLabel: isEdit ? 'COMMON.ACTIONS.SAVE' : 'COMMON.ACTIONS.CREATE',
+        title: 'LOCATIONS.ADD.TITLE',
+        subtitle: 'LOCATIONS.ADD.SUBTITLE',
+        submitLabel: 'COMMON.ACTIONS.CREATE',
         fields: [
           {
             key: 'name',
@@ -122,20 +109,8 @@ export class LocationDetails {
             rows: 4
           },
         ],
-        initialValues: location
-          ? { name: location.name, description: location.description }
-          : undefined,
         onSubmit: (values) => {
           const v = values as { name: string; description?: string };
-
-          if (editingId != null) {
-            const patch: Partial<Location> = {
-              name: v.name,
-              description: v.description ?? '',
-            };
-            this.store.update(editingId, patch);
-            return of({ ...location!, ...patch, id: editingId }).pipe(delay(3000));
-          }
 
           const created: Location = {
             id: this.store.nextId(),
@@ -143,10 +118,25 @@ export class LocationDetails {
             description: v.description ?? '',
             parentId,
           };
-          this.store.add(created);
-          return of(created).pipe(delay(3000));
+
+          return this.store.add(created).pipe(
+            switchMap((res) =>
+              res.ok
+                ? of(res.data)
+                : throwError(() => this.toErrorMessage(res.reason)),
+            ),
+          );
         },
       })
       .closed.subscribe();
+  }
+
+  private toErrorMessage(reason: MutationError): string {
+    switch (reason) {
+      case 'MAX_DEPTH_EXCEEDED':
+        return 'LOCATIONS.ERRORS.MAX_DEPTH';
+      case 'INVALID_PARENT':
+        return 'LOCATIONS.ERRORS.INVALID_PARENT';
+    }
   }
 }
