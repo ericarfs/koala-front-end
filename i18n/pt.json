@@ -43,7 +43,10 @@
       "BACK": "Voltar",
       "CLOSE": "Fechar",
       "SEARCH": "Pesquisar",
-      "CONFIRM_DELETE":"Tem certeza que deseja excluir?"
+      "CONFIRM_DELETE":"Tem certeza que deseja excluir?",
+      "LOGIN":"Entrar",
+      "GUEST_LOGIN":"Entrar como convidado",
+      "ACCESS":"Acesse sua conta"
     },
     "FORM": {
       "NAME": "Nome",
@@ -54,13 +57,25 @@
       "DESCRIPTION_PLACEHOLDER": "Opcional",
       "EMAIL": "E-mail",
       "PASSWORD": "Senha",
-      "CONFIRM_PASSWORD": "Confirmar senha"
+      "PASSWORD_PLACEHOLDER": "Insira a senha",
+      "CONFIRM_PASSWORD": "Confirmar senha",
+      "FILE":{
+        "TITLE":"Arquivo",
+        "DRAG_FILE":"Arraste o arquivo aqui",
+        "OR":"ou",
+        "CHOOSE_FILE":"Selecione um arquivo",
+        "NO_FILE":"Nenhum arquivo escolhido",
+        "HELPER":"Clique aqui para trocar o arquivo"
+      },
+      "INVALID":"Formulário inválido. Preencha todos os campos."
     },
     "STATES": {
+      "LOGIN":"Entrando...",
       "LOADING": "Carregando...",
       "SENDING": "Enviando...",
       "SEARCHING": "Buscando...",
-      "EMPTY": "Nenhum item encontrado"
+      "EMPTY": "Nenhum item encontrado",
+      "ERROR":"Não foi possível carregar os dados. Tente novamente."
     },
     "VALIDATION": {
       "REQUIRED": "Este campo é obrigatório"
@@ -158,6 +173,7 @@
       "CONFIRM": "Tem certeza que deseja excluir o ambiente '{{name}}'?"
     },
     "DETAILS": {
+      "LOCATIONS":"locais",
       "SUB_LOCATIONS": "Sub-ambientes ({{count}})",
       "SUB_LOCATIONS_COUNT": "{{count}} locais",
       "VIEW_DEVICES": "Ver dispositivos",
@@ -219,5 +235,13 @@
   "USER_MENU": {
     "ACCOUNT_SETTINGS": "Configurações de conta",
     "LOGOUT": "Sair"
+  },
+
+  "OTA":{
+    "TITLE": "Atualização OTA",
+    "NAME":"Nome da atualização",
+    "NAME_HELPER":"Digite o nome",
+    "COMPILER":"Compilador",
+    "COMPILER_HELPER":"Selecione o compilador"
   }
 }

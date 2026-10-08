@@ -1,1 +1,0 @@
-var o=[{path:``,loadComponent:()=>import(`./chunk-B4-1cXyl.js`).then(t=>t.DevicesList)},{path:`:id`,loadComponent:()=>import(`./chunk-Cy2wq1jw.js`).then(t=>t.DeviceDetails)}];export{o as DEVICES_ROUTES};

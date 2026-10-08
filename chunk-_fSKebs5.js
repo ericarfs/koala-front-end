@@ -1,0 +1,1 @@
+var o=[{path:``,children:[{path:``,redirectTo:`dashboard`,pathMatch:`full`},{path:`ota`,loadComponent:()=>import(`./chunk-D1_kMl8U.js`).then(t=>t.Ota)}]}];export{o as AIRCON_ROUTES};

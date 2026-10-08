@@ -1,0 +1,1 @@
+var t=[{path:``,loadComponent:()=>import(`./chunk-DiPpTHV-.js`).then(o=>o.LocationList)},{path:`:id`,loadComponent:()=>import(`./chunk-BwxmqtA6.js`).then(o=>o.LocationDetails)}];export{t as LOCATION_ROUTES};
