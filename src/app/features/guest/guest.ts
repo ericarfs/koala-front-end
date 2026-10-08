@@ -14,9 +14,11 @@ import { ChartDataStore } from '@shared/domain/monitoring/stores/chart-data-stor
 import { ChartPanel } from '@shared/domain/monitoring/components/chart-panel';
 import { ChipSelect } from '@shared/domain/monitoring/components/chip-select';
 import { DEFAULT_TIME_BUCKET, TIME_BUCKET_OPTIONS, TimeBucket } from '@shared/domain/monitoring/models/time-bucket';
+import { IntervalSelector } from '@shared/domain/monitoring/components/interval-selector';
+import { SearchButton } from '@shared/domain/monitoring/components/search-button';
 
 @Component({
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, ContentLayout, LocationTreeSelect, InterfacePreferences ,TranslatePipe, ChartPanel, ChipSelect],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, ContentLayout, LocationTreeSelect, InterfacePreferences ,TranslatePipe, ChartPanel, ChipSelect, IntervalSelector, SearchButton],
   providers: [ChartDataStore],
   selector: 'app-guest',
   styleUrl: './guest.css',

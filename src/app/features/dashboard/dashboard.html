@@ -15,19 +15,11 @@
           <label for="timeBucket" class="text-sm text-neutral font-medium mb-1.5">
             {{'MONITORING.FILTERS.INTERVAL' | translate}}
           </label>
-          <div class="flex flex-wrap border border-outline rounded-md min-h-10 overflow-hidden">
-            @for (opt of intervalOptions; track opt.id) {
-              <button
-                type="button"
-                class="flex-1 basis-1/4 md:basis-1/7 cursor-pointer px-4 py-2 text-sm transition-colors"
-                [class.bg-primary]="filterForm.value.timeBucket === opt.id"
-                [class.text-primary-foreground]="filterForm.value.timeBucket === opt.id"
-                (click)="filterForm.controls.timeBucket.setValue(opt.id)"
-              >
-                {{ opt.text }}
-              </button>
-            }
-          </div>
+          <app-interval-selector
+            [options]="intervalOptions"
+            [value]="filterForm.value.timeBucket"
+            (valueChange)="filterForm.controls.timeBucket.setValue($event)"
+          />
         </div>
 
         <div class="flex flex-wrap gap-2 max-w-full">
@@ -64,20 +56,11 @@
         />
       }
 
-      <button
-        type="button"
-        class="btn w-full md:w-fit px-4 py-2 gap-2 bg-primary text-primary-foreground"
+      <app-search-button
+        [loading]="store.loading()"
         [disabled]="filterForm.invalid || selectedTypes().length === 0"
-        (click)="search()"
-      >
-        @if (store.loading()) {
-          <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-          <span>{{ 'COMMON.STATES.SEARCHING' | translate }}</span>
-        } @else {
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <span>{{ 'COMMON.ACTIONS.SEARCH' | translate }}</span>
-        }
-      </button>
+        (clicked)="search()"
+      />
     </form>
 
     <app-chart-panel

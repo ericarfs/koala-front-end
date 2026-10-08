@@ -15,13 +15,15 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ChartDataStore } from '@shared/domain/monitoring/stores/chart-data-store';
 import { ChartPanel } from '@shared/domain/monitoring/components/chart-panel';
 import { DEFAULT_TIME_BUCKET, TIME_BUCKET_OPTIONS, TimeBucket } from '@shared/domain/monitoring/models/time-bucket';
+import { IntervalSelector } from '@shared/domain/monitoring/components/interval-selector';
+import { SearchButton } from '@shared/domain/monitoring/components/search-button';
 
 
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ContentLayout, LocationTreeSelect, TranslatePipe, ChipSelect, ChartPanel],
+  imports: [CommonModule, ReactiveFormsModule, ContentLayout, LocationTreeSelect, TranslatePipe, ChipSelect, ChartPanel, IntervalSelector, SearchButton],
   providers: [ChartDataStore],
   templateUrl: './dashboard.html',
 })

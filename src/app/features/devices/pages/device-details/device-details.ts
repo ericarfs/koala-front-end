@@ -15,13 +15,15 @@ import { ChartDataStore } from '@shared/domain/monitoring/stores/chart-data-stor
 import { ChartPanel } from '@shared/domain/monitoring/components/chart-panel';
 import { ChipSelect } from '@shared/domain/monitoring/components/chip-select';
 import { DEFAULT_TIME_BUCKET, TIME_BUCKET_OPTIONS, TimeBucket } from '@shared/domain/monitoring/models/time-bucket';
+import { IntervalSelector } from '@shared/domain/monitoring/components/interval-selector';
+import { SearchButton } from '@shared/domain/monitoring/components/search-button';
 
 
 
 @Component({
   selector: 'app-device-details',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ContentLayout, TranslatePipe, ChipSelect, ChartPanel],
+  imports: [CommonModule, ReactiveFormsModule, ContentLayout, TranslatePipe, ChipSelect, ChartPanel, IntervalSelector, SearchButton],
   providers: [ChartDataStore],
   templateUrl: './device-details.html',
 })
