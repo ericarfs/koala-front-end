@@ -99,7 +99,7 @@ export class Ota {
         }
       });*/
     } else {
-      this.logText.set('Formulário inválido. Preencha todos os campos.');
+      this.logText.set('COMMON.FORM.INVALID');
       console.log(this.logText())
     }
   }
