@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -9,7 +10,6 @@ import { TranslateService } from '@ngx-translate/core';
     class="inline-flex items-center justify-center rounded-xl border border-outline
           bg-container text-default hover:bg-input transition-colors duration-200
           h-full overflow-hidden"
-    [class.md:justify-center]="collapsed"
   >
     <label for="lang-select" class="sr-only">Idioma</label>
 
@@ -39,12 +39,16 @@ import { TranslateService } from '@ngx-translate/core';
   `
 })
 export class LanguageSelector {
-  collapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+  translate = inject(TranslateService)
 
   public readonly availableLangs = ['en', 'pt'];
-  constructor(public translate: TranslateService) {
+  constructor() {
     const savedLang = localStorage.getItem('lang') ?? 'pt';
     this.translate.use(savedLang);
+
+    this.translate.onLangChange
+      .pipe(takeUntilDestroyed())
+      .subscribe(({ lang }) => localStorage.setItem('lang', lang));
   }
 
   langName(lang: string): string {
