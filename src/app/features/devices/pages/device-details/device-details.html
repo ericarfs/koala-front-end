@@ -1,5 +1,5 @@
 <app-content-layout
-  [title]="'DEVICES.LIST.TITLE' | translate"
+  [title]="'DEVICES.LIST.TITLE' | transloco"
   [subtitle]="device()?.name">
   @if (device(); as dev) {
     <div class="flex flex-col gap-6">
@@ -37,7 +37,7 @@
         <div class="flex flex-wrap gap-4">
           <div class="flex flex-col gap-1 w-full lg:max-w-140">
             <label for="timeBucket" class="text-sm text-neutral font-medium mb-1.5">
-              {{'MONITORING.FILTERS.INTERVAL' | translate}}
+              {{'MONITORING.FILTERS.INTERVAL' | transloco}}
             </label>
             <app-interval-selector
               [options]="intervalOptions"
@@ -49,14 +49,14 @@
           <div class="flex flex-wrap gap-2 max-w-full">
             <div class="flex flex-col gap-1 max-w-full">
               <label for="fromDate" class="text-sm text-neutral font-medium mb-1">
-                {{ 'MONITORING.DATE_RANGE.FROM' | translate }}
+                {{ 'MONITORING.DATE_RANGE.FROM' | transloco }}
               </label>
               <input type="date" class="border border-outline rounded-md px-3 py-2 bg-container text-default" formControlName="fromDate">
             </div>
 
             <div class="flex flex-col gap-1 max-w-full">
               <label for="toDate" class="text-sm text-neutral font-medium mb-1">
-                {{ 'MONITORING.DATE_RANGE.TO' | translate }}
+                {{ 'MONITORING.DATE_RANGE.TO' | transloco }}
               </label>
               <input type="date" class="border border-outline rounded-md px-3 py-2 bg-container text-default" formControlName="toDate">
             </div>
@@ -88,7 +88,7 @@
     </div>
   } @else {
     <p class="text-xl text-default font-medium">
-      {{ 'DEVICES.DETAILS.NOT_FOUND' | translate }}
+      {{ 'DEVICES.DETAILS.NOT_FOUND' | transloco }}
     </p>
   }
 </app-content-layout>

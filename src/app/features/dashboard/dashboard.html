@@ -6,14 +6,14 @@
       <div class="flex flex-wrap gap-4">
         <div class="flex flex-col gap-1 w-full lg:w-auto md:min-w-75">
           <label for="location" class="text-sm text-neutral font-medium mb-1.5">
-            {{'MONITORING.FILTERS.LOCATION' | translate}}
+            {{'MONITORING.FILTERS.LOCATION' | transloco}}
           </label>
           <app-location-tree-select formControlName="location"></app-location-tree-select>
         </div>
 
         <div class="flex flex-col gap-1 w-full lg:max-w-140">
           <label for="timeBucket" class="text-sm text-neutral font-medium mb-1.5">
-            {{'MONITORING.FILTERS.INTERVAL' | translate}}
+            {{'MONITORING.FILTERS.INTERVAL' | transloco}}
           </label>
           <app-interval-selector
             [options]="intervalOptions"
@@ -25,14 +25,14 @@
         <div class="flex flex-wrap gap-2 max-w-full">
           <div class="flex flex-col gap-1 max-w-full">
             <label for="fromDate" class="text-sm text-neutral font-medium mb-1">
-              {{ 'MONITORING.DATE_RANGE.FROM' | translate }}
+              {{ 'MONITORING.DATE_RANGE.FROM' | transloco }}
             </label>
             <input type="date" class="border border-outline rounded-md px-3 py-2 bg-container text-default" formControlName="fromDate">
           </div>
 
           <div class="flex flex-col gap-1 max-w-full">
             <label for="toDate" class="text-sm text-neutral font-medium mb-1">
-              {{ 'MONITORING.DATE_RANGE.TO' | translate }}
+              {{ 'MONITORING.DATE_RANGE.TO' | transloco }}
             </label>
             <input type="date" class="border border-outline rounded-md px-3 py-2 bg-container text-default" formControlName="toDate">
           </div>

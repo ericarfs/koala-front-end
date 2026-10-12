@@ -6,14 +6,14 @@
         class="btn px-4 bg-primary text-primary-foreground hover:bg-primary-details gap-1"
       >
         <i class="fa-solid fa-plus"></i>
-        {{'LOCATIONS.ADD.TITLE' | translate}}
+        {{'LOCATIONS.ADD.TITLE' | transloco}}
   </button>
   <div class="flex flex-col gap-6 flex-1">
     @if (location(); as loc) {
 
       <nav class="flex flex-wrap items-center gap-2 text-sm">
         <a routerLink="/location" class="text-primary hover:text-primary-details">
-          {{ 'LOCATIONS.LIST.TITLE' | translate }}
+          {{ 'LOCATIONS.LIST.TITLE' | transloco }}
         </a>
         @for (item of breadcrumb(); track item.id; let last = $last) {
           <i class="fa-solid fa-angle-right text-xs text-neutral"></i>
@@ -33,7 +33,7 @@
       @if (children().length > 0) {
         <div class="flex flex-col gap-3">
           <h2 class="text-lg font-semibold">
-            {{ 'LOCATIONS.DETAILS.SUB_LOCATIONS' | translate:{ count: children().length } }}
+            {{ 'LOCATIONS.DETAILS.SUB_LOCATIONS' | transloco:{ count: children().length } }}
           </h2>
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 md:gap-1">
             @for (child of pagination.pagedItems(); track child.id) {
@@ -54,7 +54,7 @@
       @if (showDevices()) {
         <div class="flex flex-col gap-3 break-all flex-1">
           <h2 class="text-lg font-semibold">
-            {{ 'LOCATIONS.DETAILS.VIEW_DEVICES' | translate:{ count: devices().length } }}
+            {{ 'LOCATIONS.DETAILS.VIEW_DEVICES' | transloco:{ count: devices().length } }}
           </h2>
           <app-device-list [devices]="devices()"></app-device-list>
         </div>
@@ -62,7 +62,7 @@
 
     } @else {
       <p class="text-xl text-default font-medium">
-        {{ 'LOCATIONS.DETAILS.NOT_FOUND' | translate }}
+        {{ 'LOCATIONS.DETAILS.NOT_FOUND' | transloco }}
       </p>
     }
   </div>

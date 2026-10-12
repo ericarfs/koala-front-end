@@ -2,12 +2,12 @@ import { MenuItem } from '../../../extensions/extension-registry';
 import { Component, input, output } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'li[app-nav-group]',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, NgClass, TranslatePipe],
+  imports: [RouterLink, RouterLinkActive, NgClass, TranslocoPipe],
   template:`
   <button
     type="button"
@@ -19,7 +19,7 @@ import { TranslatePipe } from '@ngx-translate/core';
     <i [ngClass]="icon()" class="text-lg w-5 text-center shrink-0"></i>
 
     @if (!collapsed()) {
-      <span class="flex-1 text-left whitespace-nowrap">{{ labelKey() | translate }}</span>
+      <span class="flex-1 text-left whitespace-nowrap">{{ labelKey() | transloco }}</span>
       <i
         class="fa-solid fa-chevron-down text-xs transition-transform duration-200"
         [class.rotate-180]="expanded()"
@@ -38,7 +38,7 @@ import { TranslatePipe } from '@ngx-translate/core';
             class="flex items-center gap-3 px-3 py-1.5 rounded-md text-neutral hover:bg-neutral/15 transition"
           >
             <i [ngClass]="sub.icon" class="w-4 text-center"></i>
-            <span>{{ sub.labelKey | translate }}</span>
+            <span>{{ sub.labelKey | transloco }}</span>
           </a>
         </li>
       }

@@ -2,10 +2,10 @@ import { ContentLayout } from '@shared/layouts/content/content';
 import { Component, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Input } from '@shared/components/input/input';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
-  imports: [ContentLayout, ReactiveFormsModule, Input, TranslatePipe],
+  imports: [ContentLayout, ReactiveFormsModule, Input, TranslocoPipe],
   selector: 'app-ota',
   styleUrl: './ota.css',
   templateUrl: './ota.html',

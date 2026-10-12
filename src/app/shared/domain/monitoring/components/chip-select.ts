@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input, model } from '@angular/core';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 export interface ChipOption {
   id: number;
@@ -9,14 +9,14 @@ export interface ChipOption {
 @Component({
   selector: 'app-chip-select',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-1 w-full">
       <div class="flex flex-wrap items-center justify-between mb-1.5 break-all">
-        <span class="text-sm text-neutral font-medium">{{ label() | translate }}</span>
+        <span class="text-sm text-neutral font-medium">{{ label() | transloco }}</span>
         <span class="text-xs text-neutral">
-          {{ 'MONITORING.FILTERS.SELECTED_COUNT' | translate: { selected: selected().length, total: max() } }}
+          {{ 'MONITORING.FILTERS.SELECTED_COUNT' | transloco: { selected: selected().length, total: max() } }}
         </span>
       </div>
 

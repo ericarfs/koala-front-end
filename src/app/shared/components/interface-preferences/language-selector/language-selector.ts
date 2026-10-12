@@ -1,6 +1,5 @@
-import { Component, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TranslateService } from '@ngx-translate/core';
+import { Component, effect, inject } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-language-selector',
@@ -16,7 +15,7 @@ import { TranslateService } from '@ngx-translate/core';
     <select
       id="lang-select"
       #langSelect
-      (change)="translate.use(langSelect.value)"
+      (change)="translate.setActiveLang(langSelect.value)"
       class="appearance-none bg-transparent text-neutral cursor-pointer
             focus:outline-none focus-visible:ring-2 focus-visible:ring-primary
             rounded w-full h-full text-center text-base leading-none
@@ -27,7 +26,7 @@ import { TranslateService } from '@ngx-translate/core';
       @for (lang of availableLangs; track lang) {
         <option
           [value]="lang"
-          [selected]="lang === translate.currentLang()"
+          [selected]="lang === currentLang()"
           [attr.aria-label]="langName(lang)"
           [attr.title]="langName(lang)"
         >
@@ -39,16 +38,17 @@ import { TranslateService } from '@ngx-translate/core';
   `
 })
 export class LanguageSelector {
-  translate = inject(TranslateService)
-
+  public readonly translate = inject(TranslocoService)
   public readonly availableLangs = ['en', 'pt'];
+  public readonly currentLang = this.translate.activeLang;
+
   constructor() {
     const savedLang = localStorage.getItem('lang') ?? 'pt';
-    this.translate.use(savedLang);
+    this.translate.setActiveLang(savedLang);
 
-    this.translate.onLangChange
-      .pipe(takeUntilDestroyed())
-      .subscribe(({ lang }) => localStorage.setItem('lang', lang));
+    effect(() => {
+      localStorage.setItem('lang', this.currentLang());
+    });
   }
 
   langName(lang: string): string {
@@ -56,7 +56,7 @@ export class LanguageSelector {
   }
 
   currentLangName(): string {
-    const lang = this.translate.currentLang();
+    const lang = this.currentLang();
     return lang ? this.langName(lang) : '';
   }
 

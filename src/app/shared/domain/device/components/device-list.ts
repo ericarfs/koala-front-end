@@ -7,7 +7,7 @@ import { Device, DeviceWithTypes } from '@shared/interfaces/device';
 import { Paginator} from '@shared/components/pagination/paginator';
 import { paginate } from '@shared/utils/paginate';
 import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { mediaQuery } from '@shared/utils/media-query';
 
 
@@ -15,11 +15,11 @@ import { mediaQuery } from '@shared/utils/media-query';
 @Component({
   selector: 'app-device-list',
   standalone: true,
-  imports: [CommonModule, DeviceCard, Paginator, TranslatePipe],
+  imports: [CommonModule, DeviceCard, Paginator, TranslocoPipe],
   template: `
     @if (devices().length === 0) {
       <p class="text-neutral text-lg">
-        {{'DEVICES.LIST.EMPTY' | translate}}
+        {{'DEVICES.LIST.EMPTY' | transloco}}
       </p>
     } @else {
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-1">

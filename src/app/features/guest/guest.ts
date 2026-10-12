@@ -7,7 +7,7 @@ import { DEVICE_TYPES_MOCK } from '../../mocks/device-types';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { getPath } from '@shared/domain/location/location-tree';
 import { LOCATIONS_MOCK } from '../../mocks/locations';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { CommonModule } from '@angular/common';
 import { LocationTreeSelect } from '@shared/domain/location/location-tree-select';
 import { ChartDataStore } from '@shared/domain/monitoring/stores/chart-data-store';
@@ -18,7 +18,7 @@ import { IntervalSelector } from '@shared/domain/monitoring/components/interval-
 import { SearchButton } from '@shared/domain/monitoring/components/search-button';
 
 @Component({
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, ContentLayout, LocationTreeSelect, InterfacePreferences ,TranslatePipe, ChartPanel, ChipSelect, IntervalSelector, SearchButton],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, ContentLayout, LocationTreeSelect, InterfacePreferences ,TranslocoPipe, ChartPanel, ChipSelect, IntervalSelector, SearchButton],
   providers: [ChartDataStore],
   selector: 'app-guest',
   styleUrl: './guest.css',

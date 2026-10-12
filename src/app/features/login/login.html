@@ -3,7 +3,7 @@
     <i class="fa fa-sitemap text-4xl text-primary" aria-hidden="true"></i>
     <h1 class="text-2xl font-semibold mt-3 mb-1">SmartLab</h1>
     <p class="text-sm text-neutral mb-6">
-      {{ 'COMMON.ACTIONS.ACCESS' | translate }}
+      {{ 'COMMON.ACTIONS.ACCESS' | transloco }}
     </p>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col text-left">
@@ -35,7 +35,7 @@
         [disabled]="!loginForm.valid"
         class="btn py-3 mt-6 bg-primary text-primary-foreground"
         >
-        {{ (loading() ? 'COMMON.STATES.LOGIN' : 'COMMON.ACTIONS.LOGIN') | translate }}
+        {{ (loading() ? 'COMMON.STATES.LOGIN' : 'COMMON.ACTIONS.LOGIN') | transloco }}
       </button>
     </form>
 
@@ -43,7 +43,7 @@
       routerLink="/guest"
       class="btn mt-2 bg-transparent border-0 text-primary hover:text-primary-details text-sm cursor-pointer"
       >
-      {{ 'COMMON.ACTIONS.GUEST_LOGIN' | translate }}
+      {{ 'COMMON.ACTIONS.GUEST_LOGIN' | transloco }}
     </a>
   </div>
 </section>

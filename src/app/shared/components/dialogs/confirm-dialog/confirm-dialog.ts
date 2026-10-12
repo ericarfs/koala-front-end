@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 export interface ConfirmDialogData {
   title: string;
@@ -10,15 +10,15 @@ export interface ConfirmDialogData {
 @Component({
   selector: 'app-confirm-dialog',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslocoPipe],
   template: `
     <div class="bg-container border-2 border-outline rounded-md shadow-xl w-full max-w-md
                 gap-4 flex flex-col overflow-hidden">
 
       <header class="p-6 pb-0">
-        <h2 class="text-lg font-semibold text-default">{{ data.title | translate }}</h2>
+        <h2 class="text-lg font-semibold text-default">{{ data.title | transloco }}</h2>
         @if (data.message) {
-          <p class="text-sm text-neutral mt-1">{{ data.message | translate }}</p>
+          <p class="text-sm text-neutral mt-1">{{ data.message | transloco }}</p>
         }
       </header>
 
@@ -32,9 +32,9 @@ export interface ConfirmDialogData {
         >
           @if (loading()) {
             <i class="fa-solid fa-spinner fa-spin"></i>
-            <span class="animate-pulse">{{ 'COMMON.STATES.SENDING' | translate }}</span>
+            <span class="animate-pulse">{{ 'COMMON.STATES.SENDING' | transloco }}</span>
           } @else {
-            <span>{{ 'COMMON.ACTIONS.DELETE' | translate }}</span>
+            <span>{{ 'COMMON.ACTIONS.DELETE' | transloco }}</span>
           }
         </button>
 
@@ -45,7 +45,7 @@ export interface ConfirmDialogData {
           class="btn border border-outline text-sm font-medium hover:bg-neutral/20
                  disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {{  'COMMON.ACTIONS.CANCEL' | translate }}
+          {{  'COMMON.ACTIONS.CANCEL' | transloco }}
         </button>
       </div>
     </div>

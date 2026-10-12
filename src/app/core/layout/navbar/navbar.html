@@ -12,7 +12,7 @@
     </button>
   </div>
 
-  <div class="text-default font-semibold text-center">{{ activeLabel() | translate }}</div>
+  <div class="text-default font-semibold text-center">{{ activeLabel() | transloco }}</div>
 
   <div class="flex justify-end">
     <app-user-menu [compact]="true" />
@@ -89,7 +89,7 @@
   <!-- Navegação -->
   <nav class="flex-1 overflow-y-auto px-2 pb-4 overflow-x-hidden">
     <ul class="flex flex-col gap-2">
-      @for (item of menuItems; track item.id) {
+      @for (item of menuItems(); track item.id) {
         @if (item.subItems.length > 0) {
           <li
             app-nav-group

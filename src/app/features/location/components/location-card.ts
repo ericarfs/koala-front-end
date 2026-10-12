@@ -2,7 +2,7 @@ import { Component, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Location } from '@shared/interfaces/location';
 import { LocationStats } from '@shared/domain/location/location-stats';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { CommonModule } from '@angular/common';
 import { ActionButtons } from '@shared/components/action-buttons/action-buttons';
 import { DialogService } from '@shared/components/dialogs/dialogs.service';
@@ -12,7 +12,7 @@ import { finalize, of, switchMap, throwError } from 'rxjs';
 @Component({
   selector: 'app-location-card',
   standalone: true,
-  imports: [CommonModule, RouterLink, ActionButtons, TranslatePipe],
+  imports: [CommonModule, RouterLink, ActionButtons, TranslocoPipe],
   host: { class: 'contents' },
   template: `
     <a
@@ -55,7 +55,7 @@ import { finalize, of, switchMap, throwError } from 'rxjs';
               <div class="flex flex-wrap items-baseline gap-2">
                 <i class="fa-solid fa-microchip text-primary"></i>
                 <span class="text-3xl font-bold leading-none">{{ s.devicesTotal }}</span>
-                <span class="text-xs text-neutral">{{ 'LOCATIONS.STATS.DEVICES' | translate }}</span>
+                <span class="text-xs text-neutral">{{ 'LOCATIONS.STATS.DEVICES' | transloco }}</span>
               </div>
 
               @if (s.avgTemperature !== null) {
@@ -77,12 +77,12 @@ import { finalize, of, switchMap, throwError } from 'rxjs';
               <span class="inline-flex items-center gap-1.5">
                 <span class="size-2 rounded-full bg-success"></span>
                 <b class="text-foreground">{{ s.devicesOnline }}</b>
-                {{ 'LOCATIONS.STATS.ONLINE' | translate }}
+                {{ 'LOCATIONS.STATS.ONLINE' | transloco }}
               </span>
               <span class="inline-flex items-center gap-1.5">
                 <span class="size-2 rounded-full bg-destructive"></span>
                 <b class="text-foreground">{{ s.devicesOffline }}</b>
-                {{ 'LOCATIONS.STATS.OFFLINE' | translate }}
+                {{ 'LOCATIONS.STATS.OFFLINE' | transloco }}
               </span>
             </div>
           </div>

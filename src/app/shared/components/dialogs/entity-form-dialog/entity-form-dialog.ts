@@ -3,22 +3,22 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { finalize } from 'rxjs';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Input } from '@shared/components/input/input';
 
 
 @Component({
   selector: 'app-form-dialog',
   standalone: true,
-  imports: [FormsModule, Input, TranslatePipe],
+  imports: [FormsModule, Input, TranslocoPipe],
   template: `
   <div class="bg-container border-2 border-outline rounded-md shadow-xl w-full max-w-md
               max-h-[90vh] gap-4 flex flex-col overflow-hidden">
 
     <header class="p-6 pb-0">
-      <h2 class="text-lg font-semibold text-default">{{ data.title | translate }}</h2>
+      <h2 class="text-lg font-semibold text-default">{{ data.title | transloco }}</h2>
       @if (data.subtitle) {
-        <p class="text-sm text-neutral mt-1">{{ data.subtitle | translate }}</p>
+        <p class="text-sm text-neutral mt-1">{{ data.subtitle | transloco }}</p>
       }
     </header>
 
@@ -43,9 +43,9 @@ import { Input } from '@shared/components/input/input';
         >
           @if (loading()) {
             <i class="fa-solid fa-spinner fa-spin"></i>
-            <span class="animate-pulse"> {{ 'COMMON.STATES.SENDING' | translate }}</span>
+            <span class="animate-pulse"> {{ 'COMMON.STATES.SENDING' | transloco }}</span>
           } @else {
-            <span>{{ (data.submitLabel ?? 'COMMON.ACTIONS.SAVE') | translate }}</span>
+            <span>{{ (data.submitLabel ?? 'COMMON.ACTIONS.SAVE') | transloco }}</span>
           }
         </button>
 
@@ -54,7 +54,7 @@ import { Input } from '@shared/components/input/input';
           (click)="close()"
           class="btn border border-outline text-sm font-medium hover:bg-neutral/20"
         >
-          {{ (data.cancelLabel ?? 'COMMON.ACTIONS.CANCEL') | translate }}
+          {{ (data.cancelLabel ?? 'COMMON.ACTIONS.CANCEL') | transloco }}
         </button>
       </div>
     </form>

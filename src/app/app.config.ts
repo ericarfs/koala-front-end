@@ -1,8 +1,14 @@
 import { authInterceptor } from './core/auth/interceptors/auth';
-import { ApplicationConfig, inject, provideAppInitializer, provideBrowserGlobalErrorListeners } from '@angular/core';
+import {
+  ApplicationConfig,
+  inject,
+  provideAppInitializer,
+  provideBrowserGlobalErrorListeners,
+  isDevMode,
+} from '@angular/core';
 import { provideRouter, Router } from '@angular/router';
 import { CORE_ROUTES } from './app.routes';
-import { provideHttpClient, withInterceptors,  } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { ExtensionRegistryService } from './core/extensions/extension-registry';
 import { MainLayout } from './core/layout/main/main-layout';
 import { provideKoalaModule } from './core/extensions/koala-module-extensions.token';
@@ -10,9 +16,8 @@ import { mffModuleDefinition } from './domains/mff/mff.module-definition';
 import { AuthService } from './core/auth/services/auth';
 import { PERMISSIONS } from './shared/tokens/permissions';
 
-//Traducao
-import { provideTranslateService } from '@ngx-translate/core';
-import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
+import { TranslocoHttpLoader } from './transloco-loader';
+import { provideTransloco } from '@jsverse/transloco';
 
 import { environment } from '../environments/environment';
 import { MetricsService } from '@shared/domain/monitoring/services/metrics';
@@ -25,13 +30,6 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(CORE_ROUTES),
     provideHttpClient(withInterceptors([authInterceptor])),
-    provideTranslateService({
-      fallbackLang: 'en',
-      loader: provideTranslateHttpLoader({
-        prefix: './i18n/',
-        suffix: '.json'
-      })
-    }),
     provideKoalaModule(mffModuleDefinition),
     provideKoalaModule(airconModuleDefinition),
 
@@ -51,8 +49,16 @@ export const appConfig: ApplicationConfig = {
 
       router.resetConfig([...CORE_ROUTES]);
     }),
-    (environment.useMock
-      ? [{ provide: MetricsService, useClass: MockMetricsService }]
-      : []),
-  ]
+    environment.useMock ? [{ provide: MetricsService, useClass: MockMetricsService }] : [],
+    provideHttpClient(),
+    provideTransloco({
+      config: {
+        availableLangs: ['en', 'pt'],
+        defaultLang: 'en',
+        reRenderOnLangChange: true,
+        prodMode: !isDevMode(),
+      },
+      loader: TranslocoHttpLoader,
+    }),
+  ],
 };

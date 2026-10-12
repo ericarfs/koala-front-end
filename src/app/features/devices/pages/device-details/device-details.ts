@@ -8,7 +8,7 @@ import { ContentLayout } from '@shared/layouts/content/content';
 import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
 import { DeviceWithTypes } from '@shared/interfaces/device';
 import { DEVICES_MOCK } from '../../../../mocks/devices';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { LOCATIONS_MOCK } from '../../../../mocks/locations';
 import { getPath } from '@shared/domain/location/location-tree';
 import { ChartDataStore } from '@shared/domain/monitoring/stores/chart-data-store';
@@ -23,7 +23,7 @@ import { SearchButton } from '@shared/domain/monitoring/components/search-button
 @Component({
   selector: 'app-device-details',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ContentLayout, TranslatePipe, ChipSelect, ChartPanel, IntervalSelector, SearchButton],
+  imports: [CommonModule, ReactiveFormsModule, ContentLayout, TranslocoPipe, ChipSelect, ChartPanel, IntervalSelector, SearchButton],
   providers: [ChartDataStore],
   templateUrl: './device-details.html',
 })

@@ -1,6 +1,6 @@
 <app-content-layout
-  [title]="'SENSORS.LIST.TITLE' | translate"
-  [subtitle]="'SENSORS.LIST.SUBTITLE' | translate"
+  [title]="'SENSORS.LIST.TITLE' | transloco"
+  [subtitle]="'SENSORS.LIST.SUBTITLE' | transloco"
 >
   <button
         actions
@@ -9,11 +9,11 @@
         class="btn px-4 bg-primary text-primary-foreground hover:bg-primary-details gap-1"
       >
         <i class="fa-solid fa-plus"></i>
-       {{'SENSORS.ADD.TITLE' | translate}}
+       {{'SENSORS.ADD.TITLE' | transloco}}
   </button>
   @if (deviceTypes().length === 0) {
     <p class="text-neutral text-xl">
-      {{'SENSORS.LIST.EMPTY' | translate}}
+      {{'SENSORS.LIST.EMPTY' | transloco}}
     </p>
   } @else {
     <div class="flex flex-wrap justify-center lg:justify-start gap-2 w-full">

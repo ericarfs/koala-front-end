@@ -1,6 +1,6 @@
 import { Component, ElementRef, forwardRef, input, viewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { noop } from 'rxjs';
 
 let nextId = 0;
@@ -10,7 +10,7 @@ type InputValue = string | File | null;
 @Component({
   selector: 'app-input',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslocoPipe],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -19,7 +19,7 @@ type InputValue = string | File | null;
     },
   ],
   template: `
-    <label [for]="inputId" class="font-medium text-neutral block text-sm mb-1.5">{{ label() | translate }}</label>
+    <label [for]="inputId" class="font-medium text-neutral block text-sm mb-1.5">{{ label() | transloco }}</label>
 
     @if (type() === 'file') {
       <input
@@ -56,14 +56,14 @@ type InputValue = string | File | null;
 
         @if (fileName) {
           <span class="text-sm font-semibold text-neutral break-all">{{ fileName }}</span>
-          <span class="text-xs text-neutral/70">{{ 'COMMON.FORM.FILE.HELPER' | translate }}</span>
+          <span class="text-xs text-neutral/70">{{ 'COMMON.FORM.FILE.HELPER' | transloco }}</span>
         } @else {
           <span class="text-sm font-semibold text-neutral">
-            {{ 'COMMON.FORM.FILE.DRAG_FILE' | translate }}
+            {{ 'COMMON.FORM.FILE.DRAG_FILE' | transloco }}
           </span>
           <span class="text-xs text-neutral/70">
-            {{ 'COMMON.FORM.FILE.OR' | translate }}
-            <span class="text-primary underline">{{ 'COMMON.FORM.FILE.CHOOSE_FILE' | translate }}</span>
+            {{ 'COMMON.FORM.FILE.OR' | transloco }}
+            <span class="text-primary underline">{{ 'COMMON.FORM.FILE.CHOOSE_FILE' | transloco }}</span>
           </span>
         }
       </label>
@@ -77,7 +77,7 @@ type InputValue = string | File | null;
             class="w-full border border-outline bg-container rounded-md px-3 py-2 text-sm
                    focus:outline-none focus:border-none focus:ring-1 focus:ring-primary
                    resize-none"
-            [placeholder]="placeholder() | translate"
+            [placeholder]="placeholder() | transloco"
             [value]="textValue"
             (input)="onInput($event)"
             (blur)="onBlur()"
@@ -89,7 +89,7 @@ type InputValue = string | File | null;
             [disabled]="disabled"
             class="w-full h-10 border border-outline bg-container rounded-md px-3 pr-10 text-sm
                    focus:outline-none focus:border-none focus:ring-1 focus:ring-primary"
-            [placeholder]="placeholder() | translate"
+            [placeholder]="placeholder() | transloco"
             [value]="textValue"
             (input)="onInput($event)"
             (blur)="onBlur()"
@@ -101,7 +101,7 @@ type InputValue = string | File | null;
 
     @if (errorMessage() || fileError) {
       <p class="text-xs text-red-500 mb-3" [class]="type() === 'file' ? 'mt-1.5' : '-mt-3'">
-        {{ errorMessage() || fileError | translate }}
+        {{ errorMessage() || fileError | transloco }}
       </p>
     }
   `,

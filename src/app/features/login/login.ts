@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/auth/services/auth';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Input } from '@shared/components/input/input';
 import { InputPassword } from '@shared/components/input/input-password';
 import { finalize } from 'rxjs';
@@ -17,7 +17,7 @@ interface LoginForm {
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, Input, InputPassword, RouterLink, TranslatePipe],
+  imports: [ReactiveFormsModule, Input, InputPassword, RouterLink, TranslocoPipe],
   templateUrl: './login.html',
   host: {
     'class': 'login-host'

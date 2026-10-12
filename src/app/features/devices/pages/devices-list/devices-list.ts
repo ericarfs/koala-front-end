@@ -10,14 +10,13 @@ import { DEVICES_MOCK } from '../../../../mocks/devices';
 import { Device } from '@shared/interfaces/device';
 import { getDescendantIds, getPath } from '@shared/domain/location/location-tree';
 import { LOCATIONS_MOCK } from '../../../../mocks/locations';
-import { TranslatePipe } from '@ngx-translate/core';
-
+import { TranslocoPipe } from '@jsverse/transloco';
 
 
 @Component({
   selector: 'app-devices-list',
   standalone: true,
-  imports: [ReactiveFormsModule, ContentLayout, DeviceList, Input, LocationTreeSelect, TranslatePipe],
+  imports: [ReactiveFormsModule, ContentLayout, DeviceList, Input, LocationTreeSelect, TranslocoPipe],
   styleUrl: './devices-list.css',
   templateUrl: './devices-list.html',
   host: {

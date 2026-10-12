@@ -7,7 +7,7 @@
         routerLink="/login"
         class="text-primary hover:text-primary-details inline-flex items-center gap-1 w-fit cursor-pointer">
           <i class="fa-solid fa-arrow-left"></i>
-          {{ 'COMMON.ACTIONS.BACK' | translate }}
+          {{ 'COMMON.ACTIONS.BACK' | transloco }}
       </a>
     </div>
     <app-interface-preferences/>
@@ -21,14 +21,14 @@
           <div class="flex flex-wrap gap-4">
             <div class="flex flex-col gap-1 w-full lg:w-auto md:min-w-75">
               <label for="location" class="text-sm text-neutral font-medium mb-1.5">
-                {{ 'MONITORING.FILTERS.LOCATION' | translate }}
+                {{ 'MONITORING.FILTERS.LOCATION' | transloco }}
               </label>
               <app-location-tree-select formControlName="location"></app-location-tree-select>
             </div>
 
             <div class="flex flex-col gap-1 w-full lg:max-w-140">
               <label for="timeBucket" class="text-sm text-neutral font-medium mb-1.5">
-                {{ 'MONITORING.FILTERS.INTERVAL' | translate }}
+                {{ 'MONITORING.FILTERS.INTERVAL' | transloco }}
               </label>
               <app-interval-selector
                 [options]="intervalOptions"

@@ -9,7 +9,7 @@ import { DEVICES_MOCK } from '../../mocks/devices';
 import { LOCATIONS_MOCK } from '../../mocks/locations';
 import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
 import { Subscription } from 'rxjs';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { ChipOption, ChipSelect } from '@shared/domain/monitoring/components/chip-select';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ChartDataStore } from '@shared/domain/monitoring/stores/chart-data-store';
@@ -23,7 +23,7 @@ import { SearchButton } from '@shared/domain/monitoring/components/search-button
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ContentLayout, LocationTreeSelect, TranslatePipe, ChipSelect, ChartPanel, IntervalSelector, SearchButton],
+  imports: [CommonModule, ReactiveFormsModule, ContentLayout, LocationTreeSelect, TranslocoPipe, ChipSelect, ChartPanel, IntervalSelector, SearchButton],
   providers: [ChartDataStore],
   templateUrl: './dashboard.html',
 })

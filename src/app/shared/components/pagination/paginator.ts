@@ -1,9 +1,9 @@
 import { Component, input, model } from '@angular/core';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-paginator',
-  imports:[TranslatePipe],
+  imports:[TranslocoPipe],
   standalone: true,
   template: `
     @if (totalPages() > 1) {
@@ -18,7 +18,7 @@ import { TranslatePipe } from '@ngx-translate/core';
         </button>
 
         <span class="w-full text-sm text-neutral">
-          {{ 'COMMON.PAGINATION.PAGE_OF' | translate:{
+          {{ 'COMMON.PAGINATION.PAGE_OF' | transloco:{
               current: pageIndex() + 1, total: totalPages() } }}
         </span>
 

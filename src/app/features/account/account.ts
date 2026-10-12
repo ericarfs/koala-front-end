@@ -5,7 +5,7 @@ import { Location } from '@angular/common';
 import { ContentLayout } from '@shared/layouts/content/content';
 import { Input } from '@shared/components/input/input';
 import { InputPassword } from '@shared/components/input/input-password';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 
 interface UserForm {
@@ -20,7 +20,7 @@ interface PasswordForm {
 }
 
 @Component({
-  imports: [ReactiveFormsModule, ContentLayout, Input, InputPassword, TranslatePipe],
+  imports: [ReactiveFormsModule, ContentLayout, Input, InputPassword, TranslocoPipe],
   selector: 'app-account',
   styleUrl: './account.css',
   templateUrl: './account.html',

@@ -1,6 +1,6 @@
 <app-content-layout
-  [title]="'LOCATIONS.LIST.TITLE' | translate"
-  [subtitle]="'LOCATIONS.LIST.SUBTITLE' | translate"
+  [title]="'LOCATIONS.LIST.TITLE' | transloco"
+  [subtitle]="'LOCATIONS.LIST.SUBTITLE' | transloco"
 >
   <button
         actions
@@ -9,11 +9,11 @@
         class="btn px-4 bg-primary text-primary-foreground hover:bg-primary-details gap-1"
       >
         <i class="fa-solid fa-plus"></i>
-        {{'LOCATIONS.ADD.TITLE' | translate}}
+        {{'LOCATIONS.ADD.TITLE' | transloco}}
   </button>
   @if (locations().length === 0) {
     <p class="text-neutral text-xl">
-      {{'LOCATIONS.LIST.EMPTY' | translate}}
+      {{'LOCATIONS.LIST.EMPTY' | transloco}}
     </p>
   } @else {
     <form class="flex flex-wrap items-end break-all" [formGroup]="searchForms">

@@ -7,11 +7,11 @@ import { ContentLayout } from '@shared/layouts/content/content';
 import { USERS_MOCK } from '../../mocks/users';
 import { paginate } from '@shared/utils/paginate';
 import { delay, of, tap } from 'rxjs';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 
 @Component({
-  imports: [ContentLayout, ActionButtons, Paginator, TranslatePipe],
+  imports: [ContentLayout, ActionButtons, Paginator, TranslocoPipe],
   selector: 'app-users',
   styleUrl: './users.css',
   templateUrl: './users.html',

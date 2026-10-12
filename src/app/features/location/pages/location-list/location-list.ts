@@ -8,7 +8,7 @@ import { LocationStore, MutationError } from '@shared/domain/location/location-s
 import { getChildren } from '@shared/domain/location/location-tree';
 import { paginate } from '@shared/utils/paginate';
 import { Location } from '@shared/interfaces/location';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DEVICES_MOCK } from '../../../../mocks/devices';
@@ -19,7 +19,7 @@ import { LocationTreeSelect } from '@shared/domain/location/location-tree-select
 
 
 @Component({
-  imports: [ReactiveFormsModule, ContentLayout, LocationCard, Paginator, LocationTreeSelect, TranslatePipe],
+  imports: [ReactiveFormsModule, ContentLayout, LocationCard, Paginator, LocationTreeSelect, TranslocoPipe],
   selector: 'app-location-list',
   styleUrl: './location-list.css',
   templateUrl: './location-list.html',

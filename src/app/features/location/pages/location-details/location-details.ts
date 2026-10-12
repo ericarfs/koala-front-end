@@ -11,7 +11,7 @@ import { LocationStore, MutationError } from '@shared/domain/location/location-s
 import { DialogService } from '@shared/components/dialogs/dialogs.service';
 import { DEVICES_MOCK } from '../../../../mocks/devices';
 import { Location } from '@shared/interfaces/location';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { Paginator} from '@shared/components/pagination/paginator';
 import { paginate } from '@shared/utils/paginate';
 import { getLocationStats, LocationStats } from '@shared/domain/location/location-stats';
@@ -24,7 +24,7 @@ import { mediaQuery } from '@shared/utils/media-query';
 @Component({
   selector: 'app-location-details',
   standalone: true,
-  imports: [CommonModule, RouterLink, ContentLayout, DeviceList, LocationCard, Paginator, TranslatePipe],
+  imports: [CommonModule, RouterLink, ContentLayout, DeviceList, LocationCard, Paginator, TranslocoPipe],
   templateUrl: './location-details.html',
   host: {
     class: 'block flex-1',
@@ -34,7 +34,7 @@ export class LocationDetails {
   private readonly route = inject(ActivatedRoute);
   private readonly store = inject(LocationStore);
   private readonly formDialog = inject(DialogService);
-  private readonly translate = inject(TranslateService);
+  private readonly translate = inject(TranslocoService);
 
   private readonly id = toSignal(
     this.route.paramMap.pipe(map((p) => Number(p.get('id')))),

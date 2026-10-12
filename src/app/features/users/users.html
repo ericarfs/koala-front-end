@@ -1,6 +1,6 @@
 <app-content-layout
-  [title]="'USERS.LIST.TITLE' | translate"
-  [subtitle]="'USERS.LIST.SUBTITLE' | translate"
+  [title]="'USERS.LIST.TITLE' | transloco"
+  [subtitle]="'USERS.LIST.SUBTITLE' | transloco"
 >
   <button
         actions
@@ -9,11 +9,11 @@
         class="btn px-4 bg-primary text-primary-foreground hover:bg-primary-details gap-1"
       >
         <i class="fa-solid fa-plus"></i>
-        {{'USERS.ADD.TITLE' | translate}}
+        {{'USERS.ADD.TITLE' | transloco}}
   </button>
   @if (allUsers().length === 0) {
     <p class="text-neutral text-xl">
-      {{'USERS.LIST.EMPTY' | translate}}
+      {{'USERS.LIST.EMPTY' | transloco}}
     </p>
   } @else {
     <div class="grid grid-cols-1 gap-1">

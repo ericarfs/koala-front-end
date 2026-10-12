@@ -1,11 +1,11 @@
 import { Component, inject, input, output } from '@angular/core';
 import { PERMISSIONS } from '../../tokens/permissions';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { DialogService } from '../dialogs/dialogs.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
-  imports: [TranslatePipe],
+  imports: [TranslocoPipe],
   selector: 'app-action-buttons',
   template: `
     @if (permissions.isAdmin()) {
@@ -14,7 +14,7 @@ import { firstValueFrom } from 'rxjs';
           type="button"
           class="hover:text-primary"
           (click)="$event.stopPropagation(); $event.preventDefault(); onEdit()"
-          [attr.aria-label]="'COMMON.ACTIONS.EDIT' | translate"
+          [attr.aria-label]="'COMMON.ACTIONS.EDIT' | transloco"
         >
           <i class="fa-solid fa-edit"></i>
         </button>
@@ -24,7 +24,7 @@ import { firstValueFrom } from 'rxjs';
           class="hover:text-destructive"
           [disabled]="deleting()"
           (click)="$event.stopPropagation(); $event.preventDefault(); onDelete()"
-          [attr.aria-label]="'COMMON.ACTIONS.DELETE' | translate"
+          [attr.aria-label]="'COMMON.ACTIONS.DELETE' | transloco"
         >
           @if(deleting()){
             <i class="fa-solid fa-spinner fa-spin"></i>
@@ -39,7 +39,7 @@ import { firstValueFrom } from 'rxjs';
 })
 export class ActionButtons {
   protected readonly permissions = inject(PERMISSIONS);
-  protected readonly translate = inject(TranslateService);
+  protected readonly translocoService = inject(TranslocoService);
   private readonly confirmDialog = inject(DialogService);
 
   readonly deleting = input(false);
@@ -55,7 +55,7 @@ export class ActionButtons {
   }
 
   async onDelete(): Promise<void> {
-    const msg = this.translate.instant(this.deleteMessageKey(), this.deleteMessageParams());
+    const msg = this.translocoService.translate(this.deleteMessageKey(), this.deleteMessageParams());
     const dialogRef = this.confirmDialog
       .openConfirm({
         title: 'COMMON.ACTIONS.DELETE',

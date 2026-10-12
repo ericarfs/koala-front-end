@@ -6,10 +6,10 @@ import { DEVICE_TYPES_MOCK } from '../../mocks/device-types';
 import { ActionButtons } from '@shared/components/action-buttons/action-buttons';
 import { DialogService } from '@shared/components/dialogs/dialogs.service';
 import { ContentLayout } from '@shared/layouts/content/content';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
-  imports: [ContentLayout, ActionButtons, TranslatePipe],
+  imports: [ContentLayout, ActionButtons, TranslocoPipe],
   selector: 'app-device-type',
   styleUrl: './device-types.css',
   templateUrl: './device-types.html',
@@ -17,7 +17,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 export class DeviceTypes {
   private readonly http = inject(HttpClient);
   private readonly formDialog = inject(DialogService);
-  private readonly translate = inject(TranslateService);
+  private readonly translate = inject(TranslocoService);
 
   readonly deviceTypes = signal<DeviceType[]>(DEVICE_TYPES_MOCK);;
 

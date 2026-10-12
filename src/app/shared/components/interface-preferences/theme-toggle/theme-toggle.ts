@@ -1,24 +1,24 @@
 import { Component, OnInit } from '@angular/core';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-theme-toggle',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslocoPipe],
   template: `
     <button
       (click)="toggleTheme()"
-      [attr.aria-label]="(isDark ? 'COMMON.THEME.TOGGLE_TO_LIGHT' : 'COMMON.THEME.TOGGLE_TO_DARK') | translate"
+      [attr.aria-label]="(isDark ? 'COMMON.THEME.TOGGLE_TO_LIGHT' : 'COMMON.THEME.TOGGLE_TO_DARK') | transloco"
       [attr.aria-pressed]="isDark"
       class="inline-flex items-center justify-center p-2 rounded-xl border border-outline bg-container text-default hover:bg-input transition-colors duration-200 cursor-pointer"
-      [title]="(isDark ? 'COMMON.THEME.ACTIVATE_LIGHT' : 'COMMON.THEME.ACTIVATE_DARK') | translate">
+      [title]="(isDark ? 'COMMON.THEME.ACTIVATE_LIGHT' : 'COMMON.THEME.ACTIVATE_DARK') | transloco">
 
       <span aria-hidden="true" class="text-md">
         {{ isDark ? '☀️' : '🌙' }}
       </span>
 
       <span class="sr-only">
-        {{ (isDark ? 'COMMON.THEME.LIGHT_MODE' : 'COMMON.THEME.DARK_MODE') | translate }}
+        {{ (isDark ? 'COMMON.THEME.LIGHT_MODE' : 'COMMON.THEME.DARK_MODE') | transloco }}
       </span>
     </button>
   `

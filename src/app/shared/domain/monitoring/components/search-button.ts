@@ -1,11 +1,11 @@
 import { Component, input, output } from '@angular/core';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 
 @Component({
   selector: 'app-search-button',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslocoPipe],
   template: `
     <button
       type="button"
@@ -14,10 +14,10 @@ import { TranslatePipe } from '@ngx-translate/core';
       (click)="clicked.emit()">
       @if (loading()) {
         <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-        <span>{{ 'COMMON.STATES.SEARCHING' | translate }}</span>
+        <span>{{ 'COMMON.STATES.SEARCHING' | transloco }}</span>
       } @else {
         <i class="fa-solid fa-magnifying-glass"></i>
-        <span>{{ 'COMMON.ACTIONS.SEARCH' | translate }}</span>
+        <span>{{ 'COMMON.ACTIONS.SEARCH' | transloco }}</span>
       }
     </button>
   `,

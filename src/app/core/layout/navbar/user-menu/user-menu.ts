@@ -1,12 +1,12 @@
 import { AuthService } from '@core/auth/services/auth';
 import { Component, ElementRef, HostListener, inject, signal, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-user-menu',
   standalone: true,
-  imports: [RouterLink, TranslatePipe],
+  imports: [RouterLink, TranslocoPipe],
   template: `
     <div class="relative">
       <button
@@ -27,11 +27,11 @@ import { TranslatePipe } from '@ngx-translate/core';
              [class]="compact() ? 'right-0 top-full mt-2' : 'left-0 bottom-full mb-2'">
           <a routerLink="/account" (click)="open.set(false)"
              class="block px-3 py-2 text-sm text-default hover:bg-neutral/20 rounded-sm">
-            {{ 'USER_MENU.ACCOUNT_SETTINGS' | translate }}
+            {{ 'USER_MENU.ACCOUNT_SETTINGS' | transloco }}
           </a>
           <button type="button" (click)="auth.logout()"
                   class="block w-full text-left px-3 py-2 text-sm text-destructive hover:bg-destructive/10 cursor-pointer rounded-sm">
-            {{ 'USER_MENU.LOGOUT' | translate }}
+            {{ 'USER_MENU.LOGOUT' | transloco }}
           </button>
         </div>
       }

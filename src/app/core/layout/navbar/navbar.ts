@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
@@ -9,13 +9,13 @@ import { NavItem } from './nav-item/nav-item';
 import { NavGroup } from './nav-group/nav-group';
 import { UserMenu } from './user-menu/user-menu';
 import { InterfacePreferences } from '@shared/components/interface-preferences/interface-preferences';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, NgClass, NavItem, NavGroup, UserMenu, InterfacePreferences, TranslatePipe],
+  imports: [CommonModule, NgClass, NavItem, NavGroup, UserMenu, InterfacePreferences, TranslocoPipe],
   templateUrl:'./navbar.html'
 })
 export class Navbar {
@@ -24,12 +24,12 @@ export class Navbar {
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly sidebar = inject(SidebarStateService);
-  protected readonly menuItems = this.registry.getMenuItems();
+  protected readonly menuItems = computed(() => this.registry.getMenuItems());
   protected readonly expandedId = signal<string | null>(null);
   protected readonly activeLabel = signal<string>('Smart Lab');
 
   constructor() {
-    this.expandedId.set('monitoramento');
+    this.expandedId.set('monitoring');
 
     this.router.events
     .pipe(
@@ -42,7 +42,7 @@ export class Navbar {
       interface Flat { label: string; routerLink: string; groupId?: string };
       const flat: Flat[] = [];
 
-      for (const item of this.menuItems) {
+      for (const item of this.menuItems()) {
         if (item.subItems.length > 0) {
           for (const sub of item.subItems) {
             flat.push({ label: sub.labelKey, routerLink: sub.routerLink, groupId: item.id });

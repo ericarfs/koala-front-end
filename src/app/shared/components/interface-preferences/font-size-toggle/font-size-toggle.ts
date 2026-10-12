@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 const LEVELS = [100, 115, 130]; // porcentagem do font-size base
 const LABEL_KEYS = [
@@ -12,18 +12,18 @@ const STORAGE_KEY = 'font-scale';
 @Component({
   selector: 'app-font-size-toggle',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslocoPipe],
   template: `
     <button
       type="button"
       (click)="cycle()"
-      [attr.aria-label]="'COMMON.FONT_SIZE.ARIA_LABEL' | translate: { size: (labelKeys[index] | translate) }"
-      [title]="'COMMON.FONT_SIZE.TITLE' | translate: { size: (labelKeys[index] | translate) }"
+      [attr.aria-label]="'COMMON.FONT_SIZE.ARIA_LABEL' | transloco: { size: (labelKeys[index] | transloco) }"
+      [title]="'COMMON.FONT_SIZE.TITLE' | transloco: { size: (labelKeys[index] | transloco) }"
       class="inline-flex items-center justify-center p-2 rounded-xl border border-outline bg-container text-default hover:bg-input transition-colors duration-200 cursor-pointer">
       <span aria-hidden="true" class="font-bold leading-none">
         <span class="text-sm">A</span><span class="text-xl">A</span>
       </span>
-      <span class="sr-only">{{ 'COMMON.FONT_SIZE.SR_ONLY' | translate }}</span>
+      <span class="sr-only">{{ 'COMMON.FONT_SIZE.SR_ONLY' | transloco }}</span>
     </button>
   `,
 })

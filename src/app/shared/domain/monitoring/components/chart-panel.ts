@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, viewChild } from '@angular/core';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { PdfExportService } from '@shared/services/pdf-export';
 import { TimeSeriesChart } from './time-series-chart';
 import { ChartData } from '../models/chart-data';
@@ -7,7 +7,7 @@ import { ChartData } from '../models/chart-data';
 @Component({
   selector: 'app-chart-panel',
   standalone: true,
-  imports: [TimeSeriesChart, TranslatePipe],
+  imports: [TimeSeriesChart, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="bg-container border border-outline rounded-md p-4 relative min-h-96">
@@ -15,19 +15,19 @@ import { ChartData } from '../models/chart-data';
         <div class="absolute inset-0 bg-container/80 backdrop-blur-sm rounded-md
                     flex flex-col items-center justify-center gap-3 z-10">
           <div class="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-          <span class="text-sm text-neutral">{{ 'COMMON.STATES.SEARCHING' | translate }}</span>
+          <span class="text-sm text-neutral">{{ 'COMMON.STATES.SEARCHING' | transloco }}</span>
         </div>
       }
 
       @if (error() && !loading()) {
         <div class="flex flex-col items-center justify-center py-20 gap-3 text-neutral">
           <i class="fa-solid fa-triangle-exclamation text-5xl opacity-20"></i>
-          <p class="text-sm">{{ 'COMMON.STATES.ERROR' | translate }}</p>
+          <p class="text-sm">{{ 'COMMON.STATES.ERROR' | transloco }}</p>
         </div>
       } @else if (isEmpty() && !loading()) {
         <div class="flex flex-col items-center justify-center py-20 gap-3 text-neutral">
           <i class="fa-solid fa-chart-line text-5xl opacity-20"></i>
-          <p class="text-sm">{{ emptyKey() | translate }}</p>
+          <p class="text-sm">{{ emptyKey() | transloco }}</p>
         </div>
       } @else {
         <app-time-series-chart
@@ -45,7 +45,7 @@ import { ChartData } from '../models/chart-data';
           class="btn bg-primary text-white px-4 py-2 rounded max-w-40"
         >
           <i class="fa-solid fa-file-pdf mr-2"></i>
-          {{ 'COMMON.ACTIONS.SAVE' | translate }} PDF
+          {{ 'COMMON.ACTIONS.SAVE' | transloco }} PDF
         </button>
       }
     </div>

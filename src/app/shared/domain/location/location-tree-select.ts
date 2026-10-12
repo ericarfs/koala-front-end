@@ -4,7 +4,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { buildTree } from './location-tree';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { LocationStore } from './location-store';
 
 interface LocationNode {
@@ -24,7 +24,7 @@ interface FlatNode {
 @Component({
   selector: 'app-location-tree-select',
   standalone: true,
-  imports: [CommonModule, TranslatePipe],
+  imports: [CommonModule, TranslocoPipe],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: forwardRef(() => LocationTreeSelect),
@@ -39,7 +39,7 @@ interface FlatNode {
         class="h-10 w-full flex items-center justify-between gap-2 border border-outline rounded-md px-3 bg-container text-default focus:outline-none focus:border-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       >
         <span class="truncate text-left" [class.text-neutral]="!selectedName()">
-          {{ selectedName() || ('MONITORING.PLACEHOLDERS.SELECT_LOCATION' | translate) }}
+          {{ selectedName() || ('MONITORING.PLACEHOLDERS.SELECT_LOCATION' | transloco) }}
         </span>
         <i class="fa-solid fa-chevron-down text-xs text-neutral transition-transform"
            [class.rotate-180]="open()"></i>
@@ -49,13 +49,13 @@ interface FlatNode {
         <div class="absolute z-30 mt-1 w-full min-w-72 bg-container border border-outline rounded-md shadow-lg overflow-hidden">
           <div class="p-2 border-b border-outline">
             <div class="relative">
-              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs text-neutral"></i>
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -transloco-y-1/2 text-xs text-neutral"></i>
               <input
                 #searchInput
                 type="text"
                 [value]="search()"
                 (input)="onSearch($event)"
-                [placeholder]="'MONITORING.PLACEHOLDERS.FIND_LOCATION' | translate"
+                [placeholder]="'MONITORING.PLACEHOLDERS.FIND_LOCATION' | transloco"
                 class="w-full h-9 pl-8 pr-3 text-sm border border-outline rounded-md bg-container text-default focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
@@ -64,7 +64,7 @@ interface FlatNode {
           <ul class="max-h-72 overflow-auto py-1">
             @if (visibleNodes().length === 0) {
               <li class="px-3 py-4 text-sm text-neutral text-center">
-                {{ 'MONITORING.FILTERS.EMPTY' | translate }}
+                {{ 'MONITORING.FILTERS.EMPTY' | transloco }}
               </li>
             }
             @for (node of visibleNodes(); track node.id) {
