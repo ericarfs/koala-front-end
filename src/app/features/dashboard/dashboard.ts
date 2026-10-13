@@ -17,6 +17,8 @@ import { ChartPanel } from '@shared/domain/monitoring/components/chart-panel';
 import { DEFAULT_TIME_BUCKET, TIME_BUCKET_OPTIONS, TimeBucket } from '@shared/domain/monitoring/models/time-bucket';
 import { IntervalSelector } from '@shared/domain/monitoring/components/interval-selector';
 import { SearchButton } from '@shared/domain/monitoring/components/search-button';
+import { ChartExportInfo } from '@shared/services/pdf-export';
+import { buildChartInfo } from '@shared/utils/chart-exports-info';
 
 
 
@@ -47,6 +49,8 @@ export class Dashboard {
   readonly selectedTypes = signal<number[]>([]);
   readonly selectedDevices = signal<number[]>([]);
   readonly availableDevices = signal<ChipOption[]>([]);
+
+  readonly chartInfo = signal<ChartExportInfo | undefined>(undefined);
 
   readonly chartTitle = signal('');
   readonly chartSubtitle = signal('');
@@ -112,8 +116,18 @@ export class Dashboard {
       ? this.availableDevices().filter(d => selected.includes(d.id))
       : [];
 
-    this.chartTitle.set(getPath(location, LOCATIONS_MOCK));
+    const locationPath = getPath(location, LOCATIONS_MOCK);
+
+    this.chartTitle.set(locationPath);
     this.chartSubtitle.set(this.buildSubtitle(types, devices));
+    this.chartInfo.set(buildChartInfo({
+      location: locationPath,
+      sensors: types,
+      devices,
+      timeBucket,
+      start,
+      end,
+    }));
 
     this.store.load({
       base: { idEnviroment: location, startDate: start, endDate: end, timeBucket },

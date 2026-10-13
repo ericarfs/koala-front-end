@@ -37,3 +37,7 @@ const TIME_BUCKET_LABELS: Record<TimeBucket, string> = {
 };
 
 export const TIME_BUCKET_OPTIONS = TIME_BUCKETS.map(id => ({ id, text: TIME_BUCKET_LABELS[id] }));
+
+export function timeBucketLabel(bucket: TimeBucket): string {
+  return TIME_BUCKET_LABELS[bucket];
+}

@@ -17,7 +17,8 @@ import { ChipSelect } from '@shared/domain/monitoring/components/chip-select';
 import { DEFAULT_TIME_BUCKET, TIME_BUCKET_OPTIONS, TimeBucket } from '@shared/domain/monitoring/models/time-bucket';
 import { IntervalSelector } from '@shared/domain/monitoring/components/interval-selector';
 import { SearchButton } from '@shared/domain/monitoring/components/search-button';
-
+import { ChartExportInfo } from '@shared/services/pdf-export';
+import { buildChartInfo } from '@shared/utils/chart-exports-info';
 
 
 @Component({
@@ -49,6 +50,8 @@ export class DeviceDetails {
     fromDate: new FormControl<string | null>(null, Validators.required),
     toDate: new FormControl<string | null>(null),
   });
+
+  readonly chartInfo = signal<ChartExportInfo | undefined>(undefined);
 
   readonly selectedTypes = signal<number[]>([]);
   readonly chartTitle = signal('');
@@ -94,6 +97,15 @@ export class DeviceDetails {
     const locName = device.id_enviroment != null ? getPath(device.id_enviroment, LOCATIONS_MOCK) : '-';
     this.chartTitle.set(`${locName} — ${device.name ?? ''}`);
     this.chartSubtitle.set(types.map(t => t.name).join(' × '));
+
+    this.chartInfo.set(buildChartInfo({
+      location: locName,
+      sensors: types,
+      devices: device ? [device] : [],
+      timeBucket,
+      start,
+      end,
+    }));
 
     // idDevice vai no "base": vale para todas as consultas (1 ou 2 tipos)
     this.store.load({

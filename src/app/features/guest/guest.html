@@ -41,7 +41,7 @@
           <app-chip-select
             label="MONITORING.FILTERS.DEVICE_TYPES"
             [options]="deviceTypeOptions"
-            [max]="2"
+            [max]="1"
             [(selected)]="selectedTypes"
           />
 
@@ -58,6 +58,7 @@
           [error]="store.error()"
           [title]="chartTitle()"
           [subtitle]="chartSubtitle()"
+          [info]="chartInfo()"
         />
       </div>
     </app-content-layout>

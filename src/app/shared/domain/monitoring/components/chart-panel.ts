@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, viewChild } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { PdfExportService } from '@shared/services/pdf-export';
+import { ChartExportInfo, computeSensorStats, PdfExportService, SensorStats } from '@shared/services/pdf-export';
 import { TimeSeriesChart } from './time-series-chart';
 import { ChartData } from '../models/chart-data';
 
@@ -65,16 +65,39 @@ export class ChartPanel {
 
   readonly isEmpty = computed(() => this.data().timestamps.length === 0);
 
+  readonly info = input<ChartExportInfo>();
+  readonly stats = computed<SensorStats[]>(() => {
+    const d = this.data();
+    const series = [d.primary, d.secondary, ...(d.extraSeries ?? [])].filter(Boolean);
+
+    return series
+      .map(s => computeSensorStats(s.title, s.values))
+      .filter((s): s is SensorStats => s !== null);
+  });
+
   async exportPdf(): Promise<void> {
     const title = this.title();
     const imageDataUrl = this.chart()?.getImageDataURL();
     if (!title || !imageDataUrl) return;
 
     const safe = title.replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-+|-+$/g, '');
+    const logoDataUrl = await this.pdf.loadImageAsDataUrl('assets/logo-white.png');
 
     await this.pdf.export(
-      [{ title, subtitle: this.subtitle(), imageDataUrl }],
-      `graficos-${safe || 'dashboard'}-${Date.now()}.pdf`,
+      [{
+        title,
+        subtitle: this.subtitle(),
+        imageDataUrl,
+        info: this.info(),
+        stats: this.stats(),
+      }],
+      {
+        fileName: `graficos-${safe || 'dashboard'}-${Date.now()}.pdf`,
+        appName: 'Smart Lab',
+        reportTitle: 'Relatório de Monitoramento',
+        generatedBy: 'Nome do usuário',
+        logoDataUrl: logoDataUrl ?? undefined,
+      },
     );
   }
 }

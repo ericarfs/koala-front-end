@@ -16,6 +16,8 @@ import { ChipSelect } from '@shared/domain/monitoring/components/chip-select';
 import { DEFAULT_TIME_BUCKET, TIME_BUCKET_OPTIONS, TimeBucket } from '@shared/domain/monitoring/models/time-bucket';
 import { IntervalSelector } from '@shared/domain/monitoring/components/interval-selector';
 import { SearchButton } from '@shared/domain/monitoring/components/search-button';
+import { ChartExportInfo } from '@shared/services/pdf-export';
+import { buildChartInfo } from '@shared/utils/chart-exports-info';
 
 @Component({
   imports: [CommonModule, RouterLink, ReactiveFormsModule, ContentLayout, LocationTreeSelect, InterfacePreferences ,TranslocoPipe, ChartPanel, ChipSelect, IntervalSelector, SearchButton],
@@ -42,14 +44,24 @@ export class Guest {
   readonly chartTitle = signal('');
   readonly chartSubtitle = signal('');
 
+  readonly chartInfo = signal<ChartExportInfo | undefined>(undefined);
+
   search(): void {
     const { location, timeBucket } = this.filterForm.getRawValue();
     const types = this.selectedTypes().map(id => ({ id, name: this.typeName(id) }));
     if (location == null || types.length === 0 || this.filterForm.invalid) return;
 
+    const locationPath = getPath(location, LOCATIONS_MOCK);
+
     // Textos do cabeçalho do gráfico (não dependem da resposta da API)
-    this.chartTitle.set(getPath(location, LOCATIONS_MOCK));
+    this.chartTitle.set(locationPath);
     this.chartSubtitle.set(types.map(t => t.name).join(' × '));
+
+    this.chartInfo.set(buildChartInfo({
+      location: locationPath,
+      sensors: types,
+      timeBucket,
+    }));
 
     // O store decide quantas consultas fazer e monta as séries
     this.store.load({ base: { idEnviroment: location, timeBucket }, types });
