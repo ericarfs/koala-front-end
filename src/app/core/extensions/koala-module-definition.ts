@@ -6,7 +6,6 @@ export interface KoalaSubItem {
   label: string;
   routePath: string;
   icon?: string;
-  subtitle?: string;
 }
 
 export interface KoalaModuleDefinition {
@@ -14,6 +13,7 @@ export interface KoalaModuleDefinition {
   label: string;
   routePath: string;
   icon?: string;
+  adminOnly?: boolean;
 
   loadChildren?: () => Promise<Route[]>;
   loadComponent?: () => Promise<Type<unknown>>;
@@ -22,4 +22,5 @@ export interface KoalaModuleDefinition {
 
   meta?: Record<string, unknown>;
   order?: number;
+  menuGroup?: string;
 }
