@@ -15,9 +15,11 @@ export interface ChipOption {
     <div class="flex flex-col gap-1 w-full">
       <div class="flex flex-wrap items-center justify-between mb-1.5 break-all">
         <span class="text-sm text-neutral font-medium">{{ label() | transloco }}</span>
-        <span class="text-xs text-neutral">
-          {{ 'MONITORING.FILTERS.SELECTED_COUNT' | transloco: { selected: selected().length, total: max() } }}
-        </span>
+        @if (max() !== null) {
+          <span class="text-xs text-neutral">
+            {{ 'MONITORING.FILTERS.SELECTED_COUNT' | transloco: { selected: selected().length, total: max() } }}
+          </span>
+        }
       </div>
 
       <div class="flex flex-wrap gap-2">
@@ -47,7 +49,7 @@ export interface ChipOption {
 export class ChipSelect {
   readonly label = input.required<string>();
   readonly options = input.required<readonly ChipOption[]>();
-  readonly max = input(2);
+  readonly max = input<number | null>(null);
 
   readonly selected = model<number[]>([]);
 
@@ -58,13 +60,17 @@ export class ChipSelect {
   }
 
   isDisabled(id: number): boolean {
-    return !this.isSelected(id) && this.selected().length >= this.max();
+    if (this.isSelected(id)) return false;
+    const max = this.max();
+    if (max === null) return false;
+    return this.selected().length >= max;
   }
 
   toggle(id: number): void {
     this.selected.update(list => {
       if (list.includes(id)) return list.filter(i => i !== id);
-      if (list.length >= this.max()) return list;
+      const max = this.max();
+      if (max !== null && list.length >= max) return list;
       return [...list, id];
     });
   }
