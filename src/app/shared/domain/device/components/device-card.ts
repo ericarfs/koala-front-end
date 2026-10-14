@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, input } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject, input } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ActionButtons } from '@shared/components/action-buttons/action-buttons';
 import { DeviceWithTypes } from '@shared/interfaces/device';
 
@@ -55,6 +55,7 @@ import { DeviceWithTypes } from '@shared/interfaces/device';
 
       <div class="border-t border-outline pt-2">
         <app-action-buttons
+        (edit)="onEdit()"
         ></app-action-buttons>
       </div>
 
@@ -63,6 +64,13 @@ import { DeviceWithTypes } from '@shared/interfaces/device';
   host: { class: 'contents' },
 })
 export class DeviceCard {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   device = input.required<DeviceWithTypes>();
   locationName = input<string>();
+
+  onEdit(){
+    this.router.navigate(['edit', this.device().id], { relativeTo: this.route });
+  }
 }

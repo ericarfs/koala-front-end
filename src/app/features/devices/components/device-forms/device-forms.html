@@ -1,0 +1,42 @@
+<app-content-layout
+[title]="title">
+<div class="flex flex-col gap-6">
+    <form [formGroup]="deviceForm" class="flex flex-col gap-4 bg-container border border-outline rounded-md p-4 w-5xl max-w-full  break-all">
+      <div class="flex flex-col gap-1 w-full lg:w-auto md:min-w-75">
+        <label for="location" class="text-sm text-neutral font-medium mb-1.5">
+            {{'MONITORING.FILTERS.LOCATION' | transloco}}
+        </label>
+        <app-location-tree-select formControlName="location"></app-location-tree-select>
+      </div>
+
+      <app-input
+        formControlName="name"
+        type="text"
+        label='COMMON.FORM.NAME'
+        placeholder='COMMON.FORM.NAME_PLACEHOLDER'
+      />
+
+      <app-input
+        formControlName="mac"
+        type="text"
+        label='MAC'
+        placeholder='MAC'
+      />
+
+      <app-chip-select
+        label="MONITORING.FILTERS.DEVICE_TYPES"
+        [options]="deviceTypeOptions"
+        [max]="5"
+        [selected]="selectedTypes()"
+        (selectedChange)="onTypesChange($event)"
+      />
+
+      <app-input
+        formControlName="description"
+        type="textarea"
+        label='COMMON.FORM.DESCRIPTION'
+        placeholder='COMMON.FORM.DESCRIPTION_PLACEHOLDER'
+      />
+    </form>
+  </div>
+</app-content-layout>
