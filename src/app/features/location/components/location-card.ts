@@ -21,7 +21,7 @@ import { finalize, of, switchMap, throwError } from 'rxjs';
       [class.opacity-50]="deleting()"
       [attr.aria-disabled]="deleting()"
       [attr.tabindex]="deleting() ? -1 : null"
-      class="group flex flex-col justify-start gap-2 w-full max-w-full  min-h-120 p-4 bg-container rounded-sm cursor-pointer outline outline-outline shadow-primary-background/80 hover:outline-primary hover:shadow-lg hover:transition-all">
+      class="group flex flex-col justify-start gap-2 w-full max-w-full  min-h-120 p-4 bg-container rounded-sm cursor-pointer outline outline-outline shadow-primary-background/80 hover:outline-primary hover:shadow-md hover:transition-all">
 
       <div class="flex flex-wrap justify-between items-center gap-2 text-sm text-neutral min-h-6">
         <div class="flex items-center justify-center min-h-6 w-6 bg-secondary rounded-sm text-primary-foreground">

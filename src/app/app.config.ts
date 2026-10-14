@@ -23,6 +23,18 @@ import { environment } from '../environments/environment';
 import { MetricsService } from '@shared/domain/monitoring/services/metrics';
 import { MockMetricsService } from '@shared/domain/monitoring/services/metrics.mock';
 import { airconModuleDefinition } from './domains/aircon/aircon.module-definition';
+import { LocationService } from '@shared/domain/location/services/location';
+import { MockLocationService } from '@shared/domain/location/services/location.mock';
+import { DeviceService } from '@shared/domain/device/services/device';
+import { MockDeviceService } from '@shared/domain/device/services/device.mock';
+import { DeviceTypeService } from '@shared/domain/device-type/services/device-type';
+import { MockDeviceTypeService } from '@shared/domain/device-type/services/device-type.mock';
+import { FirmwareService } from '@shared/domain/device/services/firmware';
+import { MockFirmwareService } from '@shared/domain/device/services/firmware.mock';
+import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
+import { MockDeviceMappingService } from '@shared/domain/device/services/device-mapping.mock';
+import { UserService } from '@shared/domain/user/services/user';
+import { MockUserService } from '@shared/domain/user/services/user.mock';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -49,7 +61,17 @@ export const appConfig: ApplicationConfig = {
 
       router.resetConfig([...CORE_ROUTES]);
     }),
-    environment.useMock ? [{ provide: MetricsService, useClass: MockMetricsService }] : [],
+    (environment.useMock
+      ? [
+          { provide: MetricsService, useClass: MockMetricsService },
+          { provide: LocationService, useClass: MockLocationService },
+          { provide: DeviceService, useClass: MockDeviceService },
+          { provide: DeviceTypeService, useClass: MockDeviceTypeService },
+          { provide: FirmwareService, useClass: MockFirmwareService },
+          { provide: DeviceMappingService, useClass: MockDeviceMappingService },
+          { provide: UserService, useClass: MockUserService },
+        ]
+      : []),
     provideHttpClient(),
     provideTransloco({
       config: {

@@ -1,8 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, input } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ActionButtons } from '@shared/components/action-buttons/action-buttons';
-import { DeviceWithTypes } from '@shared/interfaces/device';
+import { Device } from '@shared/interfaces/device';
+import { DeviceMappingService } from '../services/device-mapping';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { of, switchMap } from 'rxjs';
+import { DeviceType } from '@shared/interfaces/device-type';
 
 @Component({
   selector: 'app-device-card',
@@ -32,9 +36,9 @@ import { DeviceWithTypes } from '@shared/interfaces/device';
         </div>
       </div>
 
-      @if (device().types.length > 0) {
+      @if (types().length > 0) {
         <div class="flex flex-wrap gap-1">
-          @for (type of device().types; track type.id) {
+          @for (type of types(); track type.id) {
             <span class="inline-flex items-center px-2 py-0.5 rounded-sm text-xs bg-neutral/10 text-neutral">
               {{ type.name }}
             </span>
@@ -64,13 +68,24 @@ import { DeviceWithTypes } from '@shared/interfaces/device';
   host: { class: 'contents' },
 })
 export class DeviceCard {
-  private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private readonly mappingService = inject(DeviceMappingService);
 
-  device = input.required<DeviceWithTypes>();
+  device = input.required<Device>();
   locationName = input<string>();
 
+  readonly types = toSignal(
+    toObservable(this.device).pipe(
+      switchMap(device =>
+        device.id != null
+          ? this.mappingService.getTypesForDevice(device.id)
+          : of([] as DeviceType[]),
+      ),
+    ),
+    { initialValue: [] as DeviceType[] },
+  );
+
   onEdit(){
-    this.router.navigate(['edit', this.device().id], { relativeTo: this.route });
+    this.router.navigate(['devices/edit', this.device().id]);
   }
 }

@@ -3,10 +3,8 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { InterfacePreferences } from '@shared/components/interface-preferences/interface-preferences';
 import { ContentLayout } from '@shared/layouts/content/content';
-import { DEVICE_TYPES_MOCK } from '../../mocks/device-types';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { getPath } from '@shared/domain/location/location-tree';
-import { LOCATIONS_MOCK } from '../../mocks/locations';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { CommonModule } from '@angular/common';
 import { LocationTreeSelect } from '@shared/domain/location/location-tree-select';
@@ -18,6 +16,8 @@ import { IntervalSelector } from '@shared/domain/monitoring/components/interval-
 import { SearchButton } from '@shared/domain/monitoring/components/search-button';
 import { ChartExportInfo, localeFromLang } from '@shared/services/pdf-export';
 import { buildChartInfo } from '@shared/utils/chart-exports-info';
+import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
+import { LocationStore } from '@shared/domain/location/location-store';
 
 @Component({
   imports: [CommonModule, RouterLink, ReactiveFormsModule, ContentLayout, LocationTreeSelect, InterfacePreferences ,TranslocoPipe, ChartPanel, ChipSelect, IntervalSelector, SearchButton],
@@ -28,9 +28,12 @@ import { buildChartInfo } from '@shared/utils/chart-exports-info';
 })
 export class Guest {
   private readonly transloco = inject(TranslocoService);
+  private readonly deviceTypeStore = inject(DeviceTypeStore);
+  private readonly locationStore = inject(LocationStore);
+
   readonly store = inject(ChartDataStore);
 
-  readonly deviceTypeOptions = DEVICE_TYPES_MOCK;
+  readonly deviceTypeOptions = this.deviceTypeStore.items;
   readonly intervalOptions = TIME_BUCKET_OPTIONS;
 
   readonly filterForm = new FormGroup({
@@ -47,12 +50,17 @@ export class Guest {
 
   readonly chartInfo = signal<ChartExportInfo | undefined>(undefined);
 
+  constructor() {
+    this.deviceTypeStore.load();
+  }
+
+
   search(): void {
     const { location, timeBucket } = this.filterForm.getRawValue();
     const types = this.selectedTypes().map(id => ({ id, name: this.typeName(id) }));
     if (location == null || types.length === 0 || this.filterForm.invalid) return;
 
-    const locationPath = getPath(location, LOCATIONS_MOCK);
+    const locationPath = getPath(location, this.locationStore.items());
 
     // Textos do cabeçalho do gráfico (não dependem da resposta da API)
     this.chartTitle.set(locationPath);
@@ -70,6 +78,6 @@ export class Guest {
   }
 
   private typeName(id: number): string {
-    return DEVICE_TYPES_MOCK.find(t => t.id === id)?.name ?? '';
+    return this.deviceTypeStore.items().find(t => t.id === id)?.name ?? '';
   }
 }

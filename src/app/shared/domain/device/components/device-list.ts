@@ -1,12 +1,9 @@
 import { DeviceCard } from './device-card';
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, input } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { combineLatest, map, of, switchMap } from 'rxjs';
-import { Device, DeviceWithTypes } from '@shared/interfaces/device';
+import { Component, computed, input } from '@angular/core';
+import { Device } from '@shared/interfaces/device';
 import { Paginator} from '@shared/components/pagination/paginator';
 import { paginate } from '@shared/utils/paginate';
-import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { mediaQuery } from '@shared/utils/media-query';
 
@@ -42,32 +39,7 @@ import { mediaQuery } from '@shared/utils/media-query';
   },
 })
 export class DeviceList {
-  private readonly mappingService = inject(DeviceMappingService);
-
   devices = input.required<Device[]>();
-
-  readonly enrichedDevices = toSignal(
-    // Reage a mudanças no input
-    toObservable(this.devices).pipe(
-      // Para cada lista de devices, busca os types de todos em paralelo
-      switchMap(devices => {
-        if (devices.length === 0) return of([] as DeviceWithTypes[]);
-
-        // Cria um Observable por device
-        const observables = devices.map(device =>
-          device.id != null
-            ? this.mappingService.getTypesForDevice(device.id).pipe(
-                map(types => ({ ...device, types } as DeviceWithTypes))
-              )
-            : of({ ...device, types: [] } as DeviceWithTypes)
-        );
-
-        // Combina todos num só array
-        return combineLatest(observables);
-      })
-    ),
-    { initialValue: [] as DeviceWithTypes[] }
-  );
 
   pageSize = input(9);
   private isMid     = mediaQuery('(max-width: 1279px)');
@@ -77,7 +49,7 @@ export class DeviceList {
     return this.pageSize();
   });
 
-  pagination = paginate(this.enrichedDevices, this.effectivePageSize);
+  pagination = paginate(this.devices, this.effectivePageSize);
 
   resolveLocationName = input<(device: Device) => string | undefined>();
 

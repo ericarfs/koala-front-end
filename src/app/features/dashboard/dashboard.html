@@ -41,7 +41,7 @@
 
       <app-chip-select
         label="MONITORING.FILTERS.DEVICE_TYPES"
-        [options]="deviceTypeOptions"
+        [options]="deviceTypeOptions()"
         [max]="2"
         [selected]="selectedTypes()"
         (selectedChange)="onTypesChange($event)"

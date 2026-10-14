@@ -4,9 +4,6 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { getDescendantIds, getPath } from '@shared/domain/location/location-tree';
 import { LocationTreeSelect } from '@shared/domain/location/location-tree-select';
 import { ContentLayout } from '@shared/layouts/content/content';
-import { DEVICE_TYPES_MOCK } from '../../mocks/device-types';
-import { DEVICES_MOCK } from '../../mocks/devices';
-import { LOCATIONS_MOCK } from '../../mocks/locations';
 import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
 import { Subscription } from 'rxjs';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
@@ -19,6 +16,9 @@ import { IntervalSelector } from '@shared/domain/monitoring/components/interval-
 import { SearchButton } from '@shared/domain/monitoring/components/search-button';
 import { ChartExportInfo, localeFromLang } from '@shared/services/pdf-export';
 import { buildChartInfo } from '@shared/utils/chart-exports-info';
+import { DeviceStore } from '@shared/domain/device/stores/device-store';
+import { LocationStore } from '@shared/domain/location/location-store';
+import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
 
 
 
@@ -32,9 +32,12 @@ import { buildChartInfo } from '@shared/utils/chart-exports-info';
 export class Dashboard {
   private readonly transloco = inject(TranslocoService);
   private readonly mappingService = inject(DeviceMappingService);
+  private readonly deviceTypeStore = inject(DeviceTypeStore);
+  private readonly deviceStore = inject(DeviceStore);
+  private readonly locationStore = inject(LocationStore);
   readonly store = inject(ChartDataStore);
 
-  readonly deviceTypeOptions = DEVICE_TYPES_MOCK;
+  readonly deviceTypeOptions = this.deviceTypeStore.items;
   readonly intervalOptions = TIME_BUCKET_OPTIONS;
 
   readonly filterForm = new FormGroup({
@@ -59,6 +62,7 @@ export class Dashboard {
   private devicesSub?: Subscription;
 
   constructor() {
+    this.deviceTypeStore.load();
     // Só o campo "location" interessa (antes qualquer mudança do form recalculava).
     this.filterForm.controls.location.valueChanges
       .pipe(takeUntilDestroyed())
@@ -85,17 +89,18 @@ export class Dashboard {
       return;
     }
 
-    const descendantIds = getDescendantIds(location, LOCATIONS_MOCK);
+    const locations = this.locationStore.items();
+    const allDevices = this.deviceStore.items();
+    const descendantIds = getDescendantIds(location, locations);
 
     this.devicesSub = this.mappingService.getDevicesForType(types[0]).subscribe(deviceIds => {
-      const devices: ChipOption[] = DEVICES_MOCK
+      const devices: ChipOption[] = allDevices
         .filter(d =>
           d.id != null && deviceIds.includes(d.id) &&
           d.id_enviroment != null && descendantIds.has(d.id_enviroment))
         .map(d => ({ id: d.id!, name: d.name ?? '' }));
 
       this.availableDevices.set(devices);
-      // remove seleções que não fazem mais sentido
       this.selectedDevices.update(list => list.filter(id => devices.some(d => d.id === id)));
     });
   }
@@ -117,7 +122,7 @@ export class Dashboard {
       ? this.availableDevices().filter(d => selected.includes(d.id))
       : [];
 
-    const locationPath = getPath(location, LOCATIONS_MOCK);
+    const locationPath = getPath(location, this.locationStore.items());
 
     this.chartTitle.set(locationPath);
     this.chartSubtitle.set(this.buildSubtitle(types, devices));
@@ -147,6 +152,6 @@ export class Dashboard {
   }
 
   private typeName(id: number): string {
-    return DEVICE_TYPES_MOCK.find(t => t.id === id)?.name ?? '';
+    return this.deviceTypeStore.items().find(t => t.id === id)?.name ?? '';
   }
 }

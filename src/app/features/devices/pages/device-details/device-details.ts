@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -7,9 +7,7 @@ import { map } from 'rxjs';
 import { ContentLayout } from '@shared/layouts/content/content';
 import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
 import { DeviceWithTypes } from '@shared/interfaces/device';
-import { DEVICES_MOCK } from '../../../../mocks/devices';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { LOCATIONS_MOCK } from '../../../../mocks/locations';
 import { getPath } from '@shared/domain/location/location-tree';
 import { ChartDataStore } from '@shared/domain/monitoring/stores/chart-data-store';
 import { ChartPanel } from '@shared/domain/monitoring/components/chart-panel';
@@ -19,6 +17,9 @@ import { IntervalSelector } from '@shared/domain/monitoring/components/interval-
 import { SearchButton } from '@shared/domain/monitoring/components/search-button';
 import { ChartExportInfo, localeFromLang } from '@shared/services/pdf-export';
 import { buildChartInfo } from '@shared/utils/chart-exports-info';
+import { DeviceStore } from '@shared/domain/device/stores/device-store';
+import { LocationStore } from '@shared/domain/location/location-store';
+import { DeviceType } from '@shared/interfaces/device-type';
 
 
 @Component({
@@ -33,6 +34,9 @@ export class DeviceDetails {
   private readonly routerLocation = inject(Location);
   private readonly mappingService = inject(DeviceMappingService);
   private readonly transloco = inject(TranslocoService);
+  private readonly deviceStore = inject(DeviceStore);
+  private readonly locationStore = inject(LocationStore);
+
   readonly store = inject(ChartDataStore);
 
   private readonly id = toSignal(
@@ -41,7 +45,18 @@ export class DeviceDetails {
   );
 
   readonly intervalOptions = TIME_BUCKET_OPTIONS;
-  readonly device = signal<DeviceWithTypes | null>(null);
+
+  private readonly loadedTypes = signal<DeviceType[]>([]);
+
+  readonly device = computed<DeviceWithTypes | null>(() => {
+    const id = this.id();
+    if (Number.isNaN(id)) return null;
+
+    const found = this.deviceStore.items().find((d) => d.id === id);
+    if (!found) return null;
+
+    return { ...found, types: this.loadedTypes() };
+  });
 
   readonly filterForm = new FormGroup({
     timeBucket: new FormControl<TimeBucket>(DEFAULT_TIME_BUCKET, {
@@ -60,21 +75,17 @@ export class DeviceDetails {
 
   constructor() {
     effect(() => {
-      const found = DEVICES_MOCK.find(d => d.id === this.id());
+      const id = this.id();
 
-      // Trocou de dispositivo (mesma rota, outro id): limpa seleção e gráfico
+      // Reset em qualquer troca de id
       this.selectedTypes.set([]);
+      this.loadedTypes.set([]);
       this.store.reset();
 
-      if (!found) {
-        this.device.set(null);
-        return;
-      }
+      if (Number.isNaN(id)) return;
 
-      // Renderiza nome/descrição já, e completa com os tipos quando chegarem
-      this.device.set({ ...found, types: [] });
-      this.mappingService.getTypesForDevice(found.id!).subscribe(types => {
-        this.device.set({ ...found, types });
+      this.mappingService.getTypesForDevice(id).subscribe((types) => {
+        this.loadedTypes.set(types);
       });
     });
   }
@@ -95,7 +106,9 @@ export class DeviceDetails {
     const end = toDate ? new Date(toDate) : new Date();
     end.setHours(23, 59, 59);
 
-    const locName = device.id_enviroment != null ? getPath(device.id_enviroment, LOCATIONS_MOCK) : '-';
+    const locName = device.id_enviroment != null
+      ? getPath(device.id_enviroment, this.locationStore.items())
+      : '-';
     this.chartTitle.set(`${locName} — ${device.name ?? ''}`);
     this.chartSubtitle.set(types.map(t => t.name).join(' × '));
 

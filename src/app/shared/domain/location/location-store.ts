@@ -1,24 +1,27 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { canAddChild, canReparent, getAncestors, getChildren } from './location-tree';
 import { Location } from '@shared/interfaces/location';
-import { LOCATIONS_MOCK } from '../../../mocks/locations';
-import { map, Observable, of, switchMap, timer } from 'rxjs';
+import { catchError, map, Observable, of, tap } from 'rxjs';
+import { LocationService } from './services/location';
 
 export type MutationError =
   | 'MAX_DEPTH_EXCEEDED'
   | 'INVALID_PARENT';
 
-const FAKE_LATENCY_MS = 3000;
 
-/** Resultado de uma mutação assíncrona. */
 export type MutationResult<T> =
   | { ok: true; data: T }
   | { ok: false; reason: MutationError };
 
 @Injectable({ providedIn: 'root' })
 export class LocationStore {
-  private readonly _items = signal<Location[]>(LOCATIONS_MOCK);
+  private readonly service = inject(LocationService);
+
+  private readonly _items = signal<Location[]>([]);
   readonly items = this._items.asReadonly();
+
+  private readonly _loading = signal(false);
+  readonly loading = this._loading.asReadonly();
 
   // -------- consultas reativas (sempre derivam do items) --------
   readonly roots = computed(() => getChildren(null, this._items()));
@@ -35,22 +38,41 @@ export class LocationStore {
     return computed(() => this._items().find((l) => l.id === id) ?? null);
   }
 
+  constructor() {
+    this.load();
+  }
+
+  load(): void {
+    this._loading.set(true);
+    this.service.findAll().subscribe({
+      next: (items) => {
+        this._items.set(items);
+        this._loading.set(false);
+      },
+      error: (err) => {
+        console.error('[LocationStore] load failed', err);
+        this._loading.set(false);
+      },
+    });
+  }
+
   // -------- mutações --------
-   add(location: Location): Observable<MutationResult<Location>> {
-    return timer(FAKE_LATENCY_MS).pipe(
-      switchMap(() => {
-        const list = this._items();
+  add(draft: Omit<Location, 'id'>): Observable<MutationResult<Location>> {
+    const list = this._items();
 
-        if (location.parentId != null && !canAddChild(location.parentId, list)) {
-          return of<MutationResult<Location>>({
-            ok: false,
-            reason: 'MAX_DEPTH_EXCEEDED',
-          });
-        }
+    if (draft.parentId != null && !canAddChild(draft.parentId, list)) {
+      return of<MutationResult<Location>>({
+        ok: false,
+        reason: 'MAX_DEPTH_EXCEEDED',
+      });
+    }
 
-        this._items.update((l) => [...l, location]);
-        return of<MutationResult<Location>>({ ok: true, data: location });
-      }),
+    return this.service.save(draft).pipe(
+      tap((created) => this._items.update((l) => [...l, created])),
+      map((created) => ({ ok: true, data: created }) as MutationResult<Location>),
+      catchError(() =>
+        of<MutationResult<Location>>({ ok: false, reason: 'INVALID_PARENT' }),
+      ),
     );
   }
 
@@ -58,47 +80,37 @@ export class LocationStore {
     id: number,
     patch: Partial<Location>,
   ): Observable<MutationResult<Location>> {
-    return timer(FAKE_LATENCY_MS).pipe(
-      switchMap(() => {
-        const list = this._items();
-        const current = list.find((l) => l.id === id);
-        if (!current) {
-          return of<MutationResult<Location>>({
-            ok: false,
-            reason: 'INVALID_PARENT',
-          });
-        }
+    const list = this._items();
+    const current = list.find((l) => l.id === id);
+    if (!current) {
+      return of<MutationResult<Location>>({ ok: false, reason: 'INVALID_PARENT' });
+    }
 
-        if (
-          patch.parentId !== undefined &&
-          !canReparent(id, patch.parentId ?? null, list)
-        ) {
-          return of<MutationResult<Location>>({
-            ok: false,
-            reason: 'INVALID_PARENT',
-          });
-        }
+    if (
+      patch.parentId !== undefined &&
+      !canReparent(id, patch.parentId ?? null, list)
+    ) {
+      return of<MutationResult<Location>>({ ok: false, reason: 'INVALID_PARENT' });
+    }
 
-        const updated: Location = { ...current, ...patch };
-        this._items.update((l) =>
-          l.map((item) => (item.id === id ? updated : item)),
-        );
-        return of<MutationResult<Location>>({ ok: true, data: updated });
-      }),
+    return this.service.update(id, patch).pipe(
+      tap((updated) =>
+        this._items.update((l) => l.map((item) => (item.id === id ? updated : item))),
+      ),
+      map((updated) => ({ ok: true, data: updated }) as MutationResult<Location>),
+      catchError(() =>
+        of<MutationResult<Location>>({ ok: false, reason: 'INVALID_PARENT' }),
+      ),
     );
   }
 
   remove(id: number): Observable<MutationResult<void>> {
-    return timer(FAKE_LATENCY_MS).pipe(
-      map(() => {
-        this._items.update((l) => l.filter((item) => item.id !== id));
-        return { ok: true, data: undefined } as MutationResult<void>;
-      }),
+    return this.service.remove(id).pipe(
+      tap(() => this._items.update((l) => l.filter((item) => item.id !== id))),
+      map(() => ({ ok: true, data: undefined }) as MutationResult<void>),
+      catchError(() =>
+        of<MutationResult<void>>({ ok: false, reason: 'INVALID_PARENT' }),
+      ),
     );
-  }
-
-  nextId(): number {
-    const ids = this._items().map((l) => l.id ?? 0);
-    return ids.length ? Math.max(...ids) + 1 : 1;
   }
 }

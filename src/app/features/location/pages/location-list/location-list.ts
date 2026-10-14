@@ -11,11 +11,12 @@ import { Location } from '@shared/interfaces/location';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { DEVICES_MOCK } from '../../../../mocks/devices';
-import { DEVICE_MAPPINGS_MOCK } from '../../../../mocks/device-mapping';
-import { DEVICE_TYPES_MOCK } from '../../../../mocks/device-types';
 import { getLocationStats, LocationStats } from '@shared/domain/location/location-stats';
 import { LocationTreeSelect } from '@shared/domain/location/location-tree-select';
+import { DeviceStore } from '@shared/domain/device/stores/device-store';
+import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
+import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
+import { DeviceMapping } from '@shared/interfaces/device-mapping';
 
 
 @Component({
@@ -28,16 +29,25 @@ import { LocationTreeSelect } from '@shared/domain/location/location-tree-select
   },
 })
 export class LocationList {
+  private readonly deviceStore = inject(DeviceStore);
+  private readonly deviceTypeStore = inject(DeviceTypeStore);
   private readonly formDialog = inject(DialogService);
+  private readonly mappingService = inject(DeviceMappingService);
 
   readonly store = inject(LocationStore);
 
+  private readonly mappings = toSignal(
+    this.mappingService.getAllMappings(),
+    { initialValue: [] as DeviceMapping[] },
+  );
+
   readonly statsById = computed<Map<number, LocationStats>>(() => {
     const locations = this.store.items();
+    const devices = this.deviceStore.items();
     const source = {
-      devices: DEVICES_MOCK,
-      mappings: DEVICE_MAPPINGS_MOCK,
-      types: DEVICE_TYPES_MOCK,
+      devices,
+      mappings: this.mappings(),
+      types: this.deviceTypeStore.items(),
     };
 
     const map = new Map<number, LocationStats>();
@@ -78,6 +88,8 @@ export class LocationList {
   pagination = paginate(this.locations, this.pageSize);
 
   constructor() {
+    this.deviceTypeStore.load();
+
     effect(() => {
       this.filters();
       this.pagination.pageIndex.set(0);
@@ -113,14 +125,13 @@ export class LocationList {
         onSubmit: (values) => {
           const v = values as { name: string; description?: string };
 
-          const created: Location = {
-            id: this.store.nextId(),
+          const draft: Omit<Location, 'id'> = {
             name: v.name,
             description: v.description ?? '',
             parentId: null,
-          };
+          } as Omit<Location, 'id'>;
 
-          return this.store.add(created).pipe(
+          return this.store.add(draft).pipe(
             switchMap((res) =>
               res.ok
                 ? of(res.data)

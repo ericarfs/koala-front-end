@@ -1,12 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { delay, of, tap } from 'rxjs';
+import { Component, inject } from '@angular/core';
+import { of, switchMap, throwError } from 'rxjs';
 import { DeviceType } from '../../shared/interfaces/device-type';
-import { DEVICE_TYPES_MOCK } from '../../mocks/device-types';
 import { ActionButtons } from '@shared/components/action-buttons/action-buttons';
 import { DialogService } from '@shared/components/dialogs/dialogs.service';
 import { ContentLayout } from '@shared/layouts/content/content';
-import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
 
 @Component({
   imports: [ContentLayout, ActionButtons, TranslocoPipe],
@@ -15,11 +14,14 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
   templateUrl: './device-types.html',
 })
 export class DeviceTypes {
-  private readonly http = inject(HttpClient);
   private readonly formDialog = inject(DialogService);
-  private readonly translate = inject(TranslocoService);
+  private readonly store = inject(DeviceTypeStore);
 
-  readonly deviceTypes = signal<DeviceType[]>(DEVICE_TYPES_MOCK);;
+  readonly deviceTypes = this.store.items;
+
+  constructor() {
+    this.store.load();
+  }
 
   private openSensorDialog(sensor?: DeviceType): void {
     const editingId = sensor?.id ?? null;
@@ -51,41 +53,25 @@ export class DeviceTypes {
 
         onSubmit: (values) => {
           const v = values as { name: string; description?: string };
-
-          if (editingId != null) {
-            const updated: DeviceType = {
-              ...sensor!,
-              id: editingId,
-              name: v.name,
-              description: v.description ?? '',
-            };
-
-            return of(updated).pipe(
-              delay(3000),
-              tap((s) => this.deviceTypes.update((list) =>
-                list.map((item) => (item.id === s.id ? s : item))
-              )),
-            );
-          }
-
-          const created: DeviceType = {
-            id: this.nextSensorId(),
+          const patch = {
             name: v.name,
             description: v.description ?? '',
           };
 
-          return of(created).pipe(
-            delay(3000),
-            tap((s) => this.deviceTypes.update((list) => [...list, s])),
+          const op$ = editingId != null
+            ? this.store.update(editingId, patch)
+            : this.store.add(patch);
+
+          return op$.pipe(
+            switchMap((res) =>
+              res.ok
+                ? of(res.data)
+                : throwError(() => 'COMMON.ERRORS.NOT_FOUND'),
+            ),
           );
         },
       })
       .closed.subscribe();
-  }
-
-  private nextSensorId(): number {
-    const ids = this.deviceTypes().map((s) => s.id ?? 0);
-    return ids.length ? Math.max(...ids) + 1 : 1;
   }
 
   newSensor(): void {
@@ -96,7 +82,14 @@ export class DeviceTypes {
     this.openSensorDialog(sensor);
   }
 
-  deleteSensor(sensor: DeviceType) {
-    this.deviceTypes.update(sensors => sensors.filter(s => s.id !== sensor.id));
+  deleteSensor(sensor: DeviceType): void {
+    this.store.remove(sensor.id).subscribe({
+      next: (res) => {
+        if (!res.ok) {
+          // TODO: toast de erro
+        }
+      },
+      error: (err) => console.error('[DeviceTypes] delete failed', err),
+    });
   }
 }

@@ -1,13 +1,13 @@
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { ActionButtons } from '@shared/components/action-buttons/action-buttons';
 import { DialogService } from '@shared/components/dialogs/dialogs.service';
 import { Paginator } from '@shared/components/pagination/paginator';
 import { UserBasic } from '@shared/interfaces/user';
 import { ContentLayout } from '@shared/layouts/content/content';
-import { USERS_MOCK } from '../../mocks/users';
 import { paginate } from '@shared/utils/paginate';
-import { delay, of, tap } from 'rxjs';
+import { of, switchMap, throwError } from 'rxjs';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { UserStore } from '@shared/domain/user/stores/user';
 
 
 @Component({
@@ -21,10 +21,16 @@ import { TranslocoPipe } from '@jsverse/transloco';
 })
 export class Users {
   private readonly formDialog = inject(DialogService);
-  readonly allUsers = signal<UserBasic[]>(USERS_MOCK);
+  private readonly store = inject(UserStore);
+
+  readonly allUsers = this.store.items;
 
   pageSize = input(8);
   pagination = paginate(this.allUsers, this.pageSize);
+
+  constructor() {
+    this.store.load();
+  }
 
   private openUserDialog(user?: UserBasic): void {
     const editingId = user?.id ?? null;
@@ -47,27 +53,18 @@ export class Users {
 
         onSubmit: (values) => {
           const v = values as { username: string; email: string };
+          const patch = { username: v.username, email: v.email };
 
-          if (editingId != null) {
-            const updated: UserBasic = { id: editingId, username: v.username, email: v.email };
+          const op$ = editingId != null
+            ? this.store.update(editingId, patch)
+            : this.store.add(patch);
 
-            return of(updated).pipe(
-              delay(3000),
-              tap((u) => this.allUsers.update((list) =>
-                list.map((item) => (item.id === u.id ? u : item))
-              )),
-            );
-          }
-
-          const created: UserBasic = {
-            id: this.nextUserId(),
-            username: v.username,
-            email: v.email,
-          };
-
-          return of(created).pipe(
-            delay(3000),
-            tap((u) => this.allUsers.update((list) => [...list, u])),
+          return op$.pipe(
+            switchMap((res) =>
+              res.ok
+                ? of(res.data)
+                : throwError(() => 'COMMON.ERRORS.NOT_FOUND'),
+            ),
           );
         },
       })
@@ -82,13 +79,15 @@ export class Users {
     this.openUserDialog(user);
   }
 
-  deleteUser(id: number){
-    this.allUsers.update(users => users.filter(u => u.id !== id));
-  }
-
-  private nextUserId(): number {
-    const ids = this.allUsers().map((u) => u.id ?? 0);
-    return ids.length ? Math.max(...ids) + 1 : 1;
+  deleteUser(id: number): void {
+    this.store.remove(id).subscribe({
+      next: (res) => {
+        if (!res.ok) {
+          // TODO: toast de erro
+        }
+      },
+      error: (err) => console.error('[Users] delete failed', err),
+    });
   }
 
 }

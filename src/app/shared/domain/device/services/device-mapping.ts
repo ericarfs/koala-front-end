@@ -1,87 +1,52 @@
-import { Injectable, inject } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, firstValueFrom, of } from 'rxjs';
-import { environment } from '../../../../../environments/environment';
-import { DEVICE_MAPPINGS_MOCK } from '../../../../mocks/device-mapping';
-import { DEVICE_TYPES_MOCK } from '../../../../mocks/device-types';
+import { forkJoin, map, Observable } from 'rxjs';
+import { environment } from './../../../../../environments/environment';
 import { DeviceMapping } from '@shared/interfaces/device-mapping';
 import { DeviceType } from '@shared/interfaces/device-type';
+import { DeviceTypeService } from '@shared/domain/device-type/services/device-type';
 
 @Injectable({ providedIn: 'root' })
 export class DeviceMappingService {
-  private readonly http = inject(HttpClient);
-  private readonly url = `${environment.apiUrl}deviceTypeMapping`;
+  protected readonly http = inject(HttpClient);
+  protected readonly deviceTypeService = inject(DeviceTypeService);
+  protected readonly url = `${environment.apiUrl}deviceTypeMapping`;
 
-  private typeByDevice = new Map<number, number[]>();
-  private typeNameById = new Map<number, string>();
-  private deviceByType = new Map<number, number[]>();
+  // ---- primitivos (mock sobrescreve) ----
 
-
-  private loaded = false;
-  private loading?: Promise<void>;
-
-  /** Garante que os Maps estão populados (uma vez só). */
-  private ensureLoaded(): Promise<void> {
-    if (this.loaded) return Promise.resolve();
-    if (this.loading) return this.loading;
-
-    this.loading = firstValueFrom(
-      of({
-        mappings: DEVICE_MAPPINGS_MOCK,
-        types: DEVICE_TYPES_MOCK,
-      })
-    ).then(({ mappings, types }) => {
-      console.log('[Mapping] carregou:', mappings.length, 'types:', types.length);
-      // Se aparecer "carregou: 4 mappings, 8 types" → funcionou 🎉
-      this.index(mappings, types);
-      this.loaded = true;
-      this.loading = undefined;
-    });
-
-    return this.loading;
+  getMappingsForDevice(deviceId: number): Observable<DeviceMapping[]> {
+    return this.http.get<DeviceMapping[]>(`${this.url}/${deviceId}`);
   }
 
-  index(mappings: DeviceMapping[], types: DeviceType[]): void {
-    this.typeByDevice.clear();
-    this.typeNameById.clear();
-    this.deviceByType.clear();
-    for (const t of types) this.typeNameById.set(t.id, t.name);
-    for (const m of mappings) {
-      const list = this.typeByDevice.get(m.device_id) ?? [];
-      list.push(m.type_id);
-      this.typeByDevice.set(m.device_id, list);
-
-      const devices = this.deviceByType.get(m.type_id) ?? [];
-      devices.push(m.device_id);
-      this.deviceByType.set(m.type_id, devices);
-    }
-    this.loaded = true;
+  getAllMappings(): Observable<DeviceMapping[]> {
+    return this.http.get<DeviceMapping[]>(this.url);
   }
 
-  /** 👈 Retorna Observable — carrega se ainda não carregou. */
+  saveAll(deviceId: number, mappings: DeviceMapping[]): Observable<DeviceMapping[]> {
+    return this.http.post<DeviceMapping[]>(`${this.url}/${deviceId}`, mappings);
+  }
+
+  // ---- query composta  ----
+
   getTypesForDevice(deviceId: number): Observable<DeviceType[]> {
-    return new Observable(sub => {
-      this.ensureLoaded().then(() => {
-        sub.next(this.readFromMaps(deviceId));
-        sub.complete();
-      });
-    });   // 👈 ASSÍNCRONO
+    return forkJoin({
+      mappings: this.getMappingsForDevice(deviceId),
+      types: this.deviceTypeService.findAll(),
+    }).pipe(
+      map(({ mappings, types }) => {
+        const ids = new Set(mappings.map(m => m.type_id));
+        return types.filter(t => ids.has(t.id));
+      }),
+    );
   }
 
-  /** Ids de dispositivo que possuem esse tipo de sensor */
   getDevicesForType(typeId: number): Observable<number[]> {
-    return new Observable(sub => {
-      this.ensureLoaded().then(() => {
-        sub.next(this.deviceByType.get(typeId) ?? []);
-        sub.complete();
-      });
-    });
-  }
-
-  private readFromMaps(deviceId: number): DeviceType[] {
-    const typeIds = this.typeByDevice.get(deviceId) ?? [];
-    return typeIds
-      .map(id => ({ id, name: this.typeNameById.get(id) ?? '' }))
-      .filter(t => t.name !== '');
+    return this.getAllMappings().pipe(
+      map(mappings =>
+        mappings
+          .filter(m => m.type_id === typeId)
+          .map(m => m.device_id),
+      ),
+    );
   }
 }
