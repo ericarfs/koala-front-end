@@ -4,7 +4,6 @@ export const AIRCON_ROUTES: Routes = [
   {
     path: '',
     children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'ota',
         loadComponent: () =>

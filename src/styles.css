@@ -71,8 +71,6 @@
   --input-bg: var(--color-slate-700);
 }
 
-@custom-variant dark (&:where(.dark, .dark *));
-
 @theme inline {
   --color-background: var(--background);
   --color-container: var(--container);
