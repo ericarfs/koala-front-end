@@ -8,7 +8,7 @@ import { ContentLayout } from '@shared/layouts/content/content';
 import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
 import { DeviceWithTypes } from '@shared/interfaces/device';
 import { DEVICES_MOCK } from '../../../../mocks/devices';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { LOCATIONS_MOCK } from '../../../../mocks/locations';
 import { getPath } from '@shared/domain/location/location-tree';
 import { ChartDataStore } from '@shared/domain/monitoring/stores/chart-data-store';
@@ -17,7 +17,7 @@ import { ChipSelect } from '@shared/domain/monitoring/components/chip-select';
 import { DEFAULT_TIME_BUCKET, TIME_BUCKET_OPTIONS, TimeBucket } from '@shared/domain/monitoring/models/time-bucket';
 import { IntervalSelector } from '@shared/domain/monitoring/components/interval-selector';
 import { SearchButton } from '@shared/domain/monitoring/components/search-button';
-import { ChartExportInfo } from '@shared/services/pdf-export';
+import { ChartExportInfo, localeFromLang } from '@shared/services/pdf-export';
 import { buildChartInfo } from '@shared/utils/chart-exports-info';
 
 
@@ -29,9 +29,10 @@ import { buildChartInfo } from '@shared/utils/chart-exports-info';
   templateUrl: './device-details.html',
 })
 export class DeviceDetails {
-   private readonly route = inject(ActivatedRoute);
+  private readonly route = inject(ActivatedRoute);
   private readonly routerLocation = inject(Location);
   private readonly mappingService = inject(DeviceMappingService);
+  private readonly transloco = inject(TranslocoService);
   readonly store = inject(ChartDataStore);
 
   private readonly id = toSignal(
@@ -105,6 +106,7 @@ export class DeviceDetails {
       timeBucket,
       start,
       end,
+      locale: localeFromLang(this.transloco.getActiveLang()),
     }));
 
     // idDevice vai no "base": vale para todas as consultas (1 ou 2 tipos)

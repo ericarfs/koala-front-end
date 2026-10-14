@@ -6,14 +6,16 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs';
 import { ExtensionRegistryService } from '../../extensions/extension-registry';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { ChartBasket } from '@shared/components/chart-basket/chart-basket';
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [RouterOutlet, Navbar, NgClass, TranslocoPipe],
+  imports: [RouterOutlet, Navbar, NgClass, TranslocoPipe, ChartBasket],
   template: `
     <div class="flex h-screen w-full max-w-[2560px] mx-auto overflow-hidden">
-      <app-navbar></app-navbar>
+      <app-navbar/>
+      <app-chart-basket/>
       <main class="flex-1 pt-14 overflow-auto md:pt-0 flex flex-col">
         <section class="w-full max-w-[1920px] min-w-0 p-4 md:p-6 flex-1 flex flex-col">
 

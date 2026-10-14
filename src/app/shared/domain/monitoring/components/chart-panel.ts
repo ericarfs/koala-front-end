@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal, viewChild } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { ChartExportInfo, computeSensorStats, PdfExportService, SensorStats } from '@shared/services/pdf-export';
+import { ChartExportInfo, ChartExportItem, computeSensorStats, PdfExportService, SensorStats } from '@shared/services/pdf-export';
 import { TimeSeriesChart } from './time-series-chart';
 import { ChartData } from '../models/chart-data';
+import { ChartExportBasket } from '@shared/services/chart-export-basket';
 
 @Component({
   selector: 'app-chart-panel',
@@ -38,15 +39,30 @@ import { ChartData } from '../models/chart-data';
           [title]="title()"
           [subtitle]="subtitle()"
         />
-        <button
-          type="button"
-          (click)="exportPdf()"
-          [disabled]="!title() || loading()"
-          class="btn bg-primary text-white px-4 py-2 rounded max-w-40"
-        >
-          <i class="fa-solid fa-file-pdf mr-2"></i>
-          {{ 'COMMON.ACTIONS.SAVE' | transloco }} PDF
-        </button>
+        <div class="flex flex-wrap justify-center gap-2 mt-3">
+          <button
+            type="button"
+            (click)="exportPdf()"
+            [disabled]="!title() || loading()"
+            class="btn bg-primary text-white px-4 py-2 rounded max-w-40"
+          >
+            <i class="fa-solid fa-file-pdf mr-2"></i>
+            {{ 'COMMON.ACTIONS.EXPORT' | transloco }} PDF
+          </button>
+          <button
+            type="button"
+            (click)="addToReport()"
+            [disabled]="!title() || loading()"
+            class="btn border border-outline px-4 py-2 rounded hover:bg-input max-w-60"
+          >
+            <i class="fa-solid mr-2" [class]="added() ? 'fa-check' : 'fa-plus'"></i>
+            @if(added()){
+              {{ 'COMMON.STATES.ADDED' | transloco }}
+            } @else {
+              {{ 'MONITORING.REPORT.ACTIONS.ADD_TO_REPORT' | transloco }}
+            }
+          </button>
+        </div>
       }
     </div>
   `,
@@ -54,6 +70,9 @@ import { ChartData } from '../models/chart-data';
 export class ChartPanel {
   private readonly pdf = inject(PdfExportService);
   private readonly chart = viewChild(TimeSeriesChart);
+  private readonly basket = inject(ChartExportBasket);
+
+  readonly added = signal(false);
 
   readonly data = input.required<ChartData>();
   readonly title = input('');
@@ -75,29 +94,34 @@ export class ChartPanel {
       .filter((s): s is SensorStats => s !== null);
   });
 
-  async exportPdf(): Promise<void> {
+  private buildExportItem(): ChartExportItem | null {
     const title = this.title();
     const imageDataUrl = this.chart()?.getImageDataURL();
-    if (!title || !imageDataUrl) return;
+    if (!title || !imageDataUrl) return null;
 
-    const safe = title.replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-+|-+$/g, '');
-    const logoDataUrl = await this.pdf.loadImageAsDataUrl('assets/logo-white.png');
+    return {
+      title,
+      subtitle: this.subtitle(),
+      imageDataUrl,
+      info: this.info(),
+      stats: this.stats(),
+    };
+  }
 
-    await this.pdf.export(
-      [{
-        title,
-        subtitle: this.subtitle(),
-        imageDataUrl,
-        info: this.info(),
-        stats: this.stats(),
-      }],
-      {
-        fileName: `graficos-${safe || 'dashboard'}-${Date.now()}.pdf`,
-        appName: 'Smart Lab',
-        reportTitle: 'Relatório de Monitoramento',
-        generatedBy: 'Nome do usuário',
-        logoDataUrl: logoDataUrl ?? undefined,
-      },
-    );
+  async exportPdf(): Promise<void> {
+    const item = this.buildExportItem();
+    if (!item) return;
+
+    const safe = item.title.replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-+|-+$/g, '');
+    await this.pdf.exportReport([item], `graph-${safe || 'dashboard'}-${Date.now()}.pdf`);
+  }
+
+  addToReport(): void {
+    const item = this.buildExportItem();
+    if (!item) return;
+
+    this.basket.add(item);
+    this.added.set(true);
+    setTimeout(() => this.added.set(false), 1500);
   }
 }

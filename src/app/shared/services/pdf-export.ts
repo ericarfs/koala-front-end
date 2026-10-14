@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 import jsPDF from 'jspdf';
 
 type RGB = [number, number, number];
@@ -129,16 +130,23 @@ export function computeSensorStats(
   return { name, unit, min, max, avg: sum / nums.length };
 }
 
+const LOCALES: Record<string, string> = { pt: 'pt-BR', en: 'en-US' };
+
+export function localeFromLang(lang: string): string {
+  return LOCALES[lang] ?? lang;
+}
+
 @Injectable({ providedIn: 'root' })
 export class PdfExportService {
+  private readonly transloco = inject(TranslocoService);
 
   async export(charts: ChartExportItem[], options: PdfExportOptions = {}): Promise<void> {
     if (charts.length === 0) return;
 
     const {
-      fileName = 'graficos.pdf',
-      appName = 'Monitoramento',
-      reportTitle = 'Relatório de gráficos',
+      fileName = 'graph.pdf',
+      appName = 'SMART LAB',
+      reportTitle = 'MONITORING REPORT',
       generatedBy,
       locale = 'pt-BR',
     } = options;
@@ -553,6 +561,37 @@ export class PdfExportService {
       img.onload = () => resolve({ width: img.width, height: img.height });
       img.onerror = () => resolve(null);
       img.src = dataUrl;
+    });
+  }
+
+  async exportReport(charts: ChartExportItem[], fileName: string): Promise<void> {
+    const t = (key: string) => this.transloco.translate(`MONITORING.PDF.${key}`);
+    const locale = localeFromLang(this.transloco.getActiveLang());
+    const logoDataUrl = await this.loadImageAsDataUrl('assets/logo-white.png');
+
+    await this.export(charts, {
+      fileName,
+      appName: 'Smart Lab',
+      reportTitle: t('REPORT_TITLE'),
+      generatedBy: 'Nome do usuário',
+      locale,
+      logoDataUrl: logoDataUrl ?? undefined,
+      labels: {
+        generatedAt: t('GENERATED_AT'),
+        generatedBy: t('GENERATED_BY'),
+        page: t('PAGE'),
+        of: t('OF'),
+        location: t('LOCATION'),
+        devices: t('DEVICES'),
+        period: t('PERIOD'),
+        interval: t('INTERVAL'),
+        sensors: t('SENSORS'),
+        stats: t('STATS'),
+        sensor: t('SENSOR'),
+        min: t('MIN'),
+        max: t('MAX'),
+        avg: t('AVG'),
+      },
     });
   }
 }

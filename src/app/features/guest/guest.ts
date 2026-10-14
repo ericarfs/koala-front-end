@@ -7,7 +7,7 @@ import { DEVICE_TYPES_MOCK } from '../../mocks/device-types';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { getPath } from '@shared/domain/location/location-tree';
 import { LOCATIONS_MOCK } from '../../mocks/locations';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { CommonModule } from '@angular/common';
 import { LocationTreeSelect } from '@shared/domain/location/location-tree-select';
 import { ChartDataStore } from '@shared/domain/monitoring/stores/chart-data-store';
@@ -16,7 +16,7 @@ import { ChipSelect } from '@shared/domain/monitoring/components/chip-select';
 import { DEFAULT_TIME_BUCKET, TIME_BUCKET_OPTIONS, TimeBucket } from '@shared/domain/monitoring/models/time-bucket';
 import { IntervalSelector } from '@shared/domain/monitoring/components/interval-selector';
 import { SearchButton } from '@shared/domain/monitoring/components/search-button';
-import { ChartExportInfo } from '@shared/services/pdf-export';
+import { ChartExportInfo, localeFromLang } from '@shared/services/pdf-export';
 import { buildChartInfo } from '@shared/utils/chart-exports-info';
 
 @Component({
@@ -27,6 +27,7 @@ import { buildChartInfo } from '@shared/utils/chart-exports-info';
   templateUrl: './guest.html',
 })
 export class Guest {
+  private readonly transloco = inject(TranslocoService);
   readonly store = inject(ChartDataStore);
 
   readonly deviceTypeOptions = DEVICE_TYPES_MOCK;
@@ -61,6 +62,7 @@ export class Guest {
       location: locationPath,
       sensors: types,
       timeBucket,
+      locale: localeFromLang(this.transloco.getActiveLang()),
     }));
 
     // O store decide quantas consultas fazer e monta as séries

@@ -9,7 +9,7 @@ import { DEVICES_MOCK } from '../../mocks/devices';
 import { LOCATIONS_MOCK } from '../../mocks/locations';
 import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
 import { Subscription } from 'rxjs';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ChipOption, ChipSelect } from '@shared/domain/monitoring/components/chip-select';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ChartDataStore } from '@shared/domain/monitoring/stores/chart-data-store';
@@ -17,7 +17,7 @@ import { ChartPanel } from '@shared/domain/monitoring/components/chart-panel';
 import { DEFAULT_TIME_BUCKET, TIME_BUCKET_OPTIONS, TimeBucket } from '@shared/domain/monitoring/models/time-bucket';
 import { IntervalSelector } from '@shared/domain/monitoring/components/interval-selector';
 import { SearchButton } from '@shared/domain/monitoring/components/search-button';
-import { ChartExportInfo } from '@shared/services/pdf-export';
+import { ChartExportInfo, localeFromLang } from '@shared/services/pdf-export';
 import { buildChartInfo } from '@shared/utils/chart-exports-info';
 
 
@@ -30,6 +30,7 @@ import { buildChartInfo } from '@shared/utils/chart-exports-info';
   templateUrl: './dashboard.html',
 })
 export class Dashboard {
+  private readonly transloco = inject(TranslocoService);
   private readonly mappingService = inject(DeviceMappingService);
   readonly store = inject(ChartDataStore);
 
@@ -127,6 +128,7 @@ export class Dashboard {
       timeBucket,
       start,
       end,
+      locale: localeFromLang(this.transloco.getActiveLang()),
     }));
 
     this.store.load({

@@ -30,6 +30,29 @@
     "EMPTY": {
       "DASHBOARD": "Select a location and at least one sensor, then click Search",
       "DEVICES": "Select at least one sensor and click Search"
+    },
+    "REPORT":{
+      "ACTIONS":{
+        "ADD_TO_REPORT": "Add to the report"
+      },
+      "COUNT": "Report ({{count}})"
+    },
+    "PDF": {
+      "REPORT_TITLE": "Monitoring Report",
+      "GENERATED_AT": "Generated on",
+      "GENERATED_BY": "By",
+      "PAGE": "Page",
+      "OF": "of",
+      "LOCATION": "Location",
+      "DEVICES": "Devices",
+      "PERIOD": "Period",
+      "INTERVAL": "Interval",
+      "SENSORS": "Sensors",
+      "STATS": "Statistics",
+      "SENSOR": "Sensor",
+      "MIN": "Minimum",
+      "MAX": "Maximum",
+      "AVG": "Average"
     }
   },
   "COMMON": {
@@ -38,11 +61,13 @@
       "SAVE": "Save",
       "CANCEL": "Cancel",
       "DELETE": "Delete",
+      "CLEAR": "Clear",
       "CONFIRM": "Confirm",
       "EDIT": "Edit",
       "BACK": "Back",
       "CLOSE": "Close",
       "SEARCH": "Search",
+      "EXPORT": "Export",
       "CONFIRM_DELETE": "Are you sure you want to delete?",
       "LOGIN":"Login",
       "GUEST_LOGIN":"Login as guest",
@@ -74,6 +99,7 @@
       "LOADING": "Loading...",
       "SENDING": "Sending...",
       "SEARCHING": "Searching...",
+      "ADDED": "Added",
       "EMPTY": "No items found",
       "ERROR":"Could not load the data. Please try again."
     },

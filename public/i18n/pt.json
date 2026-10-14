@@ -30,6 +30,29 @@
     "EMPTY": {
       "DASHBOARD":"Selecione um ambiente e ao menos um sensor, depois clique em Pesquisar",
       "DEVICES":"Selecione ao menos um sensor e clique em Pesquisar"
+    },
+    "REPORT":{
+      "ACTIONS":{
+        "ADD_TO_REPORT": "Adicionar ao relatório"
+      },
+      "COUNT": "Relatório ({{count}})"
+    },
+    "PDF": {
+      "REPORT_TITLE": "Relatório de Monitoramento",
+      "GENERATED_AT": "Gerado em",
+      "GENERATED_BY": "Por",
+      "PAGE": "Página",
+      "OF": "de",
+      "LOCATION": "Localização",
+      "DEVICES": "Dispositivos",
+      "PERIOD": "Período",
+      "INTERVAL": "Intervalo",
+      "SENSORS": "Sensores",
+      "STATS": "Estatísticas",
+      "SENSOR": "Sensor",
+      "MIN": "Mínimo",
+      "MAX": "Máximo",
+      "AVG": "Média"
     }
   },
   "COMMON": {
@@ -38,11 +61,13 @@
       "SAVE": "Salvar",
       "CANCEL": "Cancelar",
       "DELETE": "Excluir",
+      "CLEAR": "Limpar",
       "CONFIRM": "Confirmar",
       "EDIT": "Editar",
       "BACK": "Voltar",
       "CLOSE": "Fechar",
       "SEARCH": "Pesquisar",
+      "EXPORT": "Exportar",
       "CONFIRM_DELETE":"Tem certeza que deseja excluir?",
       "LOGIN":"Entrar",
       "GUEST_LOGIN":"Entrar como convidado",
@@ -74,6 +99,7 @@
       "LOADING": "Carregando...",
       "SENDING": "Enviando...",
       "SEARCHING": "Buscando...",
+      "ADDED": "Adicionado",
       "EMPTY": "Nenhum item encontrado",
       "ERROR":"Não foi possível carregar os dados. Tente novamente."
     },
