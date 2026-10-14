@@ -1,1 +1,0 @@
-var t=[{path:``,loadComponent:()=>import(`./chunk-Cre9S1o4.js`).then(o=>o.DevicesList)},{path:`add`,loadComponent:()=>import(`./chunk-CQrHsDx0.js`).then(o=>o.DeviceForms)},{path:`edit/:id`,loadComponent:()=>import(`./chunk-CQrHsDx0.js`).then(o=>o.DeviceForms)},{path:`:id`,loadComponent:()=>import(`./chunk-DchhEtcB2.js`).then(o=>o.DeviceDetails)}];export{t as DEVICES_ROUTES};
