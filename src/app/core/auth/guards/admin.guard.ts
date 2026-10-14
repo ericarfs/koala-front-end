@@ -14,7 +14,7 @@ export const adminGuard: CanActivateFn = (route, state) => {
   }
 
   if (!auth.isAdmin()) {
-    return false;
+    return router.url === '/' ? router.createUrlTree(['/location']) : false;
   }
 
   return true;
