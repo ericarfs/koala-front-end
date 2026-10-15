@@ -1,1 +1,0 @@
-var o=[{path:``,children:[{path:`ota`,loadComponent:()=>import(`./chunk-m3-b79dY.js`).then(t=>t.Ota)}]}];export{o as AIRCON_ROUTES};
