@@ -44,14 +44,16 @@
         [options]="deviceTypeOptions()"
         [max]="2"
         [selected]="selectedTypes()"
+        [loading]="deviceTypeLoading()"
         (selectedChange)="onTypesChange($event)"
       />
 
-      @if (selectedTypes().length === 1 && availableDevices().length > 0) {
+      @if (selectedTypes().length === 1) {
         <app-chip-select
           label="MONITORING.FILTERS.DEVICES"
           [options]="availableDevices()"
           [max]="5"
+          [loading]="devicesLoading()"
           [(selected)]="selectedDevices"
         />
       }

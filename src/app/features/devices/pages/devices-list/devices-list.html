@@ -44,14 +44,14 @@
 
     <div class="flex flex-col gap-3 break-all flex-1">
       <h2 class="text-lg font-semibold">
-        Dispositivos ({{ devices().length }})
+        {{ 'DEVICES.LIST.TITLE' | transloco }} ({{ devices().length }})
       </h2>
 
       <app-device-list
         [devices]="devices()"
         [resolveLocationName]="getLocationName"
-      ></app-device-list>
+        [loading]="deviceStore.loading()"
+      />
     </div>
-
   </div>
 </app-content-layout>

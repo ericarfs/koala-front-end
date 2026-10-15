@@ -21,7 +21,8 @@ import { UserStore } from '@shared/domain/user/stores/user';
 })
 export class Users {
   private readonly formDialog = inject(DialogService);
-  private readonly store = inject(UserStore);
+
+  readonly store = inject(UserStore);
 
   readonly allUsers = this.store.items;
 

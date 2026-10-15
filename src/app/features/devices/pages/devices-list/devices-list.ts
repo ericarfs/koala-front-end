@@ -9,7 +9,7 @@ import { Device } from '@shared/interfaces/device';
 import { getDescendantIds, getPath } from '@shared/domain/location/location-tree';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { DeviceStore } from '@shared/domain/device/stores/device-store';
-import { LocationStore } from '@shared/domain/location/location-store';
+import { LocationStore } from '@shared/domain/location/stores/location-store';
 
 
 @Component({
@@ -23,8 +23,9 @@ import { LocationStore } from '@shared/domain/location/location-store';
   },
 })
 export class DevicesList {
-  private readonly deviceStore = inject(DeviceStore);
   private readonly locationStore = inject(LocationStore);
+
+  readonly deviceStore = inject(DeviceStore);
 
   searchForms = new FormGroup({
     name: new FormControl(''),

@@ -23,25 +23,31 @@ export interface ChipOption {
       </div>
 
       <div class="flex flex-wrap gap-2">
-        @for (opt of options(); track opt.id) {
-          <button
-            type="button"
-            (click)="toggle(opt.id)"
-            [disabled]="isDisabled(opt.id)"
-            [attr.aria-pressed]="isSelected(opt.id)"
-            [class]="isSelected(opt.id)
-              ? 'bg-secondary text-secondary-foreground border-secondary font-medium'
-              : 'bg-container text-default border-outline hover:border-secondary hover:text-secondary'"
-            class="inline-flex flex-wrap items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border
-                   transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed
-                   disabled:hover:border-outline disabled:hover:text-default break-all max-w-full"
-          >
-            @if (isSelected(opt.id)) {
-              <i class="fa-solid fa-check text-xs"></i>
+        @if (loading()) {
+          <!-- skeleton -->
+          <div class="h-8 w-24 bg-neutral/10 rounded-md animate-pulse"></div>
+          <div class="h-8 w-28 bg-neutral/10 rounded-md animate-pulse"></div>
+        } @else {
+              @for (opt of options(); track opt.id) {
+                <button
+                  type="button"
+                  (click)="toggle(opt.id)"
+                  [disabled]="isDisabled(opt.id)"
+                  [attr.aria-pressed]="isSelected(opt.id)"
+                  [class]="isSelected(opt.id)
+                    ? 'bg-secondary text-secondary-foreground border-secondary font-medium'
+                    : 'bg-container text-default border-outline hover:border-secondary hover:text-secondary'"
+                  class="inline-flex flex-wrap items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border
+                        transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed
+                        disabled:hover:border-outline disabled:hover:text-default break-all max-w-full"
+                >
+                  @if (isSelected(opt.id)) {
+                    <i class="fa-solid fa-check text-xs"></i>
+                  }
+                  {{ opt.name }}
+                </button>
+              }
             }
-            {{ opt.name }}
-          </button>
-        }
       </div>
     </div>
   `,
@@ -50,6 +56,8 @@ export class ChipSelect {
   readonly label = input.required<string>();
   readonly options = input.required<readonly ChipOption[]>();
   readonly max = input<number | null>(null);
+
+  readonly loading = input(false);
 
   readonly selected = model<number[]>([]);
 
@@ -60,6 +68,7 @@ export class ChipSelect {
   }
 
   isDisabled(id: number): boolean {
+     if (this.loading()) return true;
     if (this.isSelected(id)) return false;
     const max = this.max();
     if (max === null) return false;
@@ -67,6 +76,7 @@ export class ChipSelect {
   }
 
   toggle(id: number): void {
+    if (this.loading()) return;
     this.selected.update(list => {
       if (list.includes(id)) return list.filter(i => i !== id);
       const max = this.max();

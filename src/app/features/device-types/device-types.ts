@@ -15,7 +15,8 @@ import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
 })
 export class DeviceTypes {
   private readonly formDialog = inject(DialogService);
-  private readonly store = inject(DeviceTypeStore);
+
+  readonly store = inject(DeviceTypeStore);
 
   readonly deviceTypes = this.store.items;
 

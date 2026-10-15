@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { buildTree } from './location-tree';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { LocationStore } from './location-store';
+import { LocationStore } from './stores/location-store';
 
 interface LocationNode {
   id: number;
@@ -35,12 +35,16 @@ interface FlatNode {
       <button
         type="button"
         (click)="toggle()"
-        [disabled]="disabled()"
+        [disabled]="disabled() || store.loading()"
         class="h-10 w-full flex items-center justify-between gap-2 border border-outline rounded-md px-3 bg-container text-default focus:outline-none focus:border-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       >
-        <span class="truncate text-left" [class.text-neutral]="!selectedName()">
-          {{ selectedName() || ('MONITORING.PLACEHOLDERS.SELECT_LOCATION' | transloco) }}
-        </span>
+        @if (store.loading()) {
+          <span class="h-4 w-32 bg-neutral/10 rounded animate-pulse"></span>
+        } @else {
+          <span class="truncate text-left" [class.text-neutral]="!selectedName()">
+            {{ selectedName() || ('MONITORING.PLACEHOLDERS.SELECT_LOCATION' | transloco) }}
+          </span>
+        }
         <i class="fa-solid fa-chevron-down text-xs text-neutral transition-transform"
            [class.rotate-180]="open()"></i>
       </button>
@@ -49,7 +53,7 @@ interface FlatNode {
         <div class="absolute z-30 mt-1 w-full min-w-72 bg-container border border-outline rounded-md shadow-lg overflow-hidden">
           <div class="p-2 border-b border-outline">
             <div class="relative">
-              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -transloco-y-1/2 text-xs text-neutral"></i>
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs text-neutral"></i>
               <input
                 #searchInput
                 type="text"
@@ -105,7 +109,8 @@ interface FlatNode {
 })
 export class LocationTreeSelect implements ControlValueAccessor {
   private readonly el = inject(ElementRef<HTMLElement>);
-  private readonly store = inject(LocationStore);
+
+  readonly store = inject(LocationStore);
 
   readonly open = signal(false);
   readonly search = signal('');

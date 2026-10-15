@@ -1,8 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { canAddChild, canReparent, getAncestors, getChildren } from './location-tree';
+import { canAddChild, canReparent, getAncestors, getChildren } from '../location-tree';
 import { Location } from '@shared/interfaces/location';
 import { catchError, map, Observable, of, tap } from 'rxjs';
-import { LocationService } from './services/location';
+import { LocationService } from '../services/location';
 
 export type MutationError =
   | 'MAX_DEPTH_EXCEEDED'

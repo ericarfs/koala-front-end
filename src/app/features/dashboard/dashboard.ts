@@ -17,7 +17,7 @@ import { SearchButton } from '@shared/domain/monitoring/components/search-button
 import { ChartExportInfo, localeFromLang } from '@shared/services/pdf-export';
 import { buildChartInfo } from '@shared/utils/chart-exports-info';
 import { DeviceStore } from '@shared/domain/device/stores/device-store';
-import { LocationStore } from '@shared/domain/location/location-store';
+import { LocationStore } from '@shared/domain/location/stores/location-store';
 import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
 
 
@@ -35,8 +35,10 @@ export class Dashboard {
   private readonly deviceTypeStore = inject(DeviceTypeStore);
   private readonly deviceStore = inject(DeviceStore);
   private readonly locationStore = inject(LocationStore);
+
   readonly store = inject(ChartDataStore);
 
+  readonly deviceTypeLoading = this.deviceTypeStore.loading;
   readonly deviceTypeOptions = this.deviceTypeStore.items;
   readonly intervalOptions = TIME_BUCKET_OPTIONS;
 
@@ -53,6 +55,9 @@ export class Dashboard {
   readonly selectedTypes = signal<number[]>([]);
   readonly selectedDevices = signal<number[]>([]);
   readonly availableDevices = signal<ChipOption[]>([]);
+
+  private readonly _devicesLoading = signal(false);
+  readonly devicesLoading = this._devicesLoading.asReadonly();
 
   readonly chartInfo = signal<ChartExportInfo | undefined>(undefined);
 
@@ -86,6 +91,7 @@ export class Dashboard {
     if (location == null || types.length !== 1) {
       this.availableDevices.set([]);
       this.selectedDevices.set([]);
+      this._devicesLoading.set(false);
       return;
     }
 
@@ -93,15 +99,21 @@ export class Dashboard {
     const allDevices = this.deviceStore.items();
     const descendantIds = getDescendantIds(location, locations);
 
-    this.devicesSub = this.mappingService.getDevicesForType(types[0]).subscribe(deviceIds => {
-      const devices: ChipOption[] = allDevices
-        .filter(d =>
-          d.id != null && deviceIds.includes(d.id) &&
-          d.id_enviroment != null && descendantIds.has(d.id_enviroment))
-        .map(d => ({ id: d.id!, name: d.name ?? '' }));
+    this._devicesLoading.set(true);
 
-      this.availableDevices.set(devices);
-      this.selectedDevices.update(list => list.filter(id => devices.some(d => d.id === id)));
+    this.devicesSub = this.mappingService.getDevicesForType(types[0]).subscribe({
+      next: (deviceIds) => {
+        const devices: ChipOption[] = allDevices
+          .filter(d =>
+            d.id != null && deviceIds.includes(d.id) &&
+            d.id_enviroment != null && descendantIds.has(d.id_enviroment))
+          .map(d => ({ id: d.id!, name: d.name ?? '' }));
+
+        this.availableDevices.set(devices);
+        this.selectedDevices.update(list => list.filter(id => devices.some(d => d.id === id)));
+        this._devicesLoading.set(false);
+      },
+      error: () => this._devicesLoading.set(false),
     });
   }
 

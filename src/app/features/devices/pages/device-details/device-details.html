@@ -1,9 +1,29 @@
 <app-content-layout
   [title]="'DEVICES.LIST.TITLE' | transloco"
   [subtitle]="device()?.name">
-  @if (device(); as dev) {
-    <div class="flex flex-col gap-6">
+  <div class="flex flex-col gap-6">
+    @if (deviceStore.loading()) {
+      <!-- skeleton de detalhes do dispositivo -->
+      <div class="h-8 w-24 bg-neutral/10 rounded animate-pulse"></div>
+      <div class="bg-container border border-outline rounded-md p-4 flex flex-col gap-3 animate-pulse">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="bg-neutral/10 h-8 w-48 rounded"></div>
+          <div class="bg-neutral/10 h-7 w-30 rounded-full"></div>
+        </div>
 
+        <div class="bg-neutral/10 h-4 w-full max-w-96 rounded"></div>
+
+        <div class="flex flex-wrap gap-1 mt-1">
+          <div class="bg-neutral/10 h-6 w-24 rounded-sm"></div>
+          <div class="bg-neutral/10 h-6 w-20 rounded-sm"></div>
+          <div class="bg-neutral/10 h-6 w-28 rounded-sm"></div>
+        </div>
+      </div>
+
+      <div class="bg-container border border-outline rounded-md p-4 h-40 animate-pulse"></div>
+      <div class="bg-neutral/10 h-96 w-full rounded-sm animate-pulse"></div>
+
+    } @else if (device(); as dev) {
       <button (click)="goBack()" class="text-primary hover:text-primary-details inline-flex items-center gap-1 w-fit cursor-pointer">
         <i class="fa-solid fa-arrow-left"></i> Voltar
       </button>
@@ -25,10 +45,14 @@
           <p class="text-sm text-neutral">{{ dev.description }}</p>
         }
         <div class="flex flex-wrap gap-1 mt-1">
-          @for (type of dev.types; track type.id) {
-            <span class="inline-flex items-center px-3 py-1 rounded-sm text-xs bg-neutral/10 text-neutral">
-              {{ type.name }}
-            </span>
+          @if (typesResource.isLoading()) {
+            <app-device-types-skeleton/>
+          } @else if (typesResource.value()?.length) {
+            @for (type of typesResource.value()!; track type.id) {
+              <span class="inline-flex items-center px-3 py-1 rounded-sm text-xs bg-neutral/10 text-neutral">
+                {{ type.name }}
+              </span>
+            }
           }
         </div>
       </div>
@@ -47,7 +71,7 @@
           </div>
 
           <div class="flex flex-wrap gap-2 max-w-full">
-            <div class="flex flex-col gap-1 max-w-full">
+             <div class="flex flex-col gap-1 max-w-full">
               <label for="fromDate" class="text-sm text-neutral font-medium mb-1">
                 {{ 'MONITORING.DATE_RANGE.FROM' | transloco }}
               </label>
@@ -67,6 +91,7 @@
           label="MONITORING.FILTERS.DEVICE_TYPES"
           [options]="dev.types"
           [max]="2"
+          [loading]="typesResource.isLoading()"
           [(selected)]="selectedTypes"
         />
 
@@ -86,10 +111,10 @@
         [subtitle]="chartSubtitle()"
         [info]="chartInfo()"
       />
-    </div>
-  } @else {
-    <p class="text-xl text-default font-medium">
-      {{ 'DEVICES.DETAILS.NOT_FOUND' | transloco }}
-    </p>
-  }
+    } @else {
+      <p class="text-xl text-default font-medium">
+        {{ 'DEVICES.DETAILS.NOT_FOUND' | transloco }}
+      </p>
+    }
+  </div>
 </app-content-layout>

@@ -9,8 +9,29 @@
         {{'LOCATIONS.ADD.TITLE' | transloco}}
   </button>
   <div class="flex flex-col gap-6 flex-1">
-    @if (location(); as loc) {
+    @if (store.loading()) {
+      <!-- skeleton dos locations -->
+      <nav class="flex flex-wrap items-center gap-2 text-sm">
+        <a routerLink="/location" class="text-primary hover:text-primary-details">
+          {{ 'LOCATIONS.LIST.TITLE' | transloco }}
+        </a>
+        <i class="fa-solid fa-angle-right text-xs text-neutral"></i>
+        <span class="inline-block bg-neutral/10 h-4 w-32 rounded animate-pulse"></span>
+      </nav>
 
+      <div class="bg-container p-4 rounded-md border border-outline break-all space-y-3">
+        <div class="bg-neutral/10 h-7 w-48 max-w-full rounded animate-pulse"></div>
+        <div class="bg-neutral/10 h-4 w-full max-w-96 rounded animate-pulse"></div>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <div class="bg-neutral/10 h-6 w-40 max-w-full rounded animate-pulse"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 md:gap-1">
+            <app-location-card-skeleton/>
+        </div>
+      </div>
+    }
+    @else if (location(); as loc) {
       <nav class="flex flex-wrap items-center gap-2 text-sm">
         <a routerLink="/location" class="text-primary hover:text-primary-details">
           {{ 'LOCATIONS.LIST.TITLE' | transloco }}
@@ -40,7 +61,8 @@
               <app-location-card
                 [location]="child"
                 [actionLabel]="actionLabel(child)"
-                [stats]="statsFor(child)"
+                [stats]="statsStore.statsFor(child.id)"
+                [statsLoading]="statsStore.loading()"
               ></app-location-card>
             }
           </div>
@@ -56,7 +78,9 @@
           <h2 class="text-lg font-semibold">
             {{ 'LOCATIONS.DETAILS.VIEW_DEVICES' | transloco:{ count: devices().length } }}
           </h2>
-          <app-device-list [devices]="devices()"></app-device-list>
+          <app-device-list
+          [devices]="devices()"
+          [loading]="deviceStore.loading()"/>
         </div>
       }
 

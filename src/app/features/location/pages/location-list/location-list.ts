@@ -4,23 +4,21 @@ import { LocationCard } from '@features/location/components/location-card';
 import { ContentLayout } from '@shared/layouts/content/content';
 import { Paginator } from '@shared/components/pagination/paginator';
 import { DialogService } from '@shared/components/dialogs/dialogs.service';
-import { LocationStore, MutationError } from '@shared/domain/location/location-store';
+import { LocationStore, MutationError } from '@shared/domain/location/stores/location-store';
 import { getChildren } from '@shared/domain/location/location-tree';
 import { paginate } from '@shared/utils/paginate';
 import { Location } from '@shared/interfaces/location';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { getLocationStats, LocationStats } from '@shared/domain/location/location-stats';
 import { LocationTreeSelect } from '@shared/domain/location/location-tree-select';
-import { DeviceStore } from '@shared/domain/device/stores/device-store';
 import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
-import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
-import { DeviceMapping } from '@shared/interfaces/device-mapping';
+import { LocationStatsStore } from '@shared/domain/location/stores/location-stats-store';
+import { LocationCardSkeleton } from '@features/location/components/location-card-skeleton';
 
 
 @Component({
-  imports: [ReactiveFormsModule, ContentLayout, LocationCard, Paginator, LocationTreeSelect, TranslocoPipe],
+  imports: [ReactiveFormsModule, ContentLayout, LocationCard, LocationCardSkeleton, Paginator, LocationTreeSelect, TranslocoPipe],
   selector: 'app-location-list',
   styleUrl: './location-list.css',
   templateUrl: './location-list.html',
@@ -29,36 +27,11 @@ import { DeviceMapping } from '@shared/interfaces/device-mapping';
   },
 })
 export class LocationList {
-  private readonly deviceStore = inject(DeviceStore);
   private readonly deviceTypeStore = inject(DeviceTypeStore);
   private readonly formDialog = inject(DialogService);
-  private readonly mappingService = inject(DeviceMappingService);
 
+  readonly statsStore = inject(LocationStatsStore);
   readonly store = inject(LocationStore);
-
-  private readonly mappings = toSignal(
-    this.mappingService.getAllMappings(),
-    { initialValue: [] as DeviceMapping[] },
-  );
-
-  readonly statsById = computed<Map<number, LocationStats>>(() => {
-    const locations = this.store.items();
-    const devices = this.deviceStore.items();
-    const source = {
-      devices,
-      mappings: this.mappings(),
-      types: this.deviceTypeStore.items(),
-    };
-
-    const map = new Map<number, LocationStats>();
-    for (const loc of this.locations()) {
-      map.set(loc.id, getLocationStats(loc.id, locations, source));
-    }
-    return map;
-  });
-
-  statsFor = (loc: Location): LocationStats | null =>
-    this.statsById().get(loc.id) ?? null;
 
   searchForms = new FormGroup({
     currentLocation: new FormControl<number | null>(null),

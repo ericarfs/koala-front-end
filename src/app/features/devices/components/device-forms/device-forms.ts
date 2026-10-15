@@ -8,7 +8,7 @@ import { LocationTreeSelect } from '@shared/domain/location/location-tree-select
 import { ChipSelect } from '@shared/domain/monitoring/components/chip-select';
 import { Input } from '@shared/components/input/input';
 import { DeviceStore } from '@shared/domain/device/stores/device-store';
-import { LocationStore } from '@shared/domain/location/location-store';
+import { LocationStore } from '@shared/domain/location/stores/location-store';
 import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
 import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
 

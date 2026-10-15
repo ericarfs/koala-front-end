@@ -4,7 +4,7 @@ import { LocationService } from './location';
 import { Location } from '@shared/interfaces/location';
 import { LOCATIONS_MOCK } from '../../../../mocks/locations';
 
-const FAKE_LATENCY_MS = 300;
+const FAKE_LATENCY_MS = 2000;
 
 @Injectable()
 export class MockLocationService extends LocationService {

@@ -4,7 +4,7 @@ import { DeviceService, DeviceUpdate } from './device';
 import { Device } from '@shared/interfaces/device';
 import { DEVICES_MOCK } from '../../../../mocks/devices';
 
-const FAKE_LATENCY_MS = 300;
+const FAKE_LATENCY_MS = 3000;
 
 @Injectable()
 export class MockDeviceService extends DeviceService {

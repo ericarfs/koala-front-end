@@ -6,13 +6,13 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { CommonModule } from '@angular/common';
 import { ActionButtons } from '@shared/components/action-buttons/action-buttons';
 import { DialogService } from '@shared/components/dialogs/dialogs.service';
-import { LocationStore, MutationError } from '@shared/domain/location/location-store';
+import { LocationStore, MutationError } from '@shared/domain/location/stores/location-store';
 import { finalize, of, switchMap, throwError } from 'rxjs';
+import { LocationStatsSkeleton } from './location-stats-skeleton';
 
 @Component({
   selector: 'app-location-card',
-  standalone: true,
-  imports: [CommonModule, RouterLink, ActionButtons, TranslocoPipe],
+  imports: [CommonModule, RouterLink, ActionButtons, LocationStatsSkeleton, TranslocoPipe],
   host: { class: 'contents' },
   template: `
     <a
@@ -46,7 +46,10 @@ import { finalize, of, switchMap, throwError } from 'rxjs';
         }
       </div>
 
-      @if (stats(); as s) {
+      @if (statsLoading()) {
+        <!-- skeleton dos stats -->
+        <app-location-stats-skeleton/>
+      } @else if (stats(); as s) {
         <div class="flex-1 mt-4 space-y-4">
 
           <!-- 1. Resumo: total + status -->
@@ -117,6 +120,7 @@ export class LocationCard {
 
   readonly location = input.required<Location>();
   readonly actionLabel = input('Ver dispositivos');
+  readonly statsLoading = input(false);
 
   readonly deleting = signal(false);
 

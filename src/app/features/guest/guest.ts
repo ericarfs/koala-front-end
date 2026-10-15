@@ -17,7 +17,7 @@ import { SearchButton } from '@shared/domain/monitoring/components/search-button
 import { ChartExportInfo, localeFromLang } from '@shared/services/pdf-export';
 import { buildChartInfo } from '@shared/utils/chart-exports-info';
 import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
-import { LocationStore } from '@shared/domain/location/location-store';
+import { LocationStore } from '@shared/domain/location/stores/location-store';
 
 @Component({
   imports: [CommonModule, RouterLink, ReactiveFormsModule, ContentLayout, LocationTreeSelect, InterfacePreferences ,TranslocoPipe, ChartPanel, ChipSelect, IntervalSelector, SearchButton],
@@ -33,6 +33,7 @@ export class Guest {
 
   readonly store = inject(ChartDataStore);
 
+  readonly deviceTypeLoading = this.deviceTypeStore.loading;
   readonly deviceTypeOptions = this.deviceTypeStore.items;
   readonly intervalOptions = TIME_BUCKET_OPTIONS;
 

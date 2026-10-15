@@ -2,8 +2,8 @@ import { CommonModule, Location } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
+import { map, of } from 'rxjs';
 import { ContentLayout } from '@shared/layouts/content/content';
 import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
 import { DeviceWithTypes } from '@shared/interfaces/device';
@@ -18,14 +18,15 @@ import { SearchButton } from '@shared/domain/monitoring/components/search-button
 import { ChartExportInfo, localeFromLang } from '@shared/services/pdf-export';
 import { buildChartInfo } from '@shared/utils/chart-exports-info';
 import { DeviceStore } from '@shared/domain/device/stores/device-store';
-import { LocationStore } from '@shared/domain/location/location-store';
+import { LocationStore } from '@shared/domain/location/stores/location-store';
 import { DeviceType } from '@shared/interfaces/device-type';
+import { DeviceTypesSkeleton } from '@shared/domain/device/components/device-types-skeleton';
 
 
 @Component({
   selector: 'app-device-details',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ContentLayout, TranslocoPipe, ChipSelect, ChartPanel, IntervalSelector, SearchButton],
+  imports: [CommonModule, ReactiveFormsModule, ContentLayout, TranslocoPipe, ChipSelect, ChartPanel, IntervalSelector, SearchButton, DeviceTypesSkeleton],
   providers: [ChartDataStore],
   templateUrl: './device-details.html',
 })
@@ -34,14 +35,29 @@ export class DeviceDetails {
   private readonly routerLocation = inject(Location);
   private readonly mappingService = inject(DeviceMappingService);
   private readonly transloco = inject(TranslocoService);
-  private readonly deviceStore = inject(DeviceStore);
   private readonly locationStore = inject(LocationStore);
 
+  readonly deviceStore = inject(DeviceStore);
   readonly store = inject(ChartDataStore);
 
   private readonly id = toSignal(
     this.route.paramMap.pipe(map(p => Number(p.get('id')))),
     { initialValue: NaN },
+  );
+
+  readonly typesResource = rxResource({
+    params: () => {
+      const id = this.id();
+      return Number.isNaN(id) ? undefined : id;
+    },
+    stream: ({ params }) =>
+      params != null
+        ? this.mappingService.getTypesForDevice(params)
+        : of([] as DeviceType[]),
+  });
+
+  readonly deviceLoading = computed(() =>
+    this.deviceStore.loading() || this.typesResource.isLoading(),
   );
 
   readonly intervalOptions = TIME_BUCKET_OPTIONS;
@@ -55,7 +71,7 @@ export class DeviceDetails {
     const found = this.deviceStore.items().find((d) => d.id === id);
     if (!found) return null;
 
-    return { ...found, types: this.loadedTypes() };
+    return { ...found, types: this.typesResource.value() ?? [] };
   });
 
   readonly filterForm = new FormGroup({
@@ -83,10 +99,6 @@ export class DeviceDetails {
       this.store.reset();
 
       if (Number.isNaN(id)) return;
-
-      this.mappingService.getTypesForDevice(id).subscribe((types) => {
-        this.loadedTypes.set(types);
-      });
     });
   }
 

@@ -7,25 +7,23 @@ import { getActionLabel, getAncestors, getChildren } from '../../../../shared/do
 import { ContentLayout } from '@shared/layouts/content/content';
 import { DeviceList } from '@shared/domain/device/components/device-list';
 import { LocationCard } from '@features/location/components/location-card';
-import { LocationStore, MutationError } from '@shared/domain/location/location-store';
+import { LocationStore, MutationError } from '@shared/domain/location/stores/location-store';
 import { DialogService } from '@shared/components/dialogs/dialogs.service';
 import { Location } from '@shared/interfaces/location';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Paginator} from '@shared/components/pagination/paginator';
 import { paginate } from '@shared/utils/paginate';
-import { getLocationStats, LocationStats } from '@shared/domain/location/location-stats';
 import { mediaQuery } from '@shared/utils/media-query';
 import { DeviceStore } from '@shared/domain/device/stores/device-store';
-import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
-import { DeviceMapping } from '@shared/interfaces/device-mapping';
 import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
-
+import { LocationStatsStore } from '@shared/domain/location/stores/location-stats-store';
+import { LocationCardSkeleton } from '@features/location/components/location-card-skeleton';
 
 
 @Component({
   selector: 'app-location-details',
   standalone: true,
-  imports: [CommonModule, RouterLink, ContentLayout, DeviceList, LocationCard, Paginator, TranslocoPipe],
+  imports: [CommonModule, RouterLink, ContentLayout, DeviceList, LocationCard, LocationCardSkeleton, Paginator, TranslocoPipe],
   templateUrl: './location-details.html',
   host: {
     class: 'block flex-1',
@@ -34,10 +32,10 @@ import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
 export class LocationDetails {
   private readonly route = inject(ActivatedRoute);
   private readonly formDialog = inject(DialogService);
-  private readonly deviceStore = inject(DeviceStore);
   private readonly deviceTypeStore = inject(DeviceTypeStore);
-  private readonly mappingService = inject(DeviceMappingService);
 
+  readonly deviceStore = inject(DeviceStore);
+  readonly statsStore = inject(LocationStatsStore);
   readonly store = inject(LocationStore);
 
   private readonly id = toSignal(
@@ -45,41 +43,11 @@ export class LocationDetails {
     { initialValue: NaN }
   );
 
-  private readonly mappings = toSignal(
-    this.mappingService.getAllMappings(),
-    { initialValue: [] as DeviceMapping[] },
-  );
-
-  readonly statsById = computed<Map<number, LocationStats>>(() => {
-    const locations = this.store.items();
-    const devices = this.deviceStore.items();
-
-    const source = {
-      devices,
-      mappings: this.mappings(),
-      types: this.deviceTypeStore.items(),
-    };
-
-    const ids = new Set<number>();
-    const current = this.id();
-    if (!Number.isNaN(current)) ids.add(current);
-    for (const c of this.children()) ids.add(c.id);
-
-    const map = new Map<number, LocationStats>();
-    for (const id of ids) {
-      map.set(id, getLocationStats(id, locations, source));
-    }
-    return map;
-  });
-
-  statsFor = (loc: Location): LocationStats | null =>
-    this.statsById().get(loc.id) ?? null;
-
   readonly location   = computed(() => this.store.items().find((l) => l.id === this.id()) ?? null);
   readonly breadcrumb = computed(() => getAncestors(this.id(), this.store.items()));
   readonly children   = computed(() => getChildren(this.id(), this.store.items()));
   readonly devices = computed(() => this.deviceStore.items().filter((d) => d.id_enviroment === this.id()));
-  readonly showDevices = computed(() => this.children().length === 0 || this.devices().length > 0);
+  readonly showDevices = computed(() => this.children().length === 0 || this.devices().length > 0 || this.deviceStore.loading());
 
   pageSize = input(3);
   private isSmall = mediaQuery('(max-width: 767px)');

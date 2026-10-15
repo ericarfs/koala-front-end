@@ -4,14 +4,15 @@ import { Router, RouterLink } from '@angular/router';
 import { ActionButtons } from '@shared/components/action-buttons/action-buttons';
 import { Device } from '@shared/interfaces/device';
 import { DeviceMappingService } from '../services/device-mapping';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { of, switchMap } from 'rxjs';
+import { rxResource} from '@angular/core/rxjs-interop';
+import { of } from 'rxjs';
 import { DeviceType } from '@shared/interfaces/device-type';
+import { DeviceTypesSkeleton } from './device-types-skeleton';
 
 @Component({
   selector: 'app-device-card',
   standalone: true,
-  imports: [CommonModule, RouterLink, ActionButtons],
+  imports: [CommonModule, RouterLink, ActionButtons, DeviceTypesSkeleton],
   template: `
     <a [routerLink]="['/devices', device().id]"
       class="flex flex-col gap-3 p-4 bg-container border border-outline rounded-sm cursor-pointer hover:border-primary transition-colors">
@@ -36,9 +37,11 @@ import { DeviceType } from '@shared/interfaces/device-type';
         </div>
       </div>
 
-      @if (types().length > 0) {
+      @if (typesResource.isLoading()) {
+        <app-device-types-skeleton/>
+      } @else if (typesResource.value()?.length) {
         <div class="flex flex-wrap gap-1">
-          @for (type of types(); track type.id) {
+          @for (type of typesResource.value()!; track type.id) {
             <span class="inline-flex items-center px-2 py-0.5 rounded-sm text-xs bg-neutral/10 text-neutral">
               {{ type.name }}
             </span>
@@ -74,16 +77,13 @@ export class DeviceCard {
   device = input.required<Device>();
   locationName = input<string>();
 
-  readonly types = toSignal(
-    toObservable(this.device).pipe(
-      switchMap(device =>
-        device.id != null
-          ? this.mappingService.getTypesForDevice(device.id)
-          : of([] as DeviceType[]),
-      ),
-    ),
-    { initialValue: [] as DeviceType[] },
-  );
+  readonly typesResource = rxResource({
+    params: () => this.device().id,
+    stream: ({ params }) =>
+      params != null
+        ? this.mappingService.getTypesForDevice(params)
+        : of([] as DeviceType[]),
+  });
 
   onEdit(){
     this.router.navigate(['devices/edit', this.device().id]);
