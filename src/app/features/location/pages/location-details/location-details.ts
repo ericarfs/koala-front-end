@@ -47,7 +47,7 @@ export class LocationDetails {
   readonly breadcrumb = computed(() => getAncestors(this.id(), this.store.items()));
   readonly children   = computed(() => getChildren(this.id(), this.store.items()));
   readonly devices = computed(() => this.deviceStore.items().filter((d) => d.id_enviroment === this.id()));
-  readonly showDevices = computed(() => this.children().length === 0 || this.devices().length > 0 || this.deviceStore.loading());
+  readonly showDevices = computed(() => this.children().length === 0 || this.devices().length > 0);
 
   pageSize = input(3);
   private isSmall = mediaQuery('(max-width: 767px)');
