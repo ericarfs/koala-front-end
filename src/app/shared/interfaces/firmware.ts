@@ -1,4 +1,3 @@
-// @shared/interfaces/firmware.ts
 export interface Firmware {
   id: number;
   name: string;

@@ -178,6 +178,12 @@
     },
     "DETAILS": {
       "NOT_FOUND":"Dispositivo não encontrado."
+    },
+    "FIRMWARE": {
+      "TITLE": "Firmware",
+      "NAME": "Nome",
+      "VERSION": "Versão",
+      "UPDATE": "Atualizar firmware"
     }
   },
 

@@ -1,4 +1,4 @@
-import { Component, ElementRef, forwardRef, input, viewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, forwardRef, inject, input, viewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { noop } from 'rxjs';
@@ -128,18 +128,26 @@ export class Input implements ControlValueAccessor {
   private onChange: (v: InputValue) => void = noop;
   private onTouched: () => void = noop;
 
+  private readonly cd = inject(ChangeDetectorRef);
+
   writeValue(v: InputValue) {
     if (v instanceof File) {
       this.fileName = v.name;
+      this.cd.markForCheck();
       return;
     }
     this.textValue = v ?? '';
-    if (!v) this.clearFile(); // reset do form limpa o arquivo
+    if (!v) this.clearFile();
+    this.cd.markForCheck();
   }
+
 
   registerOnChange(fn: (v: InputValue) => void) { this.onChange = fn; }
   registerOnTouched(fn: () => void) { this.onTouched = fn; }
-  setDisabledState(d: boolean) { this.disabled = d; }
+  setDisabledState(d: boolean) {
+    this.disabled = d;
+    this.cd.markForCheck();
+  }
 
   // ---------- texto ----------
   onInput(e: Event) {
@@ -152,7 +160,7 @@ export class Input implements ControlValueAccessor {
 
   // ---------- arquivo ----------
   onDragOver(e: DragEvent) {
-    e.preventDefault(); // necessário para o drop funcionar
+    e.preventDefault();
     if (!this.disabled) this.dragging = true;
   }
 
@@ -189,7 +197,7 @@ export class Input implements ControlValueAccessor {
     this.fileName = '';
     this.fileError = '';
     const el = this.fileInput()?.nativeElement;
-    if (el) el.value = ''; // permite selecionar o mesmo arquivo de novo
+    if (el) el.value = '';
   }
 
   private isAccepted(file: File): boolean {

@@ -11,9 +11,10 @@ import { DeviceStore } from '@shared/domain/device/stores/device-store';
 import { LocationStore } from '@shared/domain/location/stores/location-store';
 import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
 import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
+import { DeviceFirmwareSection } from './device-firmware-section';
 
 @Component({
-  imports: [ReactiveFormsModule, ContentLayout, TranslocoPipe, LocationTreeSelect, ChipSelect, Input],
+  imports: [ReactiveFormsModule, ContentLayout, TranslocoPipe, LocationTreeSelect, ChipSelect, Input, DeviceFirmwareSection],
   selector: 'app-device-forms',
   styleUrl: './device-forms.css',
   templateUrl: './device-forms.html',
