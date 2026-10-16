@@ -274,6 +274,11 @@
     "NAME":"Update name",
     "NAME_HELPER":"Enter the name",
     "COMPILER":"Compiler",
-    "COMPILER_HELPER":"Select the compiler"
+    "COMPILER_HELPER":"Select the compiler",
+    "COMPILATION_COMPLETED":"Compilation completed successfully.",
+    "ERRORS":{
+      "UPLOAD_FAILED": "Failed to upload the file. Check your connection and try again.",
+      "LOGS_FAILED": "Failed to receive compilation logs. The connection was interrupted."
+    }
   }
 }

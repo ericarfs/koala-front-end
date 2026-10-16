@@ -1,8 +1,9 @@
 import { ContentLayout } from '@shared/layouts/content/content';
-import { Component, signal } from '@angular/core';
+import { Component, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Input } from '@shared/components/input/input';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { FirmwareService } from '@shared/domain/device/services/firmware';
 
 @Component({
   imports: [ContentLayout, ReactiveFormsModule, Input, TranslocoPipe],
@@ -11,9 +12,15 @@ import { TranslocoPipe } from '@jsverse/transloco';
   templateUrl: './ota.html',
 })
 export class Ota {
+  private readonly firmwareService = inject(FirmwareService);
+  private readonly transloco = inject(TranslocoService);
+
   protected readonly loading = signal(false);
   protected readonly uploading = signal(false);
-  protected readonly logText = signal<string | null>(null);
+  protected readonly logText = signal<string>('');
+  protected readonly errorKey = signal<string | null>(null);
+
+  private readonly logPre = viewChild<ElementRef<HTMLPreElement>>('logPre');
 
   otaForm = new FormGroup({
     files: new FormControl<File[] | null>(null, [Validators.required]),
@@ -22,8 +29,8 @@ export class Ota {
   });
 
   compilerOptions = [
-    { value: '1',  label: 'Platformio'    },
-    { value: '2',  label: 'Arduino'  },
+    { value: 'pio',  label: 'Platformio'    },
+    { value: 'arduino',  label: 'Arduino'  },
 
   ];
 
@@ -48,60 +55,71 @@ export class Ota {
     this.otaForm.patchValue({ compiler: value });
   }
 
-  uploadOta() {
-    console.log("Entrei" + this.logText())
-    this.logText.set(null);
-    if (this.otaForm.valid) {
-      if (this.otaForm.value.files?.length === 0) {
-        this.logText.set('COMMON.FORM.FILE.NO_FILE');
-        console.log(this.logText())
-        return;
-      }
-      this.uploading.set(true);
-      /*const logSubscription = this.firmwareService.addUpdateFile(
-        this.otaForm.value.files || [],
-        this.otaForm.value.name || '',
-        this.otaForm.value.compiler || ''
-      ).subscribe({
-        next: response => {
-          const result = response.body;
-          if (!result || result.status !== 'ok' || !result.sessionId) {
-            this.logText = 'Erro ao enviar o arquivo.';
-            return;
-          }
-          this.logText += `Conectando...`;
-          this.firmwareService.firmwareCompileLogs(result.sessionId).subscribe({
-            next: log => {
-              if (log === '__DONE__') {
-                this.logText += 'Compilação concluída com sucesso!';
-                logSubscription.unsubscribe();
-                this.uploading.set(false);
-                return;
-              }
-              this.logText += log + '\n';
-              if (this.logPre) {
-                setTimeout(() => {
-                  this.logPre.nativeElement.scrollTop = this.logPre.nativeElement.scrollHeight;
-                }, 1);
-              }
-            },
-            error: err => {
-              if (!this.logText.endsWith('Compilação concluída com sucesso!')) {
-                this.logText += `Erro ao receber logs: ${err.message}`;
-              }
-              this.isUploading = false;
-            }
-          });
-        },
-        error: error => {
-          this.logText = `Erro ao enviar o arquivo: ${error.message}`;
-          this.uploading.set(false);
-        }
-      });*/
-    } else {
-      this.logText.set('COMMON.FORM.INVALID');
-      console.log(this.logText())
+  uploadOta(): void {
+    if (this.uploading()) return;
+
+    this.logText.set('');
+    this.errorKey.set(null);
+
+    if (this.otaForm.invalid) {
+      this.errorKey.set('COMMON.FORM.INVALID');
+      return;
     }
+
+    const { files, name, compiler } = this.otaForm.getRawValue();
+    if (!files || files.length === 0) {
+      this.errorKey.set('COMMON.FORM.FILE.NO_FILE');
+      return;
+    }
+
+    this.uploading.set(true);
+
+    this.firmwareService.addUpdateFile(files, name ?? '', compiler ?? '').subscribe({
+      next: (res) => {
+        if (!res || res.status !== 'ok' || !res.sessionId) {
+          this.errorKey.set('OTA.ERRORS.UPLOAD_FAILED');
+          this.uploading.set(false);
+          return;
+        }
+
+        this.appendLog('Conecting...');
+
+        this.firmwareService.firmwareCompileLogs(res.sessionId).subscribe({
+          next: (log) => {
+            if (log === '__DONE__') {
+              this.appendLog(this.transloco.translate('OTA.COMPILATION_COMPLETED'));
+              this.uploading.set(false);
+              return;
+            }
+            this.appendLog(log);
+          },
+          complete: () => {
+            if (this.uploading()) {
+              this.appendLog(this.transloco.translate('OTA.COMPILATION_COMPLETED'));
+              this.uploading.set(false);
+            }
+          },
+          error: () => {
+            this.errorKey.set('OTA.ERRORS.LOGS_FAILED');
+            this.uploading.set(false);
+          },
+        });
+      },
+      error: () => {
+        this.errorKey.set('OTA.ERRORS.UPLOAD_FAILED');
+        this.uploading.set(false);
+      },
+    });
+  }
+
+  private appendLog(line: string): void {
+    this.logText.update((prev) => (prev ? `${prev}\n${line}` : line));
+
+    // auto-scroll depois que o DOM atualizar
+    queueMicrotask(() => {
+      const el = this.logPre()?.nativeElement;
+      if (el) el.scrollTop = el.scrollHeight;
+    });
   }
 
 }
