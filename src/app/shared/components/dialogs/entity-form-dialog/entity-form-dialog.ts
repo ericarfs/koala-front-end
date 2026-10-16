@@ -31,8 +31,14 @@ import { Input } from '@shared/components/input/input';
           [placeholder]="field.placeholder ?? ''"
           [type]="field.type ?? 'text'"
           [rows]="field.rows ?? 3"
+          [required]="!!field.required"
           class="mb-4"
         />
+        @if (isInvalid(field.key, !!field.required)) {
+          <p class="-mt-3 mb-3 text-xs text-destructive">
+            {{ 'COMMON.VALIDATION.REQUIRED' | transloco }}
+          </p>
+        }
       }
 
       <div class="flex justify-end gap-2 mt-2 shrink-0">
@@ -66,12 +72,27 @@ export class FormDialog {
   protected readonly data = inject<FormDialogData>(DIALOG_DATA);
 
   protected readonly loading = signal(false);
+  protected readonly submitted = signal(false);
 
   protected values: Record<string, unknown> = {
     ...(this.data.initialValues ?? {}),
   };
 
+  protected isInvalid(key: string, required: boolean): boolean {
+    if (!required || !this.submitted()) return false;
+    const v = this.values[key];
+    return v == null || (typeof v === 'string' && v.trim() === '');
+  }
+
+  private get hasErrors(): boolean {
+    return this.data.fields.some((f) => this.isInvalid(f.key, !!f.required));
+  }
+
   submit(): void {
+    this.submitted.set(true);
+
+    if (this.hasErrors) return;
+
     this.loading.set(true);
 
     this.data.onSubmit(this.values)
