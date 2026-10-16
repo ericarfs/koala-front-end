@@ -274,6 +274,11 @@
     "NAME":"Nome da atualização",
     "NAME_HELPER":"Digite o nome",
     "COMPILER":"Compilador",
-    "COMPILER_HELPER":"Selecione o compilador"
+    "COMPILER_HELPER":"Selecione o compilador",
+    "COMPILATION_COMPLETED":"Compilação concluída com sucesso.",
+    "ERRORS":{
+      "UPLOAD_FAILED": "Falha ao enviar o arquivo. Verifique sua conexão e tente novamente.",
+      "LOGS_FAILED": "Falha ao receber os logs de compilação. A conexão foi interrompida."
+    }
   }
 }
