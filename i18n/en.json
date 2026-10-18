@@ -143,7 +143,7 @@
 
   "SENSORS": {
     "LIST": {
-      "TITLE": "Sensors",
+      "TITLE": "Device Types",
       "SUBTITLE": "Available sensor categories",
       "EMPTY": "No device type found."
     },

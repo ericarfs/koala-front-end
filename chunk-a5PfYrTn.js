@@ -1,1 +1,0 @@
-var t=[{path:``,children:[{path:``,redirectTo:`dashboard`,pathMatch:`full`},{path:`dashboard`,loadComponent:()=>import(`./chunk-BizBHOjc2.js`).then(o=>o.MffDashboard)},{path:`resources`,loadComponent:()=>import(`./chunk-BrOilNzk2.js`).then(o=>o.MffResources)}]}];export{t as MFF_ROUTES};
