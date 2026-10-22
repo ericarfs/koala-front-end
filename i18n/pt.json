@@ -92,6 +92,8 @@
         "NO_FILE":"Nenhum arquivo escolhido",
         "HELPER":"Clique aqui para trocar o arquivo"
       },
+      "ICON":"Ícone",
+      "ICON_PLACEHOLDER":"(Font Awesome) Ex: fa-user",
       "INVALID":"Formulário inválido. Preencha todos os campos."
     },
     "STATES": {
