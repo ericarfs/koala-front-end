@@ -92,6 +92,8 @@
         "NO_FILE":"No file selected",
         "HELPER":"Clique here to change the file"
       },
+      "ICON":"Icon",
+      "ICON_PLACEHOLDER":"(Font Awesome) Ex: fa-user",
       "INVALID":"Invalid form. Fill all fields."
     },
     "STATES": {

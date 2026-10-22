@@ -41,6 +41,12 @@ export class DeviceTypes {
             required: true
           },
           {
+            key: 'icon',
+            label: 'COMMON.FORM.ICON',
+            placeholder: 'COMMON.FORM.ICON_PLACEHOLDER',
+            required: true
+          },
+          {
             key: 'description',
             label: 'COMMON.FORM.DESCRIPTION',
             placeholder: 'COMMON.FORM.DESCRIPTION_PLACEHOLDER',
@@ -49,13 +55,14 @@ export class DeviceTypes {
           },
         ],
         initialValues: sensor
-          ? { name: sensor.name, description: sensor.description }
+          ? { name: sensor.name, icon: sensor.icon, description: sensor.description }
           : undefined,
 
         onSubmit: (values) => {
-          const v = values as { name: string; description?: string };
+          const v = values as { name: string; icon: string ;description?: string };
           const patch = {
             name: v.name,
+            icon: v.icon,
             description: v.description ?? '',
           };
 
