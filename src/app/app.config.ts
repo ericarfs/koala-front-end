@@ -35,6 +35,7 @@ import { DeviceMappingService } from '@shared/domain/device/services/device-mapp
 import { MockDeviceMappingService } from '@shared/domain/device/services/device-mapping.mock';
 import { UserService } from '@shared/domain/user/services/user';
 import { MockUserService } from '@shared/domain/user/services/user.mock';
+import { MockAuthService } from '@core/auth/services/auth.mock';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -70,6 +71,7 @@ export const appConfig: ApplicationConfig = {
           { provide: FirmwareService, useClass: MockFirmwareService },
           { provide: DeviceMappingService, useClass: MockDeviceMappingService },
           { provide: UserService, useClass: MockUserService },
+          { provide: AuthService, useClass: MockAuthService },
         ]
       : []),
     provideHttpClient(),
