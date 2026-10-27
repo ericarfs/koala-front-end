@@ -256,6 +256,7 @@
       "NEW_PASSWORD_PLACEHOLDER": "Enter new password",
       "CONFIRM_PASSWORD": "Password confirmation",
       "CONFIRM_PASSWORD_PLACEHOLDER": "Enter confirmation",
+      "PASSWORD_MISMATCH": "The passwords don't match.",
       "RULES_TITLE": "Your password must contain:",
       "RULES": {
         "MIN_LENGTH": "Minimum 8 characters",
@@ -263,6 +264,12 @@
         "NUMBER": "At least one number",
         "SPECIAL_CHAR": "At least one special character"
       }
+    },
+    "ERRORS": {
+      "INVALID_SESSION": "Invalid session. Please log in again.",
+      "LOAD_FAILED": "Could not load user data.",
+      "INVALID_FORM": "Please fill in the fields correctly.",
+      "SAVE_FAILED": "Failed to save."
     }
   },
 

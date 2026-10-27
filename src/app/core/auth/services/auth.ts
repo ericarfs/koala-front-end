@@ -10,6 +10,7 @@ interface LoginResponse {
 }
 
 interface CurrentUser {
+  id: number | null;
   username: string;
   role: 'admin' | 'user';
 }
@@ -47,7 +48,8 @@ export class AuthService implements PermissionsProvider{
           localStorage.setItem(TOKEN_KEY, res.access);
 
           const user: CurrentUser = {
-            username: this.subjectFromJwt(res.access) ?? username,
+            id: this.idFromJwt(res.access),
+            username: this.subjectFromJwt(res.access) || username,
             role: this.roleFromJwt(res.access) ?? 'user',
           };
 
@@ -68,15 +70,30 @@ export class AuthService implements PermissionsProvider{
     const raw = localStorage.getItem(USER_KEY);
     if (!raw) return null;
 
+    let parsed: Partial<CurrentUser>;
     if (!raw.startsWith('{')) {
-      return { username: raw, role: 'user' };
+      parsed = { username: raw, role: 'user' };
+    } else {
+      try {
+        parsed = JSON.parse(raw);
+      } catch {
+        return null;
+      }
     }
 
-    try {
-      return JSON.parse(raw);
-    } catch {
-      return null;
-    }
+    const token = localStorage.getItem(TOKEN_KEY);
+    return {
+      id: parsed.id ?? (token ? this.idFromJwt(token) : null),
+      username: parsed.username ?? '',
+      role: parsed.role ?? 'user',
+    };
+  }
+
+  private idFromJwt(token: string): number | null {
+    const payload = this.decodePayload(token);
+    const raw = payload?.['userId'] ?? payload?.['id'];
+    const id = Number(raw);
+    return raw != null && Number.isFinite(id) ? id : null;
   }
 
   private roleFromJwt(token: string): 'admin' | 'user' | null {

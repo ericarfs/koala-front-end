@@ -1,15 +1,14 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { delay, Observable, of, tap } from 'rxjs';
 import { PermissionsProvider } from '@shared/tokens/permissions';
-import { environment } from './../../../../environments/environment';
 
 interface LoginResponse {
   access: string;
 }
 
 interface CurrentUser {
+  id: number | null;
   username: string;
   role: 'admin' | 'user';
 }
@@ -19,9 +18,7 @@ const USER_KEY = 'currentUser';
 
 @Injectable({ providedIn: 'root' })
 export class MockAuthService implements PermissionsProvider{
-  private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
-  private readonly baseUrl = `${environment.apiUrl}auth`;
 
   private readonly _user = signal<CurrentUser | null>(this.readUserFromStorage());
 
@@ -45,7 +42,7 @@ export class MockAuthService implements PermissionsProvider{
   }
 
   //login falso para teste
-  login(username: string, password: string): Observable<LoginResponse> {
+  login(username: string): Observable<LoginResponse> {
     // Mock do token — pode ser um JWT fake ou uma string qualquer
     const mockResponse: LoginResponse = {
       access: this.buildFakeJwt(username),
@@ -58,6 +55,7 @@ export class MockAuthService implements PermissionsProvider{
         localStorage.setItem(TOKEN_KEY, res.access);
 
         const user: CurrentUser = {
+          id: 1,
           username: this.subjectFromJwt(res.access) ?? username,
           role: this.roleFromJwt(res.access) ?? 'user',
         };
@@ -94,7 +92,7 @@ export class MockAuthService implements PermissionsProvider{
     if (!raw) return null;
 
     if (!raw.startsWith('{')) {
-      return { username: raw, role: 'user' };
+      return { id: 1, username: raw, role: 'user' };
     }
 
     try {

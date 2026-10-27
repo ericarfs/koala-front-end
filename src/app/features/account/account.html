@@ -4,8 +4,8 @@
 <div class="flex flex-col flex-1 break-words gap-4">
   <div class="w-2xl max-w-full text-center">
     <!-----Formulário de Usuário---->
-    <form [formGroup]="userForm" class="text-left flex justify-between md:gap-2 flex-wrap">
-      @for (item of userFormItems; track $index) {
+    <form [formGroup]="userForm" class="text-left flex justify-between gap-2 flex-wrap">
+      @for (item of userFormItems; track item.key) {
         <app-input
           [formControlName]="item.key"
           [type]="item.type"
@@ -42,39 +42,56 @@
         />
 
         <app-input-password
-          [control]="passwordConfirmation"
+          [control]="newPasswordConfirmation"
           label="ACCOUNT.CHANGE_PASSWORD.CONFIRM_PASSWORD"
           placeholder="ACCOUNT.CHANGE_PASSWORD.CONFIRM_PASSWORD_PLACEHOLDER"
           class="md:flex-1 w-full mb-4"
         />
       </div>
+
+      @if (passwordForm.hasError('passwordMismatch') && newPasswordConfirmation.dirty) {
+        <p class="text-sm text-destructive mb-3">
+          {{ 'ACCOUNT.CHANGE_PASSWORD.PASSWORD_MISMATCH' | transloco }}
+        </p>
+      }
+
       <div class="text-sm text-default bg-transparent py-3 px-4 rounded border border-outline">
         <p class="font-semibold mb-1">
           {{ 'ACCOUNT.CHANGE_PASSWORD.RULES_TITLE' | transloco }}
         </p>
         <ul class="list-disc list-inside space-y-1">
-          <li>{{ 'ACCOUNT.CHANGE_PASSWORD.RULES.MIN_LENGTH' | transloco }}</li>
-          <li>{{ 'ACCOUNT.CHANGE_PASSWORD.RULES.UPPERCASE' | transloco }}</li>
-          <li>{{ 'ACCOUNT.CHANGE_PASSWORD.RULES.NUMBER' | transloco }}</li>
-          <li>{{ 'ACCOUNT.CHANGE_PASSWORD.RULES.SPECIAL_CHAR' | transloco }}</li>
+          @for (rule of passwordRules; track rule.error) {
+            <li
+              [class.text-destructive]="newPassword.dirty && newPassword.hasError(rule.error)"
+              [class.text-success]="newPassword.dirty && !newPassword.hasError(rule.error)"
+            >
+              {{ rule.key | transloco }}
+            </li>
+          }
         </ul>
       </div>
     </form>
   </div>
-   <div class="w-2xl max-w-full flex justify-between gap-2 flex-wrap">
-      <button
-        type="submit"
-        [disabled]="loading()"
-        class="btn md:flex-1 w-full bg-primary text-white hover:bg-primary-details disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-        {{ 'COMMON.ACTIONS.SAVE' | transloco }}
-      </button>
 
-      <button
-        type="button"
-        (click) = "goBack()"
-        class="btn md:flex-1 w-full border border-outline text-sm font-medium hover:bg-neutral/20"
-      >
+  @if (error(); as errorKey) {
+    <p class="w-2xl max-w-full text-sm text-destructive">{{ errorKey | transloco }}</p>
+  }
+
+  <div class="w-2xl max-w-full flex justify-between gap-2 flex-wrap">
+    <button
+      type="button"
+      (click)="onSubmit()"
+      [disabled]="loading()"
+      class="btn md:flex-1 w-full bg-primary text-white hover:bg-primary-details disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {{ 'COMMON.ACTIONS.SAVE' | transloco }}
+    </button>
+
+    <button
+      type="button"
+      (click)="goBack()"
+      class="btn md:flex-1 w-full border border-outline text-sm font-medium hover:bg-neutral/20"
+    >
       {{ 'COMMON.ACTIONS.CANCEL' | transloco }}
     </button>
   </div>
