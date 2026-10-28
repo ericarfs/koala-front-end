@@ -30,6 +30,13 @@
         (selectedChange)="onTypesChange($event)"
       />
 
+      <app-chip-select
+        label="DEVICES.ACTUATOR.TITLE"
+        [options]="actuatorOptions()"
+        [selected]="selectedActuators()"
+        (selectedChange)="onActuatorsChange($event)"
+      />
+
       <app-input
         formControlName="description"
         type="textarea"

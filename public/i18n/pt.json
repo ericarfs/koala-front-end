@@ -186,6 +186,9 @@
       "NAME": "Nome",
       "VERSION": "Versão",
       "UPDATE": "Atualizar firmware"
+    },
+    "ACTUATOR": {
+      "TITLE": "Atuadores"
     }
   },
 

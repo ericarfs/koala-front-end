@@ -12,6 +12,11 @@ import { LocationStore } from '@shared/domain/location/stores/location-store';
 import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
 import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
 import { DeviceFirmwareSection } from './device-firmware-section';
+import { ActuatorStore } from '@shared/domain/actuator/stores/actuator';
+import { ActuatorMappingService } from '@shared/domain/device/services/actuator-mapping';
+import { forkJoin, map, Observable, of, switchMap, throwError } from 'rxjs';
+import { DeviceMapping } from '@shared/interfaces/device-mapping';
+import { ActuatorMapping } from '@shared/interfaces/actuator-mapping';
 
 @Component({
   imports: [ReactiveFormsModule, ContentLayout, TranslocoPipe, LocationTreeSelect, ChipSelect, Input, DeviceFirmwareSection],
@@ -25,9 +30,12 @@ export class DeviceForms implements OnInit {
   private readonly deviceStore = inject(DeviceStore);
   private readonly locationStore = inject(LocationStore);
   private readonly deviceTypeStore = inject(DeviceTypeStore);
-  private readonly mappingService = inject(DeviceMappingService);
+  private readonly actuatorStore = inject(ActuatorStore);
+  private readonly deviceMappingService = inject(DeviceMappingService);
+  private readonly actuatorMappingService = inject(ActuatorMappingService);
 
   readonly deviceTypeOptions = this.deviceTypeStore.items;
+  readonly actuatorOptions = this.actuatorStore.items;
 
   title = "Adicionar dispositivo";
   deviceId: number | null = null;
@@ -39,7 +47,11 @@ export class DeviceForms implements OnInit {
     location: new FormControl<number | null>(null, Validators.required),
     name: new FormControl<string | null>(null, Validators.required),
     mac: new FormControl<string | null>(null, Validators.required),
-    description: new FormControl<string | null>(null, Validators.required),
+    description: new FormControl<string | null>(null, [
+      Validators.required,
+      Validators.maxLength(200),
+      Validators.minLength(5),
+    ]),
   });
 
   readonly selectedTypes = signal<number[]>([]);
@@ -47,17 +59,26 @@ export class DeviceForms implements OnInit {
     this.selectedTypes.set(types);
   }
 
+  readonly selectedActuators = signal<number[]>([]);
+  onActuatorsChange(actuators: number[]): void {
+    this.selectedActuators.set(actuators);
+  }
+
   readonly locations = this.locationStore.items;
 
   constructor() {
     this.deviceTypeStore.load();
+    this.actuatorStore.load();
 
     effect(() => {
       const id = this.deviceId;
       if (!id) return;
 
       const device = this.deviceStore.items().find((d) => d.id === id);
-      if (!device) return;
+      if (!device) {
+        this.routerLocation.back();
+        return;
+      }
 
       this.deviceForm.patchValue({
         location: device.id_enviroment ?? null,
@@ -76,8 +97,12 @@ export class DeviceForms implements OnInit {
       this.editing = true;
       this.deviceId = Number(id);
 
-      this.mappingService.getTypesForDevice(this.deviceId).subscribe((types) => {
+      this.deviceMappingService.getTypesForDevice(this.deviceId).subscribe((types) => {
         this.selectedTypes.set(types.map(t => t.id));
+      });
+
+      this.actuatorMappingService.getActuatorsForDevice(this.deviceId).subscribe((actuators) => {
+        this.selectedActuators.set(actuators.map(t => t.id));
       });
     }
   }
@@ -99,12 +124,25 @@ export class DeviceForms implements OnInit {
       ? this.deviceStore.update(this.deviceId, payload)
       : this.deviceStore.add(payload);
 
-    op$.subscribe({
+    op$
+    .pipe(
+      switchMap((res) => {
+        if (!res.ok) return of(res);
+
+        const id = res.data.id;
+        if (!id) {
+          return throwError(() => new Error('Device saved without id'));
+        }
+
+        return this.saveMappings(id, this.selectedTypes(), this.selectedActuators()).pipe(
+          map(() => res),
+        );
+      }),
+    )
+    .subscribe({
       next: (res) => {
         this.submitting.set(false);
         if (res.ok) {
-          // TODO: salvar mappings de sensor/atuador (DeviceMappingService)
-          //       quando essa parte for implementada
           this.routerLocation.back();
         } else {
           // TODO: toast de erro
@@ -116,6 +154,22 @@ export class DeviceForms implements OnInit {
         // TODO: toast de erro
       },
     });
+  }
+
+  private saveMappings(deviceId: number, sensorIds: number[], actuatorIds: number[]): Observable<unknown> {
+    const sensors: DeviceMapping[] = sensorIds.map((type_id) => ({
+      device_id: deviceId,
+      type_id,
+    }));
+    const actuators: ActuatorMapping[] = actuatorIds.map((actuator_id) => ({
+      device_id: deviceId,
+      actuator_id,
+    }));
+
+    return forkJoin([
+      this.deviceMappingService.saveAll(deviceId, sensors),
+      this.actuatorMappingService.saveAll(deviceId, actuators),
+    ]);
   }
 
   cancel(): void {
