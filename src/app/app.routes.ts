@@ -4,7 +4,7 @@ import { MainLayout } from './core/layout/main/main-layout';
 import { adminGuard } from './core/auth/guards/admin.guard';
 
 export const CORE_ROUTES: Route[] = [
-  { path: '', redirectTo: '/location', pathMatch: 'full' },
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: 'login',
     loadComponent: () => import('./features/login/login').then((m) => m.Login),
     canActivate: [noAuthGuard] },

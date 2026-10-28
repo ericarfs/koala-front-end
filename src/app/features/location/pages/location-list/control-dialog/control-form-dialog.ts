@@ -2,9 +2,13 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
-import { ControlMode, ControlData, ControlResult } from './control-form-dialog.types';
+import { AirconMode, AirconParameters, ControlData, ControlResult } from './control-form-dialog.types';
 import { finalize } from 'rxjs';
+import { ActuatorService } from '@shared/domain/actuator/services/actuator';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+const MIN_TEMP = 16;
+const MAX_TEMP = 27;
 
 @Component({
   selector: 'app-control-dialog',
@@ -102,26 +106,51 @@ import { finalize } from 'rxjs';
 })
 export class ControlDialog {
   private readonly dialogRef = inject<DialogRef<ControlResult>>(DialogRef);
+  private readonly actuatorService = inject(ActuatorService);
+
   protected readonly data = inject<ControlData>(DIALOG_DATA);
 
-  protected readonly temperature = signal(this.data.temperature ?? 22);
-  protected readonly mode = signal<ControlMode>(this.data.mode ?? ControlMode.AUTO);
-  protected readonly enabled = signal(this.data.enabled ?? false);
+  protected readonly temperature = signal(22);
+  protected readonly mode = signal<AirconMode>(AirconMode.AUTO);
+  protected readonly enabled = signal(false);
 
   protected readonly loading = signal(false);
+  protected readonly error = signal<string | null>(null);
 
-  protected readonly modes: { value: ControlMode; label: string }[] = [
-    { value: ControlMode.AUTO, label: 'Auto' },
-    { value: ControlMode.COOL, label: 'Cool' },
-    { value: ControlMode.FAN, label: 'Fan' },
-    { value: ControlMode.HEAT,  label: 'Heat' },
+  private lastSentAt: Date | null = null;
+
+  protected readonly modes: { value: AirconMode; label: string }[] = [
+    { value: AirconMode.AUTO, label: 'Auto' },
+    { value: AirconMode.COOL, label: 'Cool' },
+    { value: AirconMode.FAN, label: 'Fan' },
+    { value: AirconMode.HEAT,  label: 'Heat' },
   ];
 
-  incrementTemp() { this.temperature.update(t => Math.min(t + 1, 35)); }
-  decrementTemp() { this.temperature.update(t => Math.max(t - 1, 10)); }
+  constructor() {
+    this.actuatorService
+      .getActuatorUpdates()
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (update) => {
+          const diffMs = this.lastSentAt ? Date.now() - this.lastSentAt.getTime() : null;
+          console.log(`[ControlDialog] update (${diffMs ?? '-'} ms após envio)`, update);
+          // TODO: sincronizar temperature/mode/enabled com o update quando o formato for definido
+        },
+        error: (err) => console.error('[ControlDialog] stream failed', err),
+      });
+  }
+
+  incrementTemp() { this.temperature.update(t => Math.min(t + 1, MAX_TEMP)); }
+  decrementTemp() { this.temperature.update(t => Math.max(t - 1, MIN_TEMP)); }
 
   submit(): void {
-    this.loading.set(true);
+    if (this.loading()) return;
+
+    const environmentId = this.data.environmentId;
+    if (!environmentId) {
+      this.error.set('Ambiente não informado.');
+      return;
+    }
 
     const values: ControlResult = {
       locationName: this.data.locationName,
@@ -130,11 +159,27 @@ export class ControlDialog {
       enabled: this.enabled(),
     };
 
-    this.data.onSubmit(values)
+    const command: AirconParameters = {
+      enviromentId: this.data.environmentId,
+      deviceId: null,
+      mode: values.mode,
+      temperature: values.temperature,
+      power: values.enabled,
+    };
+
+    this.error.set(null);
+    this.loading.set(true);
+    this.lastSentAt = new Date();
+
+    this.actuatorService
+      .sendAirconCommand(environmentId, command)
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: () => this.dialogRef.close(values),
-        error: (err) => console.error(err),
+        error: (err) => {
+          console.error('[ControlDialog] send failed', err);
+          this.error.set('Não foi possível enviar o comando.');
+        },
       });
   }
 

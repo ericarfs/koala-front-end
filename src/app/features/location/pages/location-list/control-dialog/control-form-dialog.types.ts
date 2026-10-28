@@ -1,24 +1,27 @@
-import { Observable } from "rxjs";
-
-export enum ControlMode {
+export enum AirconMode {
   AUTO = 0,
   COOL,
   FAN,
   HEAT,
 }
 
-export interface ControlData {
-  locationName: string;
+export interface AirconParameters {
+  enviromentId: string | number | null;
+  deviceId: number | null;
+  mode: AirconMode;
   temperature: number;
-  mode: ControlMode;
-  enabled: boolean;
-  onSubmit: (values: ControlResult) => Observable<unknown>;
+  power: boolean;
+}
+
+export interface ControlData {
+  environmentId: string;
+  locationName: string;
 }
 
 // O que o dialog devolve no submit
 export interface ControlResult {
   locationName: string;
   temperature: number;
-  mode: ControlMode;
+  mode: AirconMode;
   enabled: boolean;
 }

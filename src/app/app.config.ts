@@ -37,7 +37,7 @@ import { UserService } from '@shared/domain/user/services/user';
 import { MockUserService } from '@shared/domain/user/services/user.mock';
 import { MockAuthService } from '@core/auth/services/auth.mock';
 import { ActuatorService } from '@shared/domain/actuator/services/actuator';
-import { MockActuatorCrudService } from '@shared/domain/actuator/services/actuator.mock';
+import { MockActuatorService } from '@shared/domain/actuator/services/actuator.mock';
 import { ActuatorMappingService } from '@shared/domain/device/services/actuator-mapping';
 import { MockActuatorMappingService } from '@shared/domain/device/services/actuator-mapping.mock';
 
@@ -73,7 +73,7 @@ export const appConfig: ApplicationConfig = {
           { provide: DeviceService, useClass: MockDeviceService },
           { provide: DeviceTypeService, useClass: MockDeviceTypeService },
           { provide: FirmwareService, useClass: MockFirmwareService },
-          { provide: ActuatorService, useClass: MockActuatorCrudService },
+          { provide: ActuatorService, useClass: MockActuatorService },
           { provide: DeviceMappingService, useClass: MockDeviceMappingService },
           { provide: ActuatorMappingService, useClass: MockActuatorMappingService },
           { provide: UserService, useClass: MockUserService },

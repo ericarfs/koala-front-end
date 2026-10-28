@@ -3,11 +3,12 @@ import { delay, interval, map, Observable, of, throwError } from 'rxjs';
 import { Actuator } from '@shared/interfaces/actuator';
 import { ACTUATORS_MOCK } from '../../../../mocks/actuators';
 import { ActuatorService } from './actuator';
+import { AirconParameters } from '@features/location/pages/location-list/control-dialog/control-form-dialog.types';
 
 const FAKE_LATENCY_MS = 300;
 
 @Injectable()
-export class MockActuatorCrudService extends ActuatorService {
+export class MockActuatorService extends ActuatorService {
   private items: Actuator[] = ACTUATORS_MOCK.map((a) => ({ ...a }));
 
   override findAll(): Observable<Actuator[]> {
@@ -39,7 +40,7 @@ export class MockActuatorCrudService extends ActuatorService {
 
   override sendAirconCommand(
     _enviromentId: string,
-    _body: Record<string, unknown>,
+    _body: AirconParameters,
   ): Observable<unknown> {
     return of({ status: 'ok', message: 'Command sent' }).pipe(delay(FAKE_LATENCY_MS));
   }

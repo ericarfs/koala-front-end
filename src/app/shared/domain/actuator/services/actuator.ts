@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import { Actuator } from '@shared/interfaces/actuator';
+import { AirconParameters } from '@features/location/pages/location-list/control-dialog/control-form-dialog.types';
 
 @Injectable({ providedIn: 'root' })
 export class ActuatorService {
@@ -26,7 +27,7 @@ export class ActuatorService {
     return this.http.put<Actuator>(`${this.url}/${id}`, body);
   }
 
-  sendAirconCommand(enviromentId: string, body: Record<string, unknown>): Observable<unknown> {
+  sendAirconCommand(enviromentId: string, body: AirconParameters): Observable<unknown> {
     return this.http.post<unknown>(`${this.url}/aircon/${enviromentId}`, body);
   }
 
