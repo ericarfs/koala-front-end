@@ -4,6 +4,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Input } from '@shared/components/input/input';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { FirmwareService } from '@shared/domain/device/services/firmware';
+import { NotificationService } from '@shared/services/notification';
 
 @Component({
   imports: [ContentLayout, ReactiveFormsModule, Input, TranslocoPipe],
@@ -14,6 +15,7 @@ import { FirmwareService } from '@shared/domain/device/services/firmware';
 export class Ota {
   private readonly firmwareService = inject(FirmwareService);
   private readonly transloco = inject(TranslocoService);
+  private readonly notification = inject(NotificationService);
 
   protected readonly loading = signal(false);
   protected readonly uploading = signal(false);
@@ -79,6 +81,7 @@ export class Ota {
         if (!res || res.status !== 'ok' || !res.sessionId) {
           this.errorKey.set('OTA.ERRORS.UPLOAD_FAILED');
           this.uploading.set(false);
+          this.notification.error('Failed to upload. Try again later.');
           return;
         }
 
@@ -89,6 +92,7 @@ export class Ota {
             if (log === '__DONE__') {
               this.appendLog(this.transloco.translate('OTA.COMPILATION_COMPLETED'));
               this.uploading.set(false);
+              this.notification.success('Updated successfully.');
               return;
             }
             this.appendLog(log);
@@ -98,16 +102,19 @@ export class Ota {
               this.appendLog(this.transloco.translate('OTA.COMPILATION_COMPLETED'));
               this.uploading.set(false);
             }
+            this.notification.success('Updated successfully.');
           },
           error: () => {
             this.errorKey.set('OTA.ERRORS.LOGS_FAILED');
             this.uploading.set(false);
+            this.notification.error('Failed to upload. Try again later.');
           },
         });
       },
       error: () => {
         this.errorKey.set('OTA.ERRORS.UPLOAD_FAILED');
         this.uploading.set(false);
+        this.notification.error('Failed to upload. Try again later.');
       },
     });
   }

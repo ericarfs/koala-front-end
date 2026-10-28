@@ -5,10 +5,10 @@ export const AIRCON_ROUTES: Routes = [
     path: '',
     children: [
       {
-        path: 'ota',
+        path: 'device-control',
         loadComponent: () =>
-          import('./pages/ota/ota').then(
-            (m) => m.Ota
+          import('./pages/device-control/device-control').then(
+            (m) => m.DeviceControl
           ),
       },
     ],

@@ -1,0 +1,87 @@
+<app-content-layout
+    [title]="'DEVICE_CONTROL.TITLE' | transloco"
+  >
+
+<div class="flex flex-col gap-6">
+  <div class="bg-container border border-outline rounded-md w-2xl max-w-full p-6 flex flex-col gap-4">
+      <form [formGroup]="controlForm" class="flex flex-col overflow-y-auto gap-4">
+        <app-location-tree-select formControlName="location"></app-location-tree-select>
+        <div class="flex flex-col items-center gap-1">
+          <div class="flex items-center gap-4 [&>button]:cursor-pointer">
+            <button
+              type="button"
+              (click)="decrementTemp()"
+              class="w-8 h-8 rounded-full border border-outline text-lg hover:bg-neutral/10 transition-colors"
+            >−</button>
+
+            <span class="text-3xl font-bold text-default min-w-30 text-center">
+              {{ temperature() }}°C
+            </span>
+
+            <button
+              type="button"
+              (click)="incrementTemp()"
+              class="w-8 h-8 rounded-full border border-outline text-lg hover:bg-neutral/10 transition-colors"
+            >+</button>
+          </div>
+          <p class="text-xs text-neutral">Temperatura alvo</p>
+        </div>
+
+        <div class="flex flex-col flex-wrap justify-between gap-1">
+          <span class="text-xs text-neutral font-semibold">Modo</span>
+          <div class="flex bg-neutral/10 rounded-sm">
+            @for (m of modes; track m.value) {
+              <button
+                type="button"
+                (click)="mode.set(m.value)"
+                [class]="
+                  mode() === m.value
+                    ? 'bg-container text-default font-semibold'
+                    : 'text-neutral hover:text-default'
+                "
+                class="first:rounded-l-sm last:rounded-r-sm flex-1 p-2 text-xs border border-outline transition-colors cursor-pointer"
+              >
+                {{ m.label }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-neutral font-medium flex items-center gap-2">
+            <i class="fa-solid fa-power-off"></i>
+            {{ enabled() ? 'Ligado' : 'Desligado' }}
+          </span>
+
+          <button
+            type="button"
+            (click)="enabled.set(!enabled())"
+            [class]="enabled() ? 'bg-secondary' : 'bg-neutral/30'"
+            class="relative w-11 h-6 rounded-full transition-colors cursor-pointer"
+          >
+            <span
+              [class]="enabled() ? 'translate-x-5' : 'translate-x-0'"
+              class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform"
+            ></span>
+          </button>
+        </div>
+
+        <div class="flex justify-end gap-2 mt-2 shrink-0">
+          <button
+            type="submit"
+            (click)="submit()"
+            [disabled]="controlForm.invalid || loading()"
+            class="btn bg-primary text-white hover:bg-primary-details disabled:opacity-50 disabled:cursor-not-allowed
+            inline-flex items-center justify-center gap-2"
+          >
+            @if (loading()) {
+              <i class="fa-solid fa-spinner fa-spin"></i>
+              <span class="animate-pulse"> Enviando...</span>
+            } @else {
+              <span>Enviar</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+</div>

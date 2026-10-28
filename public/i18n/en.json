@@ -6,7 +6,8 @@
     "DASHBOARD": "Dashboard",
     "DEVICES": "Devices",
     "SETTINGS": "Settings",
-    "USERS": "Users"
+    "USERS": "Users",
+    "OTA": "OTA Update"
   },
   "MONITORING": {
     "FILTERS": {
@@ -292,5 +293,9 @@
       "UPLOAD_FAILED": "Failed to upload the file. Check your connection and try again.",
       "LOGS_FAILED": "Failed to receive compilation logs. The connection was interrupted."
     }
+  },
+
+  "DEVICE_CONTROL":{
+    "TITLE": "Device Control"
   }
 }

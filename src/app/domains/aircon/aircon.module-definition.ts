@@ -10,10 +10,10 @@ export const airconModuleDefinition: KoalaModuleDefinition = {
     import('./aircon.routes').then((m) => m.AIRCON_ROUTES),
   subItems: [
     {
-      id: 'ota',
-      label: 'Atualização OTA',
-      routePath: 'aircon/ota',
-      icon: 'fa-solid fa-file-arrow-up',
+      id: 'device-control',
+      label: 'DEVICE_CONTROL.TITLE',
+      routePath: 'aircon/device-control',
+      icon: 'fa-solid fa-temperature-half',
     },
   ],
   order: 2,

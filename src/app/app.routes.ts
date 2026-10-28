@@ -25,6 +25,8 @@ export const CORE_ROUTES: Route[] = [
       { path: 'devices', loadChildren: () => import('./features/devices/devices.routes').then((m) => m.DEVICES_ROUTES) },
       { path: 'account',
         loadComponent: () => import('./features/account/account').then((m) => m.Account), },
+      { path: 'ota',
+        loadComponent: () => import('./features/ota/ota').then((m) => m.Ota), },
       { path: 'users',
         loadComponent: () => import('./features/users/users').then((m) => m.Users),
         canActivate:[adminGuard] },

@@ -6,7 +6,8 @@
     "DASHBOARD": "Dashboard",
     "DEVICES": "Dispositivos",
     "SETTINGS": "Configurações",
-    "USERS": "Usuários"
+    "USERS": "Usuários",
+    "OTA": "Atualização OTA"
   },
   "MONITORING": {
     "FILTERS": {
@@ -292,5 +293,9 @@
       "UPLOAD_FAILED": "Falha ao enviar o arquivo. Verifique sua conexão e tente novamente.",
       "LOGS_FAILED": "Falha ao receber os logs de compilação. A conexão foi interrompida."
     }
+  },
+
+  "DEVICE_CONTROL":{
+    "TITLE": "Controle de Dispositivos"
   }
 }

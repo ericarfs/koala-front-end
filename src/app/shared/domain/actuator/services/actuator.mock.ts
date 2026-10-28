@@ -3,7 +3,6 @@ import { delay, interval, map, Observable, of, throwError } from 'rxjs';
 import { Actuator } from '@shared/interfaces/actuator';
 import { ACTUATORS_MOCK } from '../../../../mocks/actuators';
 import { ActuatorService } from './actuator';
-import { AirconParameters } from '@features/location/pages/location-list/control-dialog/control-form-dialog.types';
 
 const FAKE_LATENCY_MS = 300;
 
@@ -40,7 +39,7 @@ export class MockActuatorService extends ActuatorService {
 
   override sendAirconCommand(
     _enviromentId: string,
-    _body: AirconParameters,
+    _body: any,
   ): Observable<unknown> {
     return of({ status: 'ok', message: 'Command sent' }).pipe(delay(FAKE_LATENCY_MS));
   }
