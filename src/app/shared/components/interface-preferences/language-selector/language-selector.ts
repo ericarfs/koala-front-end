@@ -17,7 +17,7 @@ import { TranslocoService } from '@jsverse/transloco';
       #langSelect
       (change)="translate.setActiveLang(langSelect.value)"
       class="appearance-none bg-transparent text-neutral cursor-pointer
-            focus:outline-none focus-visible:ring-2 focus-visible:ring-primary
+            focus-visible:ring-2 focus-visible:ring-primary
             rounded w-full h-full text-center text-base leading-none
             border-0 px-2 py-3 m-0"
       [attr.aria-label]="currentLangName()"
