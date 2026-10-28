@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { map, of, switchMap, throwError } from 'rxjs';
+import { map, of, switchMap, tap, throwError } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getActionLabel, getAncestors, getChildren } from '../../../../shared/domain/location/location-tree';
 import { ContentLayout } from '@shared/layouts/content/content';
@@ -18,6 +18,7 @@ import { DeviceStore } from '@shared/domain/device/stores/device-store';
 import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
 import { LocationStatsStore } from '@shared/domain/location/stores/location-stats-store';
 import { LocationCardSkeleton } from '@features/location/components/location-card-skeleton';
+import { NotificationService } from '@shared/services/notification';
 
 
 @Component({
@@ -33,6 +34,7 @@ export class LocationDetails {
   private readonly route = inject(ActivatedRoute);
   private readonly formDialog = inject(DialogService);
   private readonly deviceTypeStore = inject(DeviceTypeStore);
+  private readonly notification = inject(NotificationService);
 
   readonly deviceStore = inject(DeviceStore);
   readonly statsStore = inject(LocationStatsStore);
@@ -107,6 +109,10 @@ export class LocationDetails {
                 ? of(res.data)
                 : throwError(() => this.toErrorMessage(res.reason)),
             ),
+            tap({
+              next: () => this.notification.success('Created successfully.'),
+              error: () => this.notification.error('Failed to save. Try again later.'),
+            }),
           );
         },
       })

@@ -14,9 +14,10 @@ import { DeviceMappingService } from '@shared/domain/device/services/device-mapp
 import { DeviceFirmwareSection } from './device-firmware-section';
 import { ActuatorStore } from '@shared/domain/actuator/stores/actuator';
 import { ActuatorMappingService } from '@shared/domain/device/services/actuator-mapping';
-import { forkJoin, map, Observable, of, switchMap, throwError } from 'rxjs';
+import { forkJoin, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { DeviceMapping } from '@shared/interfaces/device-mapping';
 import { ActuatorMapping } from '@shared/interfaces/actuator-mapping';
+import { NotificationService } from '@shared/services/notification';
 
 @Component({
   imports: [ReactiveFormsModule, ContentLayout, TranslocoPipe, LocationTreeSelect, ChipSelect, Input, DeviceFirmwareSection],
@@ -33,6 +34,7 @@ export class DeviceForms implements OnInit {
   private readonly actuatorStore = inject(ActuatorStore);
   private readonly deviceMappingService = inject(DeviceMappingService);
   private readonly actuatorMappingService = inject(ActuatorMappingService);
+  private readonly notification = inject(NotificationService);
 
   readonly deviceTypeOptions = this.deviceTypeStore.items;
   readonly actuatorOptions = this.actuatorStore.items;
@@ -138,6 +140,10 @@ export class DeviceForms implements OnInit {
           map(() => res),
         );
       }),
+      tap({
+        next: () => this.notification.success(this.editing ? 'Updated successfully.' : 'Created successfully.'),
+        error: () => this.notification.error('Failed to save. Try again later.'),
+      }),
     )
     .subscribe({
       next: (res) => {
@@ -145,13 +151,13 @@ export class DeviceForms implements OnInit {
         if (res.ok) {
           this.routerLocation.back();
         } else {
-          // TODO: toast de erro
+          this.notification.error('Failed to save. Try again later.');
         }
       },
       error: (err) => {
         console.error('[DeviceForms] save failed', err);
         this.submitting.set(false);
-        // TODO: toast de erro
+        this.notification.error('Failed to save. Try again later.');
       },
     });
   }

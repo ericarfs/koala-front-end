@@ -1,11 +1,12 @@
 import { Component, inject } from '@angular/core';
-import { of, switchMap, throwError } from 'rxjs';
+import { of, switchMap, tap, throwError } from 'rxjs';
 import { DeviceType } from '../../shared/interfaces/device-type';
 import { ActionButtons } from '@shared/components/action-buttons/action-buttons';
 import { DialogService } from '@shared/components/dialogs/dialogs.service';
 import { ContentLayout } from '@shared/layouts/content/content';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
+import { NotificationService } from '@shared/services/notification';
 
 @Component({
   imports: [ContentLayout, ActionButtons, TranslocoPipe],
@@ -15,6 +16,7 @@ import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
 })
 export class DeviceTypes {
   private readonly formDialog = inject(DialogService);
+  private readonly notification = inject(NotificationService);
 
   readonly store = inject(DeviceTypeStore);
 
@@ -76,6 +78,10 @@ export class DeviceTypes {
                 ? of(res.data)
                 : throwError(() => 'COMMON.ERRORS.NOT_FOUND'),
             ),
+            tap({
+              next: () => this.notification.success(isEdit ? 'Updated successfully.' : 'Created successfully.'),
+              error: () => this.notification.error('Failed to save. Try again later.'),
+            }),
           );
         },
       })
@@ -92,12 +98,8 @@ export class DeviceTypes {
 
   deleteSensor(sensor: DeviceType): void {
     this.store.remove(sensor.id).subscribe({
-      next: (res) => {
-        if (!res.ok) {
-          // TODO: toast de erro
-        }
-      },
-      error: (err) => console.error('[DeviceTypes] delete failed', err),
+      next: () => this.notification.success('Sensor deleted successfully.'),
+      error: () => this.notification.error('Failed to delete. Try again later.'),
     });
   }
 }

@@ -135,3 +135,29 @@ app-root {
     @apply flex flex-col min-h-screen items-center break-all;
   }
 }
+
+.snackbar-success,
+.snackbar-error{
+  color: white;
+  font-weight: 500;
+
+  .mat-mdc-snack-bar-action{
+    background-color: rgba(white, 0.2);
+  }
+}
+
+.snackbar-success{
+  background-color: #4caf50;
+}
+
+.snackbar-error{
+  background-color: #f44336;
+}
+
+.mat-mdc-dialog-container {
+  font-family: "Roboto Condensed", sans-serif;
+}
+
+.darker-backdrop {
+  background-color: var(--backdrop);
+}

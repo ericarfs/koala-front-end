@@ -1,5 +1,5 @@
 import { Component, computed, effect, inject, input } from '@angular/core';
-import { of, switchMap, throwError } from 'rxjs';
+import { of, switchMap, tap, throwError } from 'rxjs';
 import { LocationCard } from '@features/location/components/location-card';
 import { ContentLayout } from '@shared/layouts/content/content';
 import { Paginator } from '@shared/components/pagination/paginator';
@@ -15,6 +15,7 @@ import { LocationTreeSelect } from '@shared/domain/location/location-tree-select
 import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
 import { LocationStatsStore } from '@shared/domain/location/stores/location-stats-store';
 import { LocationCardSkeleton } from '@features/location/components/location-card-skeleton';
+import { NotificationService } from '@shared/services/notification';
 
 
 @Component({
@@ -29,6 +30,7 @@ import { LocationCardSkeleton } from '@features/location/components/location-car
 export class LocationList {
   private readonly deviceTypeStore = inject(DeviceTypeStore);
   private readonly formDialog = inject(DialogService);
+  private readonly notification = inject(NotificationService);
 
   readonly statsStore = inject(LocationStatsStore);
   readonly store = inject(LocationStore);
@@ -110,6 +112,10 @@ export class LocationList {
                 ? of(res.data)
                 : throwError(() => this.toErrorMessage(res.reason)),
             ),
+            tap({
+              next: () => this.notification.success('Created successfully.'),
+              error: () => this.notification.error('Failed to save. Try again later.'),
+            }),
           );
         },
       })

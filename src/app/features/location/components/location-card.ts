@@ -7,8 +7,9 @@ import { CommonModule } from '@angular/common';
 import { ActionButtons } from '@shared/components/action-buttons/action-buttons';
 import { DialogService } from '@shared/components/dialogs/dialogs.service';
 import { LocationStore, MutationError } from '@shared/domain/location/stores/location-store';
-import { finalize, of, switchMap, throwError } from 'rxjs';
+import { finalize, of, switchMap, tap, throwError } from 'rxjs';
 import { LocationStatsSkeleton } from './location-stats-skeleton';
+import { NotificationService } from '@shared/services/notification';
 
 @Component({
   selector: 'app-location-card',
@@ -113,6 +114,7 @@ import { LocationStatsSkeleton } from './location-stats-skeleton';
 })
 export class LocationCard {
   private readonly formDialog = inject(DialogService);
+  private readonly notification = inject(NotificationService);
 
   private readonly store = inject(LocationStore);
 
@@ -163,6 +165,10 @@ export class LocationCard {
               ? of(res.data)
               : throwError(() => this.toErrorMessage(res.reason)),
             ),
+            tap({
+              next: () => this.notification.success('Updated successfully.'),
+              error: () => this.notification.error('Failed to save. Try again later.'),
+            }),
           );
 
         },

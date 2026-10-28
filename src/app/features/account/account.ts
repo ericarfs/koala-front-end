@@ -8,6 +8,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { AuthService } from '@core/auth/services/auth';
 import { UserService } from '@shared/domain/user/services/user';
 import { of, switchMap } from 'rxjs';
+import { NotificationService } from '@shared/services/notification';
 
 const passwordsMatch: ValidatorFn = (group) => {
   const a = group.get('newPassword')?.value;
@@ -35,6 +36,9 @@ export class Account implements OnInit {
 
   protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
+
+  private readonly notification = inject(NotificationService);
+
 
   readonly userForm = new FormGroup({
     username: new FormControl('', {
@@ -163,10 +167,12 @@ export class Account implements OnInit {
       )
       .subscribe({
         next: () => {
+          this.notification.success('Updated successfully.');
           this.loading.set(false);
           this.location.back();
         },
         error: () => {
+          this.notification.error('Failed to save. Try again later.');
           this.error.set('ACCOUNT.ERRORS.SAVE_FAILED');
           this.loading.set(false);
         },

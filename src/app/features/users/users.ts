@@ -5,9 +5,10 @@ import { Paginator } from '@shared/components/pagination/paginator';
 import { UserBasic } from '@shared/interfaces/user';
 import { ContentLayout } from '@shared/layouts/content/content';
 import { paginate } from '@shared/utils/paginate';
-import { of, switchMap, throwError } from 'rxjs';
+import { of, switchMap, tap, throwError } from 'rxjs';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { UserStore } from '@shared/domain/user/stores/user';
+import { NotificationService } from '@shared/services/notification';
 
 
 @Component({
@@ -21,6 +22,7 @@ import { UserStore } from '@shared/domain/user/stores/user';
 })
 export class Users {
   private readonly formDialog = inject(DialogService);
+  private readonly notification = inject(NotificationService);
 
   readonly store = inject(UserStore);
 
@@ -66,6 +68,10 @@ export class Users {
                 ? of(res.data)
                 : throwError(() => 'COMMON.ERRORS.NOT_FOUND'),
             ),
+            tap({
+              next: () => this.notification.success(isEdit ? 'Updated successfully.' : 'Created successfully.'),
+              error: () => this.notification.error('Failed to save. Try again later.'),
+            }),
           );
         },
       })
