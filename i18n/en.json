@@ -6,7 +6,8 @@
     "DASHBOARD": "Dashboard",
     "DEVICES": "Devices",
     "SETTINGS": "Settings",
-    "USERS": "Users"
+    "USERS": "Users",
+    "OTA": "OTA Update"
   },
   "MONITORING": {
     "FILTERS": {
@@ -186,6 +187,9 @@
       "NAME": "Name",
       "VERSION": "Version",
       "UPDATE": "Update firmware"
+    },
+    "ACTUATOR": {
+      "TITLE": "Actuators"
     }
   },
 
@@ -256,6 +260,7 @@
       "NEW_PASSWORD_PLACEHOLDER": "Enter new password",
       "CONFIRM_PASSWORD": "Password confirmation",
       "CONFIRM_PASSWORD_PLACEHOLDER": "Enter confirmation",
+      "PASSWORD_MISMATCH": "The passwords don't match.",
       "RULES_TITLE": "Your password must contain:",
       "RULES": {
         "MIN_LENGTH": "Minimum 8 characters",
@@ -263,6 +268,12 @@
         "NUMBER": "At least one number",
         "SPECIAL_CHAR": "At least one special character"
       }
+    },
+    "ERRORS": {
+      "INVALID_SESSION": "Invalid session. Please log in again.",
+      "LOAD_FAILED": "Could not load user data.",
+      "INVALID_FORM": "Please fill in the fields correctly.",
+      "SAVE_FAILED": "Failed to save."
     }
   },
 
@@ -282,5 +293,9 @@
       "UPLOAD_FAILED": "Failed to upload the file. Check your connection and try again.",
       "LOGS_FAILED": "Failed to receive compilation logs. The connection was interrupted."
     }
+  },
+
+  "DEVICE_CONTROL":{
+    "TITLE": "Device Control"
   }
 }

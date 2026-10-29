@@ -1,1 +1,0 @@
-var r={production:!1,apiUrl:`http://andromeda.lasdpc.icmc.usp.br:60106/`,otaUrl:`http://andromeda.lasdpc.icmc.usp.br:60101/`,useMock:!0};export{r as t};

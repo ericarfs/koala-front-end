@@ -6,7 +6,8 @@
     "DASHBOARD": "Dashboard",
     "DEVICES": "Dispositivos",
     "SETTINGS": "Configurações",
-    "USERS": "Usuários"
+    "USERS": "Usuários",
+    "OTA": "Atualização OTA"
   },
   "MONITORING": {
     "FILTERS": {
@@ -186,6 +187,9 @@
       "NAME": "Nome",
       "VERSION": "Versão",
       "UPDATE": "Atualizar firmware"
+    },
+    "ACTUATOR": {
+      "TITLE": "Atuadores"
     }
   },
 
@@ -256,6 +260,7 @@
       "NEW_PASSWORD_PLACEHOLDER": "Insira a nova senha",
       "CONFIRM_PASSWORD": "Confirmação de senha",
       "CONFIRM_PASSWORD_PLACEHOLDER": "Insira a confirmação",
+      "PASSWORD_MISMATCH": "As senhas não coincidem.",
       "RULES_TITLE": "Sua senha deve conter:",
       "RULES": {
         "MIN_LENGTH": "Mínimo de 8 caracteres",
@@ -263,6 +268,12 @@
         "NUMBER": "Pelo menos um número",
         "SPECIAL_CHAR": "Pelo menos um caractere especial"
       }
+    },
+    "ERRORS": {
+      "INVALID_SESSION": "Sessão inválida. Faça login novamente.",
+      "LOAD_FAILED": "Não foi possível carregar os dados do usuário.",
+      "INVALID_FORM": "Preencha os campos corretamente.",
+      "SAVE_FAILED": "Erro ao salvar."
     }
   },
 
@@ -282,5 +293,9 @@
       "UPLOAD_FAILED": "Falha ao enviar o arquivo. Verifique sua conexão e tente novamente.",
       "LOGS_FAILED": "Falha ao receber os logs de compilação. A conexão foi interrompida."
     }
+  },
+
+  "DEVICE_CONTROL":{
+    "TITLE": "Controle de Dispositivos"
   }
 }
