@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import jsPDF from 'jspdf';
+import { CURRENT_USER } from '@shared/tokens/current-user';
 
 type RGB = [number, number, number];
 
@@ -139,6 +140,7 @@ export function localeFromLang(lang: string): string {
 @Injectable({ providedIn: 'root' })
 export class PdfExportService {
   private readonly transloco = inject(TranslocoService);
+  private readonly currentUser = inject(CURRENT_USER);
 
   async export(charts: ChartExportItem[], options: PdfExportOptions = {}): Promise<void> {
     if (charts.length === 0) return;
@@ -573,7 +575,7 @@ export class PdfExportService {
       fileName,
       appName: 'Smart Lab',
       reportTitle: t('REPORT_TITLE'),
-      generatedBy: 'Nome do usuário',
+      generatedBy: this.currentUser.displayName() ?? undefined,
       locale,
       logoDataUrl: logoDataUrl ?? undefined,
       labels: {

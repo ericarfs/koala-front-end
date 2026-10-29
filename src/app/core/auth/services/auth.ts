@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { PermissionsProvider } from '@shared/tokens/permissions';
 import { environment } from './../../../../environments/environment';
+import { CurrentUserProvider } from '@shared/tokens/current-user';
 
 interface LoginResponse {
   token: string;
@@ -21,7 +22,7 @@ const TOKEN_KEY = 'accessToken';
 const USER_KEY = 'currentUser';
 
 @Injectable({ providedIn: 'root' })
-export class AuthService implements PermissionsProvider {
+export class AuthService implements PermissionsProvider, CurrentUserProvider {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly baseUrl = `${environment.apiUrl}auth`;
@@ -40,6 +41,11 @@ export class AuthService implements PermissionsProvider {
   readonly dataScope = computed(() => {
     const user = this._user();
     return user && user.role !== 'guest' ? `${user.role}:${user.id}` : null;
+  });
+
+  readonly displayName = computed(() => {
+    const user = this._user();
+    return user && user.role !== 'guest' ? user.username || null : null;
   });
 
   get accessToken(): string | null {
