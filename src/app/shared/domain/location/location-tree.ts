@@ -59,7 +59,7 @@ export function getDescendantIds(id: number, list: Location[]): Set<number> {
 }
 
 export function getChildren(parentId: number | null, list: Location[]): Location[] {
-  return list.filter(l => l.parentId === parentId);
+  return list.filter(l => (l.parentId ?? null) === parentId);
 }
 
 export function getAncestors(id: number, list: Location[]): Location[] {
