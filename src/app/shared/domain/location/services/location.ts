@@ -3,20 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from './../../../../../environments/environment';
 import { Location } from '@shared/interfaces/location';
-import { AuthService } from '@core/auth/services/auth';
 
 @Injectable({ providedIn: 'root' })
 export class LocationService {
   protected readonly http = inject(HttpClient);
   protected readonly url = `${environment.apiUrl}enviroment`;
 
-  private readonly auth = inject(AuthService);
-
   findAll(): Observable<Location[]> {
-    const url = this.auth.isGuest()
-      ? `${environment.apiUrl}guest/environment`
-      : this.url;
-    return this.http.get<Location[]>(url);
+    return this.http.get<Location[]>(this.url);
   }
 
   findById(id: number): Observable<Location> {

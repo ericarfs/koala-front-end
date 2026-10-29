@@ -37,6 +37,11 @@ export class AuthService implements PermissionsProvider {
   });
   readonly isAdmin = computed(() => this._user()?.role === 'admin');
 
+  readonly dataScope = computed(() => {
+    const user = this._user();
+    return user && user.role !== 'guest' ? `${user.role}:${user.id}` : null;
+  });
+
   get accessToken(): string | null {
     return localStorage.getItem(TOKEN_KEY);
   }

@@ -11,7 +11,8 @@ export const CORE_ROUTES: Route[] = [
     canActivate: [noAuthGuard] },
   { path: 'guest',
     loadComponent: () => import('./features/guest/guest').then((m) => m.Guest),
-    canActivate: [guestGuard] },
+    canActivate: [guestGuard],
+  },
   {
     path: '',
     component: MainLayout,

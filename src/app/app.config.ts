@@ -40,10 +40,12 @@ import { ActuatorService } from '@shared/domain/actuator/services/actuator';
 import { MockActuatorService } from '@shared/domain/actuator/services/actuator.mock';
 import { ActuatorMappingService } from '@shared/domain/device/services/actuator-mapping';
 import { MockActuatorMappingService } from '@shared/domain/device/services/actuator-mapping.mock';
+import { DATA_SCOPE } from '@shared/tokens/data-scope';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     { provide: PERMISSIONS, useExisting: AuthService },
+    { provide: DATA_SCOPE, useFactory: () => inject(AuthService).dataScope },
     provideBrowserGlobalErrorListeners(),
     provideRouter(CORE_ROUTES),
     provideHttpClient(withInterceptors([authInterceptor])),

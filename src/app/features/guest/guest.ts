@@ -19,10 +19,25 @@ import { buildChartInfo } from '@shared/utils/chart-exports-info';
 import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
 import { LocationStore } from '@shared/domain/location/stores/location-store';
 import { AuthService } from '@core/auth/services/auth';
+import { DATA_SCOPE } from '@shared/tokens/data-scope';
+import { LocationService } from '@shared/domain/location/services/location';
+import { DeviceTypeService } from '@shared/domain/device-type/services/device-type';
+import { MetricsService } from '@shared/domain/monitoring/services/metrics';
+import { GuestLocationService } from './services/location';
+import { GuestDeviceTypeService } from './services/device-type';
+import { GuestMetricsService } from './services/metrics';
 
 @Component({
   imports: [CommonModule, ReactiveFormsModule, ContentLayout, LocationTreeSelect, InterfacePreferences ,TranslocoPipe, ChartPanel, ChipSelect, IntervalSelector, SearchButton],
-  providers: [ChartDataStore],
+  providers: [
+    { provide: DATA_SCOPE, useFactory: () => signal<string | null>('guest') },
+    { provide: LocationService, useClass: GuestLocationService },
+    { provide: DeviceTypeService, useClass: GuestDeviceTypeService },
+    { provide: MetricsService, useClass: GuestMetricsService },
+    LocationStore,
+    DeviceTypeStore,
+    ChartDataStore,
+  ],
   selector: 'app-guest',
   styleUrl: './guest.css',
   templateUrl: './guest.html',

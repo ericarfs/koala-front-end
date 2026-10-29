@@ -1,9 +1,10 @@
-import { computed, effect, inject, Injectable, signal, untracked } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { canAddChild, canReparent, getAncestors, getChildren } from '../location-tree';
 import { Location } from '@shared/interfaces/location';
 import { catchError, map, Observable, of, Subscription, tap } from 'rxjs';
 import { LocationService } from '../services/location';
-import { AuthService } from '@core/auth/services/auth';
+import { reloadOnScope } from '@shared/utils/reload-on-scope';
+import { DATA_SCOPE } from '@shared/tokens/data-scope';
 
 export type MutationError =
   | 'MAX_DEPTH_EXCEEDED'
@@ -17,6 +18,7 @@ export type MutationResult<T> =
 @Injectable({ providedIn: 'root' })
 export class LocationStore {
   private readonly service = inject(LocationService);
+  private loadSub?: Subscription;
 
   private readonly _items = signal<Location[]>([]);
   readonly items = this._items.asReadonly();
@@ -39,19 +41,10 @@ export class LocationStore {
     return computed(() => this._items().find((l) => l.id === id) ?? null);
   }
 
-  private readonly auth = inject(AuthService);
-  private loadSub?: Subscription;
-
   constructor() {
-    effect(() => {
-      const user = this.auth.user();
-      untracked(() => {
-        if (user) this.load();
-        else {
-          this.loadSub?.unsubscribe();
-          this._items.set([]);
-        }
-      });
+    reloadOnScope(inject(DATA_SCOPE), {
+      load: () => this.load(),
+      reset: () => this.reset(),
     });
   }
 
@@ -59,9 +52,21 @@ export class LocationStore {
     this.loadSub?.unsubscribe();
     this._loading.set(true);
     this.loadSub = this.service.findAll().subscribe({
-      next: (items) => { this._items.set(items); this._loading.set(false); },
-      error: (err) => { console.error('[LocationStore] load failed', err); this._loading.set(false); },
+      next: (items) => {
+        this._items.set(items);
+        this._loading.set(false);
+      },
+      error: (err) => {
+        console.error('[LocationStore] load failed', err);
+        this._loading.set(false);
+      },
     });
+  }
+
+  private reset(): void {
+    this.loadSub?.unsubscribe();
+    this._items.set([]);
+    this._loading.set(false);
   }
 
   // -------- mutações --------

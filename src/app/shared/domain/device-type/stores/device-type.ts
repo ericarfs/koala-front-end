@@ -1,8 +1,9 @@
-import { effect, inject, Injectable, signal, untracked } from '@angular/core';
-import { catchError, map, Observable, of, tap } from 'rxjs';
+import { inject, Injectable, signal } from '@angular/core';
+import { catchError, map, Observable, of, Subscription, tap } from 'rxjs';
 import { DeviceTypeService } from '../services/device-type';
 import { DeviceType } from '@shared/interfaces/device-type';
-import { AuthService } from '@core/auth/services/auth';
+import { reloadOnScope } from '@shared/utils/reload-on-scope';
+import { DATA_SCOPE } from '@shared/tokens/data-scope';
 
 export type MutationError = 'NOT_FOUND';
 
@@ -13,6 +14,7 @@ export type MutationResult<T> =
 @Injectable({ providedIn: 'root' })
 export class DeviceTypeStore {
   private readonly service = inject(DeviceTypeService);
+  private loadSub?: Subscription;
 
   private readonly _items = signal<DeviceType[]>([]);
   readonly items = this._items.asReadonly();
@@ -23,15 +25,10 @@ export class DeviceTypeStore {
   private readonly _loading = signal(false);
   readonly loading = this._loading.asReadonly();
 
-  private readonly auth = inject(AuthService);
-
   constructor() {
-    effect(() => {
-      this.auth.user();
-      untracked(() => {
-        this._items.set([]);
-        this._loaded.set(false);
-      });
+    reloadOnScope(inject(DATA_SCOPE), {
+      load: () => this.load(),
+      reset: () => this.reset(),
     });
   }
 
@@ -39,7 +36,7 @@ export class DeviceTypeStore {
     if (this._loaded() || this._loading()) return;
 
     this._loading.set(true);
-    this.service.findAll().subscribe({
+    this.loadSub = this.service.findAll().subscribe({
       next: (items) => {
         this._items.set(items);
         this._loaded.set(true);
@@ -50,6 +47,13 @@ export class DeviceTypeStore {
         this._loading.set(false);
       },
     });
+  }
+
+  private reset(): void {
+    this.loadSub?.unsubscribe();
+    this._items.set([]);
+    this._loaded.set(false);
+    this._loading.set(false);
   }
 
   add(draft: Omit<DeviceType, 'id'>): Observable<MutationResult<DeviceType>> {
