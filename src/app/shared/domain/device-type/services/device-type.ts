@@ -3,14 +3,20 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import { DeviceType } from '@shared/interfaces/device-type';
+import { AuthService } from '@core/auth/services/auth';
 
 @Injectable({ providedIn: 'root' })
 export class DeviceTypeService {
   protected readonly http = inject(HttpClient);
   protected readonly url = `${environment.apiUrl}deviceType`;
 
+  private readonly auth = inject(AuthService);
+
   findAll(): Observable<DeviceType[]> {
-    return this.http.get<DeviceType[]>(this.url);
+    const url = this.auth.isGuest()
+      ? `${environment.apiUrl}guest/deviceTypes`
+      : this.url;
+    return this.http.get<DeviceType[]>(url);
   }
 
   findById(id: number): Observable<DeviceType> {

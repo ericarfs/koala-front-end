@@ -1,6 +1,6 @@
 
 import { Component, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { InterfacePreferences } from '@shared/components/interface-preferences/interface-preferences';
 import { ContentLayout } from '@shared/layouts/content/content';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -18,9 +18,10 @@ import { ChartExportInfo, localeFromLang } from '@shared/services/pdf-export';
 import { buildChartInfo } from '@shared/utils/chart-exports-info';
 import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
 import { LocationStore } from '@shared/domain/location/stores/location-store';
+import { AuthService } from '@core/auth/services/auth';
 
 @Component({
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, ContentLayout, LocationTreeSelect, InterfacePreferences ,TranslocoPipe, ChartPanel, ChipSelect, IntervalSelector, SearchButton],
+  imports: [CommonModule, ReactiveFormsModule, ContentLayout, LocationTreeSelect, InterfacePreferences ,TranslocoPipe, ChartPanel, ChipSelect, IntervalSelector, SearchButton],
   providers: [ChartDataStore],
   selector: 'app-guest',
   styleUrl: './guest.css',
@@ -30,6 +31,9 @@ export class Guest {
   private readonly transloco = inject(TranslocoService);
   private readonly deviceTypeStore = inject(DeviceTypeStore);
   private readonly locationStore = inject(LocationStore);
+  private readonly router = inject(Router);
+
+  private readonly auth = inject(AuthService);
 
   readonly store = inject(ChartDataStore);
 
@@ -80,5 +84,10 @@ export class Guest {
 
   private typeName(id: number): string {
     return this.deviceTypeStore.items().find(t => t.id === id)?.name ?? '';
+  }
+
+  goBack() {
+    this.auth.logout();
+    this.router.navigateByUrl('/login')
   }
 }

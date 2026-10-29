@@ -39,11 +39,11 @@
       </button>
     </form>
 
-    <a
-      routerLink="/guest"
+    <button
+      (click)="onGuestLogin()"
       class="btn mt-2 bg-transparent border-0 text-primary hover:text-primary-details text-sm cursor-pointer"
       >
       {{ 'COMMON.ACTIONS.GUEST_LOGIN' | transloco }}
-    </a>
+    </button>
   </div>
 </section>

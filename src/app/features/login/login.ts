@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '@core/auth/services/auth';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Input } from '@shared/components/input/input';
@@ -17,7 +17,7 @@ interface LoginForm {
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, Input, InputPassword, RouterLink, TranslocoPipe],
+  imports: [ReactiveFormsModule, Input, InputPassword, TranslocoPipe],
   templateUrl: './login.html',
   host: {
     'class': 'login-host'
@@ -42,7 +42,7 @@ export class Login {
 
   get password() { return this.loginForm.get('password') as FormControl; }
 
-  async onSubmit() {
+  onSubmit() {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       this.error.set('Preencha usuário e senha.');
@@ -65,8 +65,10 @@ export class Login {
       })
   }
 
-  async onGuestLogin() {
-    //await this.auth.loginAsGuest();
-    this.router.navigateByUrl('/dashboard');
+  onGuestLogin() {
+    this.auth.guestLogin().subscribe({
+      next: () => this.router.navigateByUrl('/guest'),
+      error: (err) => console.error('Erro no login guest', err),
+    });
   }
 }

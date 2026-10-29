@@ -3,12 +3,12 @@
     class="shrink-0 min-h-14 bg-container z-30 flex flex-row flex-wrap items-center px-4 shadow-md w-full"
     >
     <div class="flex flex-1">
-      <a
-        routerLink="/login"
+      <button
+        (click)="goBack()"
         class="text-primary hover:text-primary-details inline-flex items-center gap-1 w-fit cursor-pointer">
           <i class="fa-solid fa-arrow-left"></i>
           {{ 'COMMON.ACTIONS.BACK' | transloco }}
-      </a>
+      </button>
     </div>
     <app-interface-preferences/>
   </header>
@@ -54,12 +54,14 @@
         </form>
 
         <app-chart-panel
+          class="mb-14"
           [data]="store.data()"
           [loading]="store.loading()"
           [error]="store.error()"
           [title]="chartTitle()"
           [subtitle]="chartSubtitle()"
           [info]="chartInfo()"
+          [emptyKey]="chartTitle() ? 'MONITORING.FILTERS.EMPTY' : 'MONITORING.EMPTY.DASHBOARD'"
         />
       </div>
     </app-content-layout>

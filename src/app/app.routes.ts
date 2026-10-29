@@ -2,6 +2,7 @@ import { Route } from '@angular/router';
 import { authGuard, noAuthGuard } from './core/auth/guards/auth.guards';
 import { MainLayout } from './core/layout/main/main-layout';
 import { adminGuard } from './core/auth/guards/admin.guard';
+import { guestGuard } from '@core/auth/guards/guest.guard';
 
 export const CORE_ROUTES: Route[] = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -10,7 +11,7 @@ export const CORE_ROUTES: Route[] = [
     canActivate: [noAuthGuard] },
   { path: 'guest',
     loadComponent: () => import('./features/guest/guest').then((m) => m.Guest),
-    canActivate: [noAuthGuard] },
+    canActivate: [guestGuard] },
   {
     path: '',
     component: MainLayout,

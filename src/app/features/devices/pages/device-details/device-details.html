@@ -103,13 +103,13 @@
       </form>
 
       <app-chart-panel
-        emptyKey="MONITORING.EMPTY.DEVICES"
         [data]="store.data()"
         [loading]="store.loading()"
         [error]="store.error()"
         [title]="chartTitle()"
         [subtitle]="chartSubtitle()"
         [info]="chartInfo()"
+        [emptyKey]="chartTitle() ? 'MONITORING.FILTERS.EMPTY' : 'MONITORING.EMPTY.DASHBOARD'"
       />
     } @else {
       <p class="text-xl text-default font-medium">

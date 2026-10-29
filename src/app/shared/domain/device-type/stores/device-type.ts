@@ -1,7 +1,8 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { effect, inject, Injectable, signal, untracked } from '@angular/core';
 import { catchError, map, Observable, of, tap } from 'rxjs';
 import { DeviceTypeService } from '../services/device-type';
 import { DeviceType } from '@shared/interfaces/device-type';
+import { AuthService } from '@core/auth/services/auth';
 
 export type MutationError = 'NOT_FOUND';
 
@@ -21,6 +22,18 @@ export class DeviceTypeStore {
 
   private readonly _loading = signal(false);
   readonly loading = this._loading.asReadonly();
+
+  private readonly auth = inject(AuthService);
+
+  constructor() {
+    effect(() => {
+      this.auth.user();
+      untracked(() => {
+        this._items.set([]);
+        this._loaded.set(false);
+      });
+    });
+  }
 
   load(): void {
     if (this._loaded() || this._loading()) return;

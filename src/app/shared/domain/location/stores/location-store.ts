@@ -1,8 +1,9 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, signal, untracked } from '@angular/core';
 import { canAddChild, canReparent, getAncestors, getChildren } from '../location-tree';
 import { Location } from '@shared/interfaces/location';
-import { catchError, map, Observable, of, tap } from 'rxjs';
+import { catchError, map, Observable, of, Subscription, tap } from 'rxjs';
 import { LocationService } from '../services/location';
+import { AuthService } from '@core/auth/services/auth';
 
 export type MutationError =
   | 'MAX_DEPTH_EXCEEDED'
@@ -38,21 +39,28 @@ export class LocationStore {
     return computed(() => this._items().find((l) => l.id === id) ?? null);
   }
 
+  private readonly auth = inject(AuthService);
+  private loadSub?: Subscription;
+
   constructor() {
-    this.load();
+    effect(() => {
+      const user = this.auth.user();
+      untracked(() => {
+        if (user) this.load();
+        else {
+          this.loadSub?.unsubscribe();
+          this._items.set([]);
+        }
+      });
+    });
   }
 
   load(): void {
+    this.loadSub?.unsubscribe();
     this._loading.set(true);
-    this.service.findAll().subscribe({
-      next: (items) => {
-        this._items.set(items);
-        this._loading.set(false);
-      },
-      error: (err) => {
-        console.error('[LocationStore] load failed', err);
-        this._loading.set(false);
-      },
+    this.loadSub = this.service.findAll().subscribe({
+      next: (items) => { this._items.set(items); this._loading.set(false); },
+      error: (err) => { console.error('[LocationStore] load failed', err); this._loading.set(false); },
     });
   }
 

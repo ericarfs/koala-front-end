@@ -1,121 +1,160 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { delay, Observable, of, tap } from 'rxjs';
+import { Observable, delay, of, tap } from 'rxjs';
 import { PermissionsProvider } from '@shared/tokens/permissions';
 
 interface LoginResponse {
-  access: string;
+  token: string;
 }
+
+type Role = 'admin' | 'regular' | 'guest';
 
 interface CurrentUser {
   id: number | null;
   username: string;
-  role: 'admin' | 'user';
+  role: Role;
 }
 
 const TOKEN_KEY = 'accessToken';
 const USER_KEY = 'currentUser';
 
 @Injectable({ providedIn: 'root' })
-export class MockAuthService implements PermissionsProvider{
+export class MockAuthService implements PermissionsProvider {
   private readonly router = inject(Router);
 
   private readonly _user = signal<CurrentUser | null>(this.readUserFromStorage());
 
   readonly user = this._user.asReadonly();
-  readonly isLoggedIn = computed(() => this._user() !== null);
 
-  readonly isAdmin = computed(() => {
-    const raw = localStorage.getItem(USER_KEY);
-    if (!raw) return false;
-
-    try {
-      const user: CurrentUser = JSON.parse(raw);
-      return user.role === 'admin';
-    } catch {
-      return false;
-    }
+  readonly isGuest = computed(() => this._user()?.role === 'guest');
+  readonly isLoggedIn = computed(() => {
+    const user = this._user();
+    return user !== null && user.role !== 'guest';
   });
+  readonly isAdmin = computed(() => this._user()?.role === 'admin');
 
   get accessToken(): string | null {
     return localStorage.getItem(TOKEN_KEY);
   }
 
-  //login falso para teste
-  login(username: string): Observable<LoginResponse> {
-    // Mock do token — pode ser um JWT fake ou uma string qualquer
-    const mockResponse: LoginResponse = {
-      access: this.buildFakeJwt(username),
-      // refresh: 'fake-refresh-token',  // se seu LoginResponse tiver
-    };
-
-    return of(mockResponse).pipe(
-      delay(300), // simula latência da rede (opcional)
-      tap((res) => {
-        localStorage.setItem(TOKEN_KEY, res.access);
-
-        const user: CurrentUser = {
-          id: 1,
-          username: this.subjectFromJwt(res.access) ?? username,
-          role: this.roleFromJwt(res.access) ?? 'user',
-        };
-
-        localStorage.setItem(USER_KEY, JSON.stringify(user));
-        this._user.set(user);
-      })
-    );
+  // Login falso para teste. Use "admin" como username para entrar como admin.
+  login(username: string, _password = ''): Observable<LoginResponse> {
+    const role: Role = username.toLowerCase() === 'admin' ? 'admin' : 'regular';
+    return this.fakeSession(username, role);
   }
 
-  private buildFakeJwt(username: string, role = 'admin'): string {
-    const header = { alg: 'HS256', typ: 'JWT' };
-    const payload = {
-      sub: username,
-      role: role,
-      exp: Math.floor(Date.now() / 1000) + 3600,
-    };
-
-    const b64 = (obj: object) =>
-      btoa(JSON.stringify(obj)).replace(/=+$/, '');
-
-    return `${b64(header)}.${b64(payload)}.fake-signature`;
+  guestLogin(): Observable<LoginResponse> {
+    return this.fakeSession('guest', 'guest', 120); // guest dura 2 min, como no backend
   }
 
   logout(redirect = true): void {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
+    this.clearStorage();
     this._user.set(null);
     if (redirect) this.router.navigate(['/login']);
   }
 
-  private readUserFromStorage(): CurrentUser | null {
-    const raw = localStorage.getItem(USER_KEY);
-    if (!raw) return null;
+  // ---------- Mock ----------
 
-    if (!raw.startsWith('{')) {
-      return { id: 1, username: raw, role: 'user' };
-    }
+  private fakeSession(
+    username: string,
+    role: Role,
+    ttlSeconds = 3600,
+  ): Observable<LoginResponse> {
+    const response: LoginResponse = {
+      token: this.buildFakeJwt(username, role, ttlSeconds),
+    };
 
-    try {
-      return JSON.parse(raw);
-    } catch {
-      return null;
-    }
+    return of(response).pipe(
+      delay(300), // simula latência da rede
+      tap((res) => this.startSession(res.token, username)),
+    );
   }
 
-  private roleFromJwt(token: string): 'admin' | 'user' | null {
+  private buildFakeJwt(username: string, role: Role, ttlSeconds: number): string {
+    const now = Math.floor(Date.now() / 1000);
+
+    const header = { alg: 'HS256', typ: 'JWT' };
+    const payload = {
+      sub: String(role === 'guest' ? now : 1),
+      username,
+      userType: role,
+      iat: now,
+      exp: now + ttlSeconds,
+    };
+
+    // base64url, igual ao formato real de um JWT
+    const b64 = (obj: object) =>
+      btoa(JSON.stringify(obj))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+
+    return `${b64(header)}.${b64(payload)}.fake-signature`;
+  }
+
+  // ---------- Sessão / storage (mesma lógica do AuthService real) ----------
+
+  private startSession(token: string, fallbackUsername = ''): void {
+    const user = this.userFromToken(token, fallbackUsername);
+    if (!user) throw new Error('Token com userType inválido');
+
+    localStorage.setItem(TOKEN_KEY, token);
+    this._user.set(user);
+  }
+
+  private readUserFromStorage(): CurrentUser | null {
+    const token = localStorage.getItem(TOKEN_KEY);
+
+    if (!token || this.isExpired(token)) {
+      this.clearStorage();
+      return null;
+    }
+
+    const user = this.userFromToken(token);
+    if (!user) this.clearStorage();
+    return user;
+  }
+
+  private userFromToken(token: string, fallbackUsername = ''): CurrentUser | null {
+    const role = this.roleFromJwt(token);
+    if (!role) return null;
+
+    return {
+      id: this.idFromJwt(token),
+      username: this.usernameFromJwt(token) ?? fallbackUsername,
+      role,
+    };
+  }
+
+  private clearStorage(): void {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+  }
+
+  // ---------- JWT ----------
+
+  private idFromJwt(token: string): number | null {
+    const raw = this.decodePayload(token)?.['sub'];
+    const id = Number(raw);
+    return raw != null && raw !== '' && Number.isFinite(id) ? id : null;
+  }
+
+  private usernameFromJwt(token: string): string | null {
+    const raw = this.decodePayload(token)?.['username'];
+    return typeof raw === 'string' && raw ? raw : null;
+  }
+
+  private roleFromJwt(token: string): Role | null {
     const payload = this.decodePayload(token);
     if (!payload) return null;
 
-    const raw = String(payload['role'] ?? '')
-      .replace(/^ROLE_/i, '')
-      .toLowerCase();
-
-    return raw === 'admin' ? 'admin' : raw === 'user' ? 'user' : null;
+    const raw = String(payload['userType'] ?? '').toLowerCase();
+    return raw === 'admin' || raw === 'regular' || raw === 'guest' ? raw : null;
   }
 
-  private subjectFromJwt(token: string): string | null {
-    const payload = this.decodePayload(token);
-    return payload ? String(payload['sub'] ?? '') : null;
+  private isExpired(token: string): boolean {
+    const exp = Number(this.decodePayload(token)?.['exp']);
+    return !Number.isFinite(exp) || exp * 1000 <= Date.now();
   }
 
   private decodePayload(token: string): Record<string, unknown> | null {
@@ -127,7 +166,7 @@ export class MockAuthService implements PermissionsProvider{
         atob(base64 + pad)
           .split('')
           .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
+          .join(''),
       );
       return JSON.parse(json);
     } catch {
