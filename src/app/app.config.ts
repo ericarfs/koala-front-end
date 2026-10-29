@@ -41,10 +41,12 @@ import { MockActuatorService } from '@shared/domain/actuator/services/actuator.m
 import { ActuatorMappingService } from '@shared/domain/device/services/actuator-mapping';
 import { MockActuatorMappingService } from '@shared/domain/device/services/actuator-mapping.mock';
 import { DATA_SCOPE } from '@shared/tokens/data-scope';
+import { CURRENT_USER } from '@shared/tokens/current-user';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     { provide: PERMISSIONS, useExisting: AuthService },
+    { provide: CURRENT_USER, useExisting: AuthService },
     { provide: DATA_SCOPE, useFactory: () => inject(AuthService).dataScope },
     provideBrowserGlobalErrorListeners(),
     provideRouter(CORE_ROUTES),
@@ -82,7 +84,6 @@ export const appConfig: ApplicationConfig = {
           { provide: AuthService, useClass: MockAuthService },
         ]
       : []),
-    provideHttpClient(),
     provideTransloco({
       config: {
         availableLangs: ['en', 'pt'],
