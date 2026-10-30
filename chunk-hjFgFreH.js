@@ -1,0 +1,1 @@
+import{Ln as ie,jn as ga}from"./chunk-BfqL0B-H.js";function f(d,i){let e;ga(()=>{let n=d();ie(()=>{e!==void 0&&e!==n&&i.reset(),e=n,n&&i.load()})})}export{f as t};
