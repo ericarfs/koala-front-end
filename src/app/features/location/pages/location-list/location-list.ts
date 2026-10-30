@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input } from '@angular/core';
+import { Component, computed, effect, inject, input, untracked } from '@angular/core';
 import { of, switchMap, tap, throwError } from 'rxjs';
 import { LocationCard } from '@features/location/components/location-card';
 import { ContentLayout } from '@shared/layouts/content/content';
@@ -45,11 +45,12 @@ export class LocationList {
 
   readonly locations = computed<Location[]>(() => {
     const all = this.store.items();
-    const { currentLocation } = this.filters();
+    const raw = this.filters().currentLocation as unknown;
 
-    if (currentLocation == null) return getChildren(null, all);
+    const selected = raw === null || raw === undefined || raw === '' ? null : Number(raw);
+    if (selected === null || Number.isNaN(selected)) return getChildren(null, all);
 
-    const found = all.find((l) => l.id === Number(currentLocation));
+    const found = all.find((l) => l.id === selected);
     return found ? [found] : [];
   });
 
@@ -68,6 +69,18 @@ export class LocationList {
     effect(() => {
       this.filters();
       this.pagination.pageIndex.set(0);
+    });
+
+    effect(() => {
+      const all = this.store.items();
+      if (this.store.loading()) return;
+
+      const control = this.searchForms.controls.currentLocation;
+      const selected = control.value;
+
+      if (selected != null && !all.some((l) => l.id === Number(selected))) {
+        untracked(() => control.setValue(null));
+      }
     });
   }
 

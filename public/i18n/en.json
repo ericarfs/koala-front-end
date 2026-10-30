@@ -14,6 +14,7 @@
       "DEVICE_NAME": "Name",
       "DEVICE_NAME_PLACEHOLDER": "Device name",
       "LOCATION": "Location",
+      "ALL_LOCATIONS": "All locations",
       "SELECTED_COUNT": "{{selected}}/{{total}} selected",
       "INTERVAL": "Interval",
       "DEVICE_TYPES": "Sensors",

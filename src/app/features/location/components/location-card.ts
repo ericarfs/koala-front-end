@@ -195,14 +195,14 @@ export class LocationCard {
       .subscribe({
         next: (res) => {
           if (!res.ok) {
-            // toast / snackbar de erro
+            this.notification.error('Failed to delete. Try again later.');
             return;
           }
-          // toast de sucesso, ou nada
+          this.notification.success('Deleted successfully.');
         },
         error: (err) => {
           console.error(err);
-          // toast de erro
+          this.notification.error('Failed to delete. Try again later.');
         },
       });
   }

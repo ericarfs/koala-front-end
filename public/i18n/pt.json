@@ -14,6 +14,7 @@
       "DEVICE_NAME": "Nome",
       "DEVICE_NAME_PLACEHOLDER": "Nome do dispositivo",
       "LOCATION": "Ambiente",
+      "ALL_LOCATIONS": "Todos os ambientes",
       "SELECTED_COUNT": "{{selected}}/{{total}} selecionados",
       "INTERVAL": "Intervalo",
       "DEVICE_TYPES": "Sensores",

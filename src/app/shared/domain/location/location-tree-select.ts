@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, HostListener, computed, effect, forwardRef, inject, signal,
+  Component, ElementRef, HostListener, computed, effect, forwardRef, inject, input, signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -36,13 +36,14 @@ interface FlatNode {
         type="button"
         (click)="toggle()"
         [disabled]="disabled() || store.loading()"
+        [class.pr-8]="clearable() && value() !== null"
         class="h-10 w-full flex items-center justify-between gap-2 border border-outline rounded-md px-3 bg-container text-default focus:outline-none focus:border-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       >
         @if (store.loading()) {
           <span class="h-4 w-32 bg-neutral/10 rounded animate-pulse"></span>
         } @else {
           <span class="truncate text-left" [class.text-neutral]="!selectedName()">
-            {{ selectedName() || ('MONITORING.PLACEHOLDERS.SELECT_LOCATION' | transloco) }}
+            {{ selectedName() || ((clearable() ? 'MONITORING.FILTERS.ALL_LOCATIONS' : 'MONITORING.PLACEHOLDERS.SELECT_LOCATION') | transloco) }}
           </span>
         }
         <i class="fa-solid fa-chevron-down text-xs text-neutral transition-transform"
@@ -66,6 +67,23 @@ interface FlatNode {
           </div>
 
           <ul class="max-h-72 overflow-auto py-1">
+            @if (clearable() && !search()) {
+              <li>
+                <button
+                  type="button"
+                  (click)="clear()"
+                  class="w-full flex items-center gap-1.5 px-3 py-1.5 text-sm text-left cursor-pointer transition-colors hover:bg-secondary/10"
+                  [class.font-medium]="value() === null"
+                >
+                  <i class="fa-solid fa-layer-group text-xs opacity-60"></i>
+                  <span>{{ 'MONITORING.FILTERS.ALL_LOCATIONS' | transloco }}</span>
+                  @if (value() === null) {
+                    <i class="fa-solid fa-check text-xs ml-auto"></i>
+                  }
+                </button>
+              </li>
+            }
+
             @if (visibleNodes().length === 0) {
               <li class="px-3 py-4 text-sm text-neutral text-center">
                 {{ 'MONITORING.FILTERS.EMPTY' | transloco }}
@@ -111,6 +129,9 @@ export class LocationTreeSelect implements ControlValueAccessor {
   private readonly el = inject(ElementRef<HTMLElement>);
 
   readonly store = inject(LocationStore);
+
+  /** Mostra "Todos os ambientes" e o botão de limpar. Desligado por padrão. */
+  readonly clearable = input(false);
 
   readonly open = signal(false);
   readonly search = signal('');
@@ -164,8 +185,6 @@ export class LocationTreeSelect implements ControlValueAccessor {
     });
 
     // Limpa ids "órfãos" do expandedIds quando a árvore muda
-    // (ex.: local removido). treeData não depende de expandedIds,
-    // então não há loop.
     effect(() => {
       const valid = new Set(this.treeData().nodesById.keys());
       this.expandedIds.update((set) => {
@@ -285,6 +304,15 @@ export class LocationTreeSelect implements ControlValueAccessor {
   select(node: FlatNode): void {
     this.value.set(node.id);
     this.onChange(node.id);
+    this.onTouched();
+    this.open.set(false);
+    this.search.set('');
+  }
+
+  clear(e?: Event): void {
+    e?.stopPropagation();
+    this.value.set(null);
+    this.onChange(null);
     this.onTouched();
     this.open.set(false);
     this.search.set('');
