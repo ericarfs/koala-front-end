@@ -12,7 +12,6 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { ExtensionRegistryService } from './core/extensions/extension-registry';
 import { MainLayout } from './core/layout/main/main-layout';
 import { provideKoalaModule } from './core/extensions/koala-module-extensions.token';
-import { mffModuleDefinition } from './domains/mff/mff.module-definition';
 import { AuthService } from './core/auth/services/auth';
 import { PERMISSIONS } from './shared/tokens/permissions';
 
@@ -51,7 +50,6 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(CORE_ROUTES),
     provideHttpClient(withInterceptors([authInterceptor])),
-    provideKoalaModule(mffModuleDefinition),
     provideKoalaModule(airconModuleDefinition),
 
     provideAppInitializer(() => {
