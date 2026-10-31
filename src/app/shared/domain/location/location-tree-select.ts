@@ -6,6 +6,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { buildTree } from './location-tree';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { LocationStore } from './stores/location-store';
+import { noop } from 'rxjs';
 
 interface LocationNode {
   id: number;
@@ -91,32 +92,40 @@ interface FlatNode {
             }
             @for (node of visibleNodes(); track node.id) {
               <li>
-                <button
-                  type="button"
-                  [attr.data-id]="node.id"
-                  (click)="select(node)"
-                  [style.paddingLeft.px]="node.depth * 16 + 8"
-                  class="w-full flex items-center gap-1.5 pr-3 py-1.5 text-sm text-left cursor-pointer transition-colors"
+                <div
+                  class="w-full flex items-center gap-1.5 pr-3 py-1.5 text-sm text-left transition-colors"
                   [class.bg-secondary]="value() === node.id"
                   [class.text-secondary-foreground]="value() === node.id"
                   [class.font-medium]="value() === node.id"
                   [class.hover:bg-secondary/10]="value() !== node.id"
+                  [style.paddingLeft.px]="node.depth * 16 + 8"
                 >
-                  <span
-                    class="w-5 h-5 flex items-center justify-center rounded shrink-0 hover:bg-black/10"
+                  <!-- Botão 1: Expandir/Recolher (chevron) -->
+                  <button
+                    type="button"
+                    class="w-5 h-5 flex items-center justify-center rounded shrink-0 hover:bg-black/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                     [class.invisible]="!node.hasChildren"
                     (click)="toggleExpand($event, node)"
+                    [attr.aria-label]="node.expanded ? 'Recolher' : 'Expandir'"
                   >
                     <i class="fa-solid text-[10px] transition-transform"
-                       [class.fa-chevron-right]="!node.expanded"
-                       [class.fa-chevron-down]="node.expanded"></i>
-                  </span>
-                  <i class="fa-solid fa-location-dot text-xs opacity-60"></i>
-                  <span class="truncate">{{ node.name }}</span>
-                  @if (value() === node.id) {
-                    <i class="fa-solid fa-check text-xs ml-auto"></i>
-                  }
-                </button>
+                      [class.fa-chevron-right]="!node.expanded"
+                      [class.fa-chevron-down]="node.expanded"></i>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="flex-1 flex items-center gap-1.5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer"
+                    [attr.data-id]="node.id"
+                    (click)="select(node)"
+                  >
+                    <i class="fa-solid fa-location-dot text-xs opacity-60"></i>
+                    <span class="truncate">{{ node.name }}</span>
+                    @if (value() === node.id) {
+                      <i class="fa-solid fa-check text-xs ml-auto"></i>
+                    }
+                  </button>
+                </div>
               </li>
             }
           </ul>
@@ -139,8 +148,8 @@ export class LocationTreeSelect implements ControlValueAccessor {
   readonly disabled = signal(false);
   readonly expandedIds = signal<Set<number>>(new Set());
 
-  private onChange: (v: number | null) => void = () => {};
-  private onTouched: () => void = () => {};
+  private onChange: (v: number | null) => void = noop;
+  private onTouched: () => void = noop;
 
   private readonly treeData = computed(() => {
     const tree = buildTree(this.store.items()) as LocationNode[];

@@ -5,7 +5,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
-  selector: 'li[app-nav-group]',
+  selector: 'app-nav-group',
   standalone: true,
   imports: [RouterLink, RouterLinkActive, NgClass, TranslocoPipe],
   template:`

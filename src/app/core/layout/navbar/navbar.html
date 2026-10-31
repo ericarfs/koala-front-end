@@ -91,23 +91,23 @@
     <ul class="flex flex-col gap-2">
       @for (item of menuItems(); track item.id) {
         @if (item.subItems.length > 0) {
-          <li
-            app-nav-group
+          <li>
+            <app-nav-group
             [labelKey]="item.labelKey"
             [icon]="item.icon"
             [subItems]="item.subItems"
             [collapsed]="sidebar.collapsed()"
             [expanded]="expandedId() === item.id"
             (toggled)="toggleGroup(item.id)"
-          ></li>
+          /></li>
         } @else {
-          <li
-            app-nav-item
+          <li>
+            <app-nav-item
             [route]="item.routerLink"
             [label]="item.labelKey"
             [icon]="item.icon"
             [collapsed]="sidebar.collapsed()"
-          ></li>
+          /></li>
         }
       }
     </ul>
