@@ -1,8 +1,9 @@
 import { Component, inject, input } from '@angular/core';
+import { ChartBasket } from '@shared/components/chart-basket/chart-basket';
 import { PERMISSIONS } from '@shared/tokens/permissions';
 
 @Component({
-  imports: [],
+  imports: [ChartBasket],
   selector: 'app-content-layout',
   template: `
   <div class="flex flex-col gap-6 max-w-full mb-6 h-full">
@@ -25,6 +26,7 @@ import { PERMISSIONS } from '@shared/tokens/permissions';
         </p>
       }
     </header>
+    <app-chart-basket/>
 
     <ng-content></ng-content>
   </div>`,
