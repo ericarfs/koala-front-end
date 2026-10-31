@@ -39,7 +39,7 @@ export class MockActuatorService extends ActuatorService {
 
   override sendAirconCommand(
     _enviromentId: string,
-    _body: any,
+    _body: object,
   ): Observable<unknown> {
     return of({ status: 'ok', message: 'Command sent' }).pipe(delay(FAKE_LATENCY_MS));
   }

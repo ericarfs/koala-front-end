@@ -26,7 +26,7 @@ export class ActuatorService {
     return this.http.put<Actuator>(`${this.url}/${id}`, body);
   }
 
-  sendAirconCommand(enviromentId: string, body: any): Observable<unknown> {
+  sendAirconCommand(enviromentId: string, body: object): Observable<unknown> {
     return this.http.post<unknown>(`${this.url}/aircon/${enviromentId}`, body);
   }
 
