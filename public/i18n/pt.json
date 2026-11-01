@@ -111,7 +111,9 @@
       "REQUIRED": "Este campo é obrigatório"
     },
     "PAGINATION": {
-      "PAGE_OF": "Página {{current}} de {{total}}"
+      "PAGE_OF": "Página {{current}} de {{total}}",
+      "PREVIOUS": "Página anterior",
+      "NEXT": "Próxima página"
     },
     "THEME": {
       "TOGGLE_TO_LIGHT": "Alternar para modo claro",
@@ -128,6 +130,10 @@
       "ARIA_LABEL": "Tamanho da fonte: {{size}}. Clique para alterar",
       "TITLE": "Tamanho da fonte: {{size}}",
       "SR_ONLY": "Alterar tamanho da fonte"
+    },
+    "NAV": {
+      "MAIN": "Menu principal",
+      "BREADCRUMB": "Trilha de navegação"
     }
   },
 

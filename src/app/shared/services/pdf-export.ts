@@ -82,6 +82,21 @@ interface HeaderContext {
   logo: LogoInfo | null;
 }
 
+interface PdfExportContext {
+  pdf: jsPDF;
+  pageWidth: number;
+  pageHeight: number;
+  margin: number;
+  contentWidth: number;
+  headerHeight: number;
+  footerHeight: number;
+  labels: PdfExportLabels;
+  locale: string;
+  header: HeaderContext;
+  appName: string;
+  reportTitle: string;
+}
+
 const DEFAULT_LABELS: PdfExportLabels = {
   generatedAt: 'Gerado em',
   generatedBy: 'Por',
@@ -145,8 +160,21 @@ export class PdfExportService {
   async export(charts: ChartExportItem[], options: PdfExportOptions = {}): Promise<void> {
     if (charts.length === 0) return;
 
+    const ctx = await this.createPdfContext(options);
+
+    let isFirstPage = true;
+    for (const chart of charts) {
+      if (!isFirstPage) ctx.pdf.addPage();
+      isFirstPage = false;
+      await this.drawChartPage(ctx, chart);
+    }
+
+    this.drawFooters(ctx);
+    ctx.pdf.save(options.fileName ?? 'graph.pdf');
+  }
+
+  private async createPdfContext(options: PdfExportOptions): Promise<PdfExportContext> {
     const {
-      fileName = 'graph.pdf',
       appName = 'SMART LAB',
       reportTitle = 'MONITORING REPORT',
       generatedBy,
@@ -155,7 +183,6 @@ export class PdfExportService {
     const labels: PdfExportLabels = { ...DEFAULT_LABELS, ...options.labels };
 
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
     const margin = 15;
@@ -181,126 +208,122 @@ export class PdfExportService {
       pageWidth, margin, headerHeight, appName, reportTitle, generatedAt, generatedBy, labels, logo,
     };
 
-    let isFirstPage = true;
+    return {
+      pdf, pageWidth, pageHeight, margin, contentWidth, headerHeight, footerHeight, labels, locale, header, appName, reportTitle
+    };
+  }
 
-    for (const chart of charts) {
-      const dimensions = await this.getImageDimensions(chart.imageDataUrl);
-      if (!dimensions) continue;
+  private async drawChartPage(ctx: PdfExportContext, chart: ChartExportItem): Promise<void> {
+    const dimensions = await this.getImageDimensions(chart.imageDataUrl);
+    if (!dimensions) return;
 
-      if (!isFirstPage) pdf.addPage();
-      isFirstPage = false;
+    this.drawHeader(ctx.pdf, ctx.header);
+    let y = ctx.headerHeight + 12;
 
-      this.drawHeader(pdf, header);
+    // ───────── Título e subtítulo ─────────
+    ctx.pdf.setTextColor(...COLORS.text);
+    ctx.pdf.setFont('helvetica', 'bold');
+    ctx.pdf.setFontSize(15);
+    const titleLines: string[] = ctx.pdf.splitTextToSize(chart.title, ctx.contentWidth);
+    ctx.pdf.text(titleLines, ctx.margin, y);
+    y += titleLines.length * 6.5;
 
-      let y = headerHeight + 12;
+    ctx.pdf.setDrawColor(...COLORS.primary);
+    ctx.pdf.setLineWidth(0.8);
+    ctx.pdf.line(ctx.margin, y - 3, ctx.margin + 20, y - 3);
 
-      // ───────── Título e subtítulo ─────────
-      pdf.setTextColor(...COLORS.text);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(15);
-      const titleLines: string[] = pdf.splitTextToSize(chart.title, contentWidth);
-      pdf.text(titleLines, margin, y);
-      y += titleLines.length * 6.5;
+    if (chart.subtitle) {
+      ctx.pdf.setFont('helvetica', 'normal');
+      ctx.pdf.setFontSize(10);
+      ctx.pdf.setTextColor(...COLORS.muted);
+      const subLines: string[] = ctx.pdf.splitTextToSize(chart.subtitle, ctx.contentWidth);
+      ctx.pdf.text(subLines, ctx.margin, y + 3);
+      y += subLines.length * 5 + 4;
+    }
+    y += 4;
 
-      pdf.setDrawColor(...COLORS.primary);
-      pdf.setLineWidth(0.8);
-      pdf.line(margin, y - 3, margin + 20, y - 3);
+    // ───────── Bloco de informações ─────────
+    const items = this.buildInfoItems(chart.info, ctx.labels);
+    if (items.length) {
+      const boxHeight = this.drawInfoBox(ctx.pdf, items, ctx.margin, y, ctx.contentWidth);
+      y += boxHeight + 8;
+    }
 
-      if (chart.subtitle) {
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(10);
-        pdf.setTextColor(...COLORS.muted);
-        const subLines: string[] = pdf.splitTextToSize(chart.subtitle, contentWidth);
-        pdf.text(subLines, margin, y + 3);
-        y += subLines.length * 5 + 4;
-      }
+    // ───────── Dimensionamento do gráfico ─────────
+    const cardPadding = 4;
+    const sectionGap = 8;
+    const minChartHeight = 70;
+    const stats = chart.stats ?? [];
+    const statsHeight = stats.length ? this.statsBlockHeight(stats.length) : 0;
 
-      y += 4;
+    const availableW = ctx.contentWidth - cardPadding * 2;
+    let availableH = ctx.pageHeight - ctx.footerHeight - ctx.margin - y - cardPadding * 2;
+    let statsOnNewPage = false;
 
-      // ───────── Bloco de informações ─────────
-      const items = this.buildInfoItems(chart.info, labels);
-      if (items.length) {
-        const boxHeight = this.drawInfoBox(pdf, items, margin, y, contentWidth);
-        y += boxHeight + 8;
-      }
-
-      // ───────── Dimensionamento do gráfico (reserva espaço para a tabela) ─────────
-      const cardPadding = 4;
-      const sectionGap = 8;
-      const minChartHeight = 70;
-      const stats = chart.stats ?? [];
-      const statsHeight = stats.length ? this.statsBlockHeight(stats.length) : 0;
-
-      const availableW = contentWidth - cardPadding * 2;
-      let availableH = pageHeight - footerHeight - margin - y - cardPadding * 2;
-      let statsOnNewPage = false;
-
-      if (statsHeight) {
-        const withStats = availableH - statsHeight - sectionGap;
-        if (withStats >= minChartHeight) {
-          availableH = withStats;
-        } else {
-          statsOnNewPage = true; // gráfico ocupa o espaço todo, tabela vai para a próxima página
-        }
-      }
-
-      const scale = Math.min(availableW / dimensions.width, availableH / dimensions.height);
-      const imgW = dimensions.width * scale;
-      const imgH = dimensions.height * scale;
-      const cardH = imgH + cardPadding * 2;
-
-      // ───────── Gráfico dentro de um card ─────────
-      pdf.setDrawColor(...COLORS.border);
-      pdf.setFillColor(255, 255, 255);
-      pdf.setLineWidth(0.3);
-      pdf.roundedRect(margin, y, contentWidth, cardH, 2, 2, 'FD');
-
-      pdf.addImage(
-        chart.imageDataUrl,
-        'PNG',
-        margin + (contentWidth - imgW) / 2,
-        y + cardPadding,
-        imgW,
-        imgH,
-        undefined,
-        'FAST',
-      );
-
-      y += cardH + sectionGap;
-
-      // ───────── Tabela de estatísticas ─────────
-      if (stats.length) {
-        if (statsOnNewPage) {
-          pdf.addPage();
-          this.drawHeader(pdf, header);
-          y = headerHeight + 12;
-        }
-        this.drawStats(pdf, stats, margin, y, contentWidth, labels, locale);
+    if (statsHeight) {
+      const withStats = availableH - statsHeight - sectionGap;
+      if (withStats >= minChartHeight) {
+        availableH = withStats;
+      } else {
+        statsOnNewPage = true;
       }
     }
 
-    // ───────── Rodapé ─────────
-    const totalPages = pdf.getNumberOfPages();
+    const scale = Math.min(availableW / dimensions.width, availableH / dimensions.height);
+    const imgW = dimensions.width * scale;
+    const imgH = dimensions.height * scale;
+    const cardH = imgH + cardPadding * 2;
+
+    // ───────── Gráfico dentro de um card ─────────
+    ctx.pdf.setDrawColor(...COLORS.border);
+    ctx.pdf.setFillColor(255, 255, 255);
+    ctx.pdf.setLineWidth(0.3);
+    ctx.pdf.roundedRect(ctx.margin, y, ctx.contentWidth, cardH, 2, 2, 'FD');
+
+    ctx.pdf.addImage(
+      chart.imageDataUrl,
+      'PNG',
+      ctx.margin + (ctx.contentWidth - imgW) / 2,
+      y + cardPadding,
+      imgW,
+      imgH,
+      undefined,
+      'FAST',
+    );
+
+    y += cardH + sectionGap;
+
+    // ───────── Tabela de estatísticas ─────────
+    if (stats.length) {
+      if (statsOnNewPage) {
+        ctx.pdf.addPage();
+        this.drawHeader(ctx.pdf, ctx.header);
+        y = ctx.headerHeight + 12;
+      }
+      this.drawStats(ctx.pdf, stats, ctx.margin, y, ctx.contentWidth, ctx.labels, ctx.locale);
+    }
+  }
+
+  private drawFooters(ctx: PdfExportContext): void {
+    const totalPages = ctx.pdf.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) {
-      pdf.setPage(i);
+      ctx.pdf.setPage(i);
 
-      pdf.setDrawColor(...COLORS.border);
-      pdf.setLineWidth(0.3);
-      pdf.line(margin, pageHeight - footerHeight, pageWidth - margin, pageHeight - footerHeight);
+      ctx.pdf.setDrawColor(...COLORS.border);
+      ctx.pdf.setLineWidth(0.3);
+      ctx.pdf.line(ctx.margin, ctx.pageHeight - ctx.footerHeight, ctx.pageWidth - ctx.margin, ctx.pageHeight - ctx.footerHeight);
 
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(8);
-      pdf.setTextColor(...COLORS.muted);
-      pdf.text(`${appName} • ${reportTitle}`, margin, pageHeight - footerHeight + 6);
-      pdf.text(
-        `${labels.page} ${i} ${labels.of} ${totalPages}`,
-        pageWidth - margin,
-        pageHeight - footerHeight + 6,
+      ctx.pdf.setFont('helvetica', 'normal');
+      ctx.pdf.setFontSize(8);
+      ctx.pdf.setTextColor(...COLORS.muted);
+      ctx.pdf.text(`${ctx.appName} • ${ctx.reportTitle}`, ctx.margin, ctx.pageHeight - ctx.footerHeight + 6);
+      ctx.pdf.text(
+        `${ctx.labels.page} ${i} ${ctx.labels.of} ${totalPages}`,
+        ctx.pageWidth - ctx.margin,
+        ctx.pageHeight - ctx.footerHeight + 6,
         { align: 'right' },
       );
     }
-
-    pdf.save(fileName);
   }
 
   /** Carrega uma imagem (ex.: 'assets/logo-white.png') e devolve como data URL. */

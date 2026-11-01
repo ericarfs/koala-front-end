@@ -111,7 +111,9 @@
       "REQUIRED": "This field is required"
     },
     "PAGINATION": {
-      "PAGE_OF": "Page {{current}} of {{total}}"
+      "PAGE_OF": "Page {{current}} of {{total}}",
+      "PREVIOUS": "Previous page",
+      "NEXT": "Next page"
     },
     "THEME": {
       "TOGGLE_TO_LIGHT": "Switch to light mode",
@@ -128,6 +130,10 @@
       "ARIA_LABEL": "Font size: {{size}}. Click to change",
       "TITLE": "Font size: {{size}}",
       "SR_ONLY": "Change font size"
+    },
+    "NAV": {
+      "MAIN": "Main menu",
+      "BREADCRUMB": "Navigation breadcrumb"
     }
   },
 

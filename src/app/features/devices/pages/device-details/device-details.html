@@ -30,7 +30,7 @@
 
       <div class="bg-container border border-outline rounded-md p-4 flex flex-col gap-2 break-all">
         <div class="flex flex-wrap items-center justify-between gap-3">
-          <h1 class="text-2xl font-bold">{{ dev.name }}</h1>
+          <h2 class="text-2xl font-bold">{{ dev.name }}</h2>
 
           <div
             [class]="dev.available
@@ -75,14 +75,14 @@
               <label for="fromDate" class="text-sm text-neutral font-medium mb-1">
                 {{ 'MONITORING.DATE_RANGE.FROM' | transloco }}
               </label>
-              <input type="date" class="border border-outline rounded-md px-3 py-2 bg-container text-default" formControlName="fromDate">
+              <input id="fromDate" type="date" class="border border-outline rounded-md px-3 py-2 bg-container text-default" formControlName="fromDate">
             </div>
 
             <div class="flex flex-col gap-1 max-w-full">
               <label for="toDate" class="text-sm text-neutral font-medium mb-1">
                 {{ 'MONITORING.DATE_RANGE.TO' | transloco }}
               </label>
-              <input type="date" class="border border-outline rounded-md px-3 py-2 bg-container text-default" formControlName="toDate">
+              <input id="toDate" type="date" class="border border-outline rounded-md px-3 py-2 bg-container text-default" formControlName="toDate">
             </div>
           </div>
         </div>

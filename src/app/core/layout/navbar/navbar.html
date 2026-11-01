@@ -87,7 +87,8 @@
   </div>
 
   <!-- Navegação -->
-  <nav class="flex-1 overflow-y-auto px-2 pb-4 overflow-x-hidden">
+  <nav [attr.aria-label]="'COMMON.NAV.MAIN' | transloco"
+      class="flex-1 overflow-y-auto px-2 pb-4 overflow-x-hidden">
     <ul class="flex flex-col gap-2">
       @for (item of menuItems(); track item.id) {
         @if (item.subItems.length > 0) {

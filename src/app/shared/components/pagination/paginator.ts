@@ -13,6 +13,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
           class="btn px-3 py-1 disabled:opacity-40"
           [disabled]="pageIndex() === 0"
           (click)="pageIndex.set(pageIndex() - 1)"
+          [attr.aria-label]="'COMMON.PAGINATION.PREVIOUS' | transloco"
         >
           <i class="fa-solid fa-chevron-left"></i>
         </button>
@@ -27,6 +28,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
           class="btn px-3 py-1 disabled:opacity-40"
           [disabled]="pageIndex() >= totalPages() - 1"
           (click)="pageIndex.set(pageIndex() + 1)"
+          [attr.aria-label]="'COMMON.PAGINATION.NEXT' | transloco"
         >
           <i class="fa-solid fa-chevron-right"></i>
         </button>
