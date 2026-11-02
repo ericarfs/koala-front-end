@@ -327,6 +327,8 @@
     "ERRORS": {
       "MISSING_LOCATION": "Location not provided.",
       "SEND_FAILED": "Could not send the command."
-    }
+    },
+    "DECREASE_TEMP": "Decrease temperature",
+    "INCREASE_TEMP": "Increase temperature"
   }
 }

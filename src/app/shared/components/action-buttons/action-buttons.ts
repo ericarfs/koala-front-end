@@ -9,10 +9,10 @@ import { firstValueFrom } from 'rxjs';
   selector: 'app-action-buttons',
   template: `
     @if (permissions.isAdmin()) {
-      <div class="flex flex-wrap justify-end items-center gap-2 text-sm text-neutral min-h-4 [&>button]:cursor-pointer [&>button]:transition-colors ">
+      <div class="flex flex-wrap justify-end items-center gap-2 text-sm text-neutral min-h-4">
         <button
           type="button"
-          class="hover:text-primary"
+          class="flex items-center justify-center w-8 h-8 rounded-md hover:bg-neutral/10 hover:text-primary transition-colors cursor-pointer"
           (click)="$event.stopPropagation(); $event.preventDefault(); onEdit()"
           [attr.aria-label]="'COMMON.ACTIONS.EDIT' | transloco"
         >
@@ -21,15 +21,14 @@ import { firstValueFrom } from 'rxjs';
 
         <button
           type="button"
-          class="hover:text-destructive"
+          class="flex items-center justify-center w-8 h-8 rounded-md hover:bg-destructive/10 hover:text-destructive transition-colors cursor-pointer"
           [disabled]="deleting()"
           (click)="$event.stopPropagation(); $event.preventDefault(); onDelete()"
           [attr.aria-label]="'COMMON.ACTIONS.DELETE' | transloco"
         >
           @if(deleting()){
             <i class="fa-solid fa-spinner fa-spin"></i>
-          }
-          @else {
+          } @else {
             <i class="fa-solid fa-trash"></i>
           }
         </button>

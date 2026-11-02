@@ -56,12 +56,12 @@ type InputValue = string | File | null;
 
         @if (fileName) {
           <span class="text-sm font-semibold text-neutral break-all">{{ fileName }}</span>
-          <span class="text-xs text-neutral/70">{{ 'COMMON.FORM.FILE.HELPER' | transloco }}</span>
+          <span class="text-xs text-neutral">{{ 'COMMON.FORM.FILE.HELPER' | transloco }}</span>
         } @else {
           <span class="text-sm font-semibold text-neutral">
             {{ 'COMMON.FORM.FILE.DRAG_FILE' | transloco }}
           </span>
-          <span class="text-xs text-neutral/70">
+          <span class="text-xs text-neutral">
             {{ 'COMMON.FORM.FILE.OR' | transloco }}
             <span class="text-primary underline">{{ 'COMMON.FORM.FILE.CHOOSE_FILE' | transloco }}</span>
           </span>

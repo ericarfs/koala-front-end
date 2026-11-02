@@ -11,8 +11,11 @@
             <button
               type="button"
               (click)="decrementTemp()"
+              [attr.aria-label]="'DEVICE_CONTROL.DECREASE_TEMP' | transloco"
               class="w-8 h-8 rounded-full border border-outline text-lg hover:bg-neutral/10 transition-colors"
-            >−</button>
+            >
+              <span aria-hidden="true">−</span>
+            </button>
 
             <span class="text-3xl font-bold text-default min-w-30 text-center">
               {{ temperature() }}°C
@@ -21,8 +24,11 @@
             <button
               type="button"
               (click)="incrementTemp()"
+              [attr.aria-label]="'DEVICE_CONTROL.INCREASE_TEMP' | transloco"
               class="w-8 h-8 rounded-full border border-outline text-lg hover:bg-neutral/10 transition-colors"
-            >+</button>
+            >
+              <span aria-hidden="true">+</span>
+            </button>
           </div>
           <p class="text-xs text-neutral">{{ 'DEVICE_CONTROL.TARGET_TEMP' | transloco }}</p>
         </div>
@@ -34,6 +40,7 @@
               <button
                 type="button"
                 (click)="mode.set(m.value)"
+                [attr.aria-pressed]="mode() === m.value"
                 [class]="
                   mode() === m.value
                     ? 'bg-container text-default font-semibold'
@@ -48,21 +55,23 @@
         </div>
 
         <div class="flex justify-between items-center">
-          <span class="text-sm text-neutral font-medium flex items-center gap-2">
-            <i class="fa-solid fa-power-off"></i>
+          <span [id]="powerLabelId" class="text-sm text-neutral font-medium flex items-center gap-2">
+            <i class="fa-solid fa-power-off" aria-hidden="true"></i>
             {{ (enabled() ? 'DEVICE_CONTROL.POWER_ON' : 'DEVICE_CONTROL.POWER_OFF') | transloco }}
           </span>
 
           <button
             type="button"
             (click)="enabled.set(!enabled())"
+            role="switch"
+            [attr.aria-checked]="enabled()"
+            [attr.aria-labelledby]="powerLabelId"
             [class]="enabled() ? 'bg-secondary' : 'bg-neutral/30'"
             class="relative w-11 h-6 rounded-full transition-colors cursor-pointer"
           >
-            <span
-              [class]="enabled() ? 'translate-x-5' : 'translate-x-0'"
-              class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform"
-            ></span>
+            <span aria-hidden="true"
+                  [class]="enabled() ? 'translate-x-5' : 'translate-x-0'"
+                  class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform"></span>
           </button>
         </div>
 

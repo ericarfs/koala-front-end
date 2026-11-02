@@ -25,6 +25,7 @@
           @for (status of compilerOptions; track status.value; let first = $first) {
             <button
               type="button"
+              [attr.aria-pressed]="otaForm.value.compiler === status.value"
               class="flex-1 cursor-pointer px-4 py-2 text-xs md:text-sm transition-colors"
               [class.bg-primary]="otaForm.value.compiler === status.value"
               [class.font-medium]="otaForm.value.compiler === status.value"
@@ -38,7 +39,7 @@
       </div>
 
       @if (errorKey()) {
-        <p class="text-destructive text-sm mt-3">
+        <p class="text-destructive mt-3">
           {{ errorKey()! | transloco }}
         </p>
       }
@@ -46,7 +47,7 @@
       @if (logText()) {
         <pre
           #logPre
-          class="text-xs bg-neutral/5 border border-outline rounded-md p-3 max-h-80 overflow-auto font-mono whitespace-pre-wrap"
+          class="text-xs bg-neutral/10 border border-outline rounded-md p-3 max-h-80 overflow-auto font-mono whitespace-pre-wrap"
         >{{ logText() }}</pre>
       }
 

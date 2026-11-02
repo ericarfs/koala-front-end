@@ -327,6 +327,8 @@
     "ERRORS": {
       "MISSING_LOCATION": "Ambiente não informado.",
       "SEND_FAILED": "Não foi possível enviar o comando."
-    }
+    },
+    "DECREASE_TEMP": "Diminuir temperatura",
+    "INCREASE_TEMP": "Aumentar temperatura"
   }
 }

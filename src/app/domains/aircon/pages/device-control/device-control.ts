@@ -29,6 +29,9 @@ export class DeviceControl {
   protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
 
+  protected readonly powerLabelId = `power-label-${Math.random().toString(36).slice(2, 9)}`;
+
+
   private lastSentAt: Date | null = null;
 
   protected readonly modes: { value: AirconMode; label: string }[] = [
