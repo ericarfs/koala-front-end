@@ -1,13 +1,14 @@
-import { inject, Injectable, NgZone } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from './../../../../../environments/environment';
 import { Firmware, FirmwareUpdate, FirmwareUpdateProgress } from '@shared/interfaces/firmware';
+import { SseService } from '@shared/services/sse';
 
 @Injectable({ providedIn: 'root' })
 export class FirmwareService {
   protected readonly http = inject(HttpClient);
-  protected readonly ngZone = inject(NgZone);
+  private readonly sse = inject(SseService);
   protected readonly url = `${environment.otaUrl}`;
 
   findAll(): Observable<Firmware[]> {
@@ -27,30 +28,16 @@ export class FirmwareService {
   }
 
   firmwareCompileLogs(sessionId: string): Observable<string> {
-    return this.openSse<string>(`${this.url}sse/${sessionId}`, (data) => data);
-  }
-
-  deviceUpdateProgress(sessionId: string): Observable<FirmwareUpdateProgress> {
-    return this.openSse<FirmwareUpdateProgress>(
+    return this.sse.connect(
       `${this.url}sse/${sessionId}`,
-      (data) => JSON.parse(data) as FirmwareUpdateProgress,
+      (data) => data
     );
   }
 
-  private openSse<T>(url: string, parse: (data: string) => T): Observable<T> {
-    return new Observable<T>((observer) => {
-      const source = new EventSource(url);
-
-      source.onmessage = (event) => {
-        this.ngZone.run(() => observer.next(parse(event.data)));
-      };
-
-      source.onerror = (error) => {
-        this.ngZone.run(() => observer.error(error));
-        source.close();
-      };
-
-      return () => source.close();
-    });
+  deviceUpdateProgress(sessionId: string): Observable<FirmwareUpdateProgress> {
+    return this.sse.connect(
+      `${this.url}sse/${sessionId}`,
+      (data) => JSON.parse(data) as FirmwareUpdateProgress
+    );
   }
 }

@@ -1,7 +1,7 @@
 import { DeviceType } from "./device-type";
 
 export interface Device {
-  id?: number;
+  id: number;
   name: string;
   mac: string;
   description?: string;

@@ -5,9 +5,7 @@ import {
 import * as echarts from 'echarts';
 import { TimeSeries } from '../models/time-series';
 
-
 const EMPTY_SERIES: TimeSeries = { title: '', values: [] };
-
 const FALLBACK_PALETTE = ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272'];
 const EXPORT_TEXT_COLOR = '#212529';
 const MOBILE_BREAKPOINT_PX = 768;
@@ -17,6 +15,22 @@ const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 
 const pad = (n: number) => n.toString().padStart(2, '0');
+
+// ─── Função pura para o rótulo do eixo X ──────────────────────────
+function formatXAxisLabel(value: number, rangeMs: number): string {
+  const d = new Date(value);
+  const time = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  const day = `${d.getDate()}/${d.getMonth() + 1}`;
+  const isMidnight = d.getHours() === 0 && d.getMinutes() === 0 && d.getSeconds() === 0;
+
+  if (rangeMs <= HOUR) {
+    return `${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  }
+  if (rangeMs <= 7 * DAY) {
+    return isMidnight ? `${day} ${time}` : time;
+  }
+  return day;
+}
 
 @Component({
   selector: 'app-time-series-chart',
@@ -39,13 +53,9 @@ export class TimeSeriesChart implements AfterViewInit, OnDestroy {
   private readonly chartEl = viewChild.required<ElementRef<HTMLDivElement>>('chartEl');
   private readonly zone = inject(NgZone);
 
-  /** Eixo X. Deve estar ordenado do mais antigo para o mais recente. */
   readonly timestamps = input<Date[]>([]);
-  /** Série do eixo Y esquerdo. */
   readonly primary = input<TimeSeries>(EMPTY_SERIES);
-  /** Série do eixo Y direito (opcional). */
   readonly secondary = input<TimeSeries>(EMPTY_SERIES);
-  /** Séries adicionais, plotadas no eixo esquerdo. */
   readonly extraSeries = input<TimeSeries[]>([]);
   readonly title = input('');
   readonly subtitle = input('');
@@ -54,14 +64,10 @@ export class TimeSeriesChart implements AfterViewInit, OnDestroy {
   private resizeObserver?: ResizeObserver;
   private themeObserver?: MutationObserver;
 
-  /** Calculado uma vez por render, usado pelo formatter do eixo X. */
   private rangeMs = 0;
-
-  /** true só depois de um render com dados (gráfico vazio não tem eixos). */
   private hasContent = false;
 
   constructor() {
-    // Só lê o que o render() realmente usa.
     effect(() => {
       this.timestamps();
       this.primary();
@@ -82,15 +88,12 @@ export class TimeSeriesChart implements AfterViewInit, OnDestroy {
 
       this.resizeObserver = new ResizeObserver(() => {
         this.chart?.resize();
-        // Só atualiza a rotação se já existe um eixo desenhado; num gráfico vazio
-        // o merge parcial de xAxis quebra dentro do ECharts.
         if (this.hasContent) {
           this.chart?.setOption({ xAxis: { axisLabel: { rotate: this.labelRotation() } } });
         }
       });
       this.resizeObserver.observe(el);
 
-      // Troca de tema: a classe fica no <html>, então não precisa de subtree.
       this.themeObserver = new MutationObserver(() =>
         requestAnimationFrame(() => this.render()),
       );
@@ -103,7 +106,6 @@ export class TimeSeriesChart implements AfterViewInit, OnDestroy {
     this.render();
   }
 
-  /** Exporta o gráfico em PNG com cores legíveis em fundo branco. */
   getImageDataURL(): string | null {
     if (!this.chart || !this.hasContent) return null;
 
@@ -118,7 +120,6 @@ export class TimeSeriesChart implements AfterViewInit, OnDestroy {
     return dataUrl;
   }
 
-  // Render
   private render(): void {
     if (!this.chart) return;
 
@@ -136,47 +137,8 @@ export class TimeSeriesChart implements AfterViewInit, OnDestroy {
     const times = this.timestamps().map(t => new Date(t).getTime());
     this.rangeMs = times.length > 1 ? times[times.length - 1] - times[0] : 0;
 
-    const primary = this.primary();
-    const secondary = this.secondary();
-    const extra = this.extraSeries();
-
-    const hasSecondary = secondary.values.some(v => v !== null && v !== undefined);
-
-    const series: echarts.LineSeriesOption[] = [this.buildSeries(primary, times, 0, 0)];
-    let colorIndex = 1;
-    if (hasSecondary) {
-      series.push(this.buildSeries(secondary, times, 1, colorIndex++));
-    }
-    extra.forEach(s => series.push(this.buildSeries(s, times, 0, colorIndex++)));
-
-    const axisCommon = {
-      type: 'value' as const,
-      nameLocation: 'middle' as const,
-      nameGap: 45,
-      nameRotate: 90,
-      nameTextStyle: { color: textColor },
-      axisLabel: { color: textColor },
-      axisLine: { lineStyle: { color: textColor, opacity: 0.3 } },
-    };
-
-    const yAxis: echarts.YAXisComponentOption[] = [
-      {
-        ...axisCommon,
-        id: 'left',
-        position: 'left',
-        name: primary.title,
-        splitLine: { lineStyle: { color: textColor, opacity: 0.15 } },
-      },
-    ];
-    if (hasSecondary) {
-      yAxis.push({
-        ...axisCommon,
-        id: 'right',
-        position: 'right',
-        name: secondary.title,
-        splitLine: { show: false },
-      });
-    }
+    const seriesList = this.buildSeriesList(times);
+    const hasSecondary = this.secondary().values.some(v => v !== null && v !== undefined);
 
     return {
       animation: animate,
@@ -185,36 +147,28 @@ export class TimeSeriesChart implements AfterViewInit, OnDestroy {
       textStyle: { color: textColor },
       grid: { left: '12%', right: '12%', top: '10%', bottom: '20%', containLabel: true },
       tooltip: { trigger: 'axis' },
-      legend: {
-        show: hasSecondary || extra.length > 0,
-        bottom: '0%',
-        itemGap: 12,
-        itemWidth: 14,
-        itemHeight: 10,
-        textStyle: { color: textColor, fontSize: 11 },
-        data: series.map(s => s.name as string),
-      },
-      xAxis: {
-        type: 'time',
-        axisLabel: {
-          color: textColor,
-          hideOverlap: true,
-          rotate: this.labelRotation(),
-          formatter: (value: number) => this.formatXAxisLabel(value),
-        },
-        axisLine: { lineStyle: { color: textColor, opacity: 0.3 } },
-      },
-      yAxis,
-      series,
+      legend: this.buildLegend(seriesList, textColor),
+      xAxis: this.buildXAxis(textColor),
+      yAxis: this.buildYAxes(textColor, hasSecondary),
+      series: seriesList,
     };
   }
 
-  private buildSeries(
-    data: TimeSeries,
-    times: number[],
-    yAxisIndex: number,
-    colorIndex: number,
-  ): echarts.LineSeriesOption {
+  // ─── Builders Específicos ───
+
+  private buildSeriesList(times: number[]): echarts.LineSeriesOption[] {
+    const series: echarts.LineSeriesOption[] = [this.buildSeries(this.primary(), times, 0, 0)];
+
+    let colorIndex = 1;
+    if (this.secondary().values.some(v => v != null)) {
+      series.push(this.buildSeries(this.secondary(), times, 1, colorIndex++));
+    }
+    this.extraSeries().forEach(s => series.push(this.buildSeries(s, times, 0, colorIndex++)));
+
+    return series;
+  }
+
+  private buildSeries(data: TimeSeries, times: number[], yAxisIndex: number, colorIndex: number): echarts.LineSeriesOption {
     const color = this.seriesColor(colorIndex);
     return {
       id: `${data.title}-${yAxisIndex}-${colorIndex}`,
@@ -230,29 +184,61 @@ export class TimeSeriesChart implements AfterViewInit, OnDestroy {
     };
   }
 
-  // ---------- Formatter (puro: depende só do valor e do range) ----------
+  private buildYAxes(textColor: string, hasSecondary: boolean): echarts.YAXisComponentOption[] {
+    const axisCommon = {
+      type: 'value' as const,
+      nameLocation: 'middle' as const,
+      nameGap: 45,
+      nameRotate: 90,
+      nameTextStyle: { color: textColor },
+      axisLabel: { color: textColor },
+      axisLine: { lineStyle: { color: textColor, opacity: 0.3 } },
+    };
 
-  private formatXAxisLabel(value: number): string {
-    const d = new Date(value);
-    const time = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    const day = `${d.getDate()}/${d.getMonth() + 1}`;
-    const isMidnight = d.getHours() === 0 && d.getMinutes() === 0 && d.getSeconds() === 0;
+    const axes: echarts.YAXisComponentOption[] = [{
+      ...axisCommon,
+      id: 'left',
+      position: 'left',
+      name: this.primary().title,
+      splitLine: { lineStyle: { color: textColor, opacity: 0.15 } },
+    }];
 
-    // ≤ 1 hora → mm:ss
-    if (this.rangeMs <= HOUR) {
-      return `${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    if (hasSecondary) {
+      axes.push({
+        ...axisCommon,
+        id: 'right',
+        position: 'right',
+        name: this.secondary().title,
+        splitLine: { show: false },
+      });
     }
-
-    // ≤ 7 dias → HH:mm, com a data na virada do dia
-    if (this.rangeMs <= 7 * DAY) {
-      return isMidnight ? `${day} ${time}` : time;
-    }
-
-    // > 7 dias → só a data
-    return day;
+    return axes;
   }
 
-  // ---------- Helpers ----------
+  private buildXAxis(textColor: string): echarts.XAXisComponentOption {
+    return {
+      type: 'time',
+      axisLabel: {
+        color: textColor,
+        hideOverlap: true,
+        rotate: this.labelRotation(),
+        formatter: (value: number) => formatXAxisLabel(value, this.rangeMs),
+      },
+      axisLine: { lineStyle: { color: textColor, opacity: 0.3 } },
+    };
+  }
+
+  private buildLegend(series: echarts.LineSeriesOption[], textColor: string): echarts.LegendComponentOption {
+    return {
+      show: series.length > 1,
+      bottom: '0%',
+      itemGap: 12,
+      itemWidth: 14,
+      itemHeight: 10,
+      textStyle: { color: textColor, fontSize: 11 },
+      data: series.map(s => s.name as string),
+    };
+  }
 
   private labelRotation(): number {
     const width = this.chart?.getWidth() ?? window.innerWidth;
@@ -264,7 +250,6 @@ export class TimeSeriesChart implements AfterViewInit, OnDestroy {
   }
 
   private seriesColor(index: number): string {
-    // Se o tema definir --chart-1, --chart-2..., eles têm prioridade.
     return this.cssVar(`--chart-${index + 1}`) || FALLBACK_PALETTE[index % FALLBACK_PALETTE.length];
   }
 

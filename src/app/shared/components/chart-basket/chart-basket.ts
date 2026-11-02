@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ChartExportBasket } from '@shared/services/chart-export-basket';
-import { PdfExportService } from '@shared/services/pdf-export';
+import { PdfExportService } from '@shared/services/pdf-export/pdf-export';
 
 @Component({
   selector: 'app-chart-basket',

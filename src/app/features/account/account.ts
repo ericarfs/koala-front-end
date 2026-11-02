@@ -4,7 +4,7 @@ import { Location } from '@angular/common';
 import { ContentLayout } from '@shared/layouts/content/content';
 import { Input } from '@shared/components/input/input';
 import { InputPassword } from '@shared/components/input/input-password';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { AuthService } from '@core/auth/services/auth';
 import { UserService } from '@shared/domain/user/services/user';
 import { of, switchMap } from 'rxjs';
@@ -31,14 +31,13 @@ export class Account implements OnInit {
   private readonly location = inject(Location);
   private readonly auth = inject(AuthService);
   private readonly userService = inject(UserService);
+  private readonly notification = inject(NotificationService);
+  private readonly transloco = inject(TranslocoService);
 
   private readonly userId = this.auth.user()?.id ?? null;
 
   protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
-
-  private readonly notification = inject(NotificationService);
-
 
   readonly userForm = new FormGroup({
     username: new FormControl('', {
@@ -132,54 +131,63 @@ export class Account implements OnInit {
     const id = this.userId;
     if (id === null) return;
 
-    const changingPassword = this.passwordForm.dirty;
-
-    if (this.userForm.invalid || (changingPassword && this.passwordForm.invalid)) {
-      this.userForm.markAllAsTouched();
-      if (changingPassword) this.passwordForm.markAllAsTouched();
-      this.error.set('ACCOUNT.ERRORS.INVALID_FORM');
-      return;
-    }
+    if (!this.validateForms()) return;
 
     this.loading.set(true);
     this.error.set(null);
 
-    const { username, email } = this.userForm.getRawValue();
+    const changingPassword = this.passwordForm.dirty;
 
-    this.userService
-      .update(id, { username, email })
-      .pipe(
-        switchMap(() => {
-          if (!changingPassword) return of(void 0);
-
-          const { oldPassword, newPassword, newPasswordConfirmation } =
-            this.passwordForm.getRawValue();
-
-          return this.userService.changePassword(id, {
-            id,
-            username,
-            email,
-            oldPassword,
-            newPassword,
-            newPasswordConfirmation,
-          });
-        }),
-      )
-      .subscribe({
-        next: () => {
-          this.notification.success('Updated successfully.');
-          this.loading.set(false);
-          this.location.back();
-        },
-        error: () => {
-          this.notification.error('Failed to save. Try again later.');
-          this.error.set('ACCOUNT.ERRORS.SAVE_FAILED');
-          this.loading.set(false);
-        },
-      });
+    this.saveProfile(id, changingPassword).subscribe({
+      next: () => this.handleSaveSuccess(),
+      error: () => this.handleSaveError(),
+    });
   }
 
   goBack(): void {
     this.location.back();
+  }
+
+  private validateForms(): boolean {
+    const changingPassword = this.passwordForm.dirty;
+    const isUserInvalid = this.userForm.invalid;
+    const isPasswordInvalid = changingPassword && this.passwordForm.invalid;
+
+    if (isUserInvalid || isPasswordInvalid) {
+      this.userForm.markAllAsTouched();
+      if (changingPassword) this.passwordForm.markAllAsTouched();
+      this.error.set('ACCOUNT.ERRORS.INVALID_FORM');
+      return false;
+    }
+    return true;
+  }
+
+  private saveProfile(id: number, changingPassword: boolean) {
+    const { username, email } = this.userForm.getRawValue();
+
+    return this.userService.update(id, { username, email }).pipe(
+      switchMap(() => {
+        if (!changingPassword) return of(void 0);
+
+        const { oldPassword, newPassword, newPasswordConfirmation } = this.passwordForm.getRawValue();
+        return this.userService.changePassword(id, {
+          id, username, email, oldPassword, newPassword, newPasswordConfirmation,
+        });
+      })
+    );
+  }
+
+  private handleSaveSuccess(): void {
+    const msg = this.transloco.translate('COMMON.TOASTS.UPDATED');
+    this.notification.success(msg);
+    this.loading.set(false);
+    this.location.back();
+  }
+
+  private handleSaveError(): void {
+    const msg = this.transloco.translate('COMMON.TOASTS.SAVE_FAILED');
+    this.notification.error(msg);
+    this.error.set('ACCOUNT.ERRORS.SAVE_FAILED');
+    this.loading.set(false);
   }
 }

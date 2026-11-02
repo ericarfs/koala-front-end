@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { delay, Observable, of } from 'rxjs';
 import { ActuatorMapping } from '@shared/interfaces/actuator-mapping';
-import { ACTUATOR_MAPPINGS_MOCK } from '../../../../mocks/actuator-mapping';
+import { ACTUATOR_MAPPINGS_MOCK } from '../../../../../mocks/actuator-mapping';
 import { ActuatorMappingService } from './actuator-mapping';
 
 const FAKE_LATENCY_MS = 300;

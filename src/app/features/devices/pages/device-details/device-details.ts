@@ -5,22 +5,24 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { map, of } from 'rxjs';
 import { ContentLayout } from '@shared/layouts/content/content';
-import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
+import { DeviceMappingService } from '@shared/domain/device/services/mapping/device-mapping';
 import { DeviceWithTypes } from '@shared/interfaces/device';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { getPath } from '@shared/domain/location/location-tree';
+import { getPath } from '@shared/domain/location/components/location-tree';
 import { ChartDataStore } from '@shared/domain/monitoring/stores/chart-data-store';
 import { ChartPanel } from '@shared/domain/monitoring/components/chart-panel';
 import { ChipSelect } from '@shared/domain/monitoring/components/chip-select';
 import { DEFAULT_TIME_BUCKET, TIME_BUCKET_OPTIONS, TimeBucket } from '@shared/domain/monitoring/models/time-bucket';
 import { IntervalSelector } from '@shared/domain/monitoring/components/interval-selector';
 import { SearchButton } from '@shared/domain/monitoring/components/search-button';
-import { ChartExportInfo, localeFromLang } from '@shared/services/pdf-export';
-import { buildChartInfo } from '@shared/utils/chart-exports-info';
+import { buildChartInfo } from '@shared/domain/monitoring/utils/chart-exports-info';
 import { DeviceStore } from '@shared/domain/device/stores/device-store';
 import { LocationStore } from '@shared/domain/location/stores/location-store';
 import { DeviceType } from '@shared/interfaces/device-type';
 import { DeviceTypesSkeleton } from '@shared/domain/device/components/device-types-skeleton';
+import { buildChartSubtitle, ChartType, parseDateRange } from '@shared/domain/monitoring/utils/chart-form';
+import { ChartExportInfo } from '@shared/services/pdf-export/pdf-expert.types';
+import { localeFromLang } from '@shared/services/pdf-export/pdf-export.utils';
 
 
 @Component({
@@ -93,7 +95,6 @@ export class DeviceDetails {
     effect(() => {
       const id = this.id();
 
-      // Reset em qualquer troca de id
       this.selectedTypes.set([]);
       this.loadedTypes.set([]);
       this.store.reset();
@@ -106,33 +107,17 @@ export class DeviceDetails {
     const device = this.device();
     if (!device || this.filterForm.invalid) return;
 
-    // Mantém a ordem de seleção: o primeiro vai no eixo esquerdo
-    const types = this.selectedTypes().flatMap(id => {
-      const type = device.types.find(t => t.id === id);
-      return type ? [{ id: type.id, name: type.name }] : [];
-    });
+    const types = this.getSelectedTypes(device);
     if (types.length === 0) return;
 
     const { timeBucket, fromDate, toDate } = this.filterForm.getRawValue();
-    const start = fromDate ? new Date(fromDate) : null;
-    const end = toDate ? new Date(toDate) : new Date();
-    end.setHours(23, 59, 59);
+    const { start, end } = parseDateRange(fromDate, toDate);
 
     const locName = device.id_enviroment != null
       ? getPath(device.id_enviroment, this.locationStore.items())
       : '-';
-    this.chartTitle.set(`${locName} — ${device.name ?? ''}`);
-    this.chartSubtitle.set(types.map(t => t.name).join(' × '));
 
-    this.chartInfo.set(buildChartInfo({
-      location: locName,
-      sensors: types,
-      devices: device ? [device] : [],
-      timeBucket,
-      start,
-      end,
-      locale: localeFromLang(this.transloco.getActiveLang()),
-    }));
+    this.updateChartDisplay(locName, device, types, timeBucket, start, end);
 
     // idDevice vai no "base": vale para todas as consultas (1 ou 2 tipos)
     this.store.load({
@@ -149,5 +134,34 @@ export class DeviceDetails {
 
   goBack(): void {
     this.routerLocation.back();
+  }
+
+  private getSelectedTypes(device: DeviceWithTypes): ChartType[] {
+    return this.selectedTypes().flatMap(id => {
+      const type = device.types.find(t => t.id === id);
+      return type ? [{ id: type.id, name: type.name }] : [];
+    });
+  }
+
+  private updateChartDisplay(
+    locName: string,
+    device: DeviceWithTypes,
+    types: ChartType[],
+    timeBucket: TimeBucket,
+    start: Date | null,
+    end: Date
+  ): void {
+    this.chartTitle.set(`${locName} — ${device.name ?? ''}`);
+    this.chartSubtitle.set(buildChartSubtitle(types));
+
+    this.chartInfo.set(buildChartInfo({
+      location: locName,
+      sensors: types,
+      devices: [device],
+      timeBucket,
+      start,
+      end,
+      locale: localeFromLang(this.transloco.getActiveLang()),
+    }));
   }
 }

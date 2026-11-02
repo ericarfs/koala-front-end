@@ -1,14 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { map, of, switchMap, tap, throwError } from 'rxjs';
+import { map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { getActionLabel, getAncestors, getChildren } from '../../../../shared/domain/location/location-tree';
+import { getActionLabel, getAncestors, getChildren } from '../../../../shared/domain/location/components/location-tree';
 import { ContentLayout } from '@shared/layouts/content/content';
 import { DeviceList } from '@shared/domain/device/components/device-list';
 import { LocationCard } from '@features/location/components/location-card';
-import { LocationStore, MutationError } from '@shared/domain/location/stores/location-store';
-import { DialogService } from '@shared/components/dialogs/dialogs.service';
+import { LocationStore } from '@shared/domain/location/stores/location-store';
 import { Location } from '@shared/interfaces/location';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Paginator} from '@shared/components/pagination/paginator';
@@ -18,7 +17,7 @@ import { DeviceStore } from '@shared/domain/device/stores/device-store';
 import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
 import { LocationStatsStore } from '@shared/domain/location/stores/location-stats-store';
 import { LocationCardSkeleton } from '@features/location/components/location-card-skeleton';
-import { NotificationService } from '@shared/services/notification';
+import { LocationActions } from '@features/location/components/location-actions';
 
 
 @Component({
@@ -32,9 +31,8 @@ import { NotificationService } from '@shared/services/notification';
 })
 export class LocationDetails {
   private readonly route = inject(ActivatedRoute);
-  private readonly formDialog = inject(DialogService);
   private readonly deviceTypeStore = inject(DeviceTypeStore);
-  private readonly notification = inject(NotificationService);
+  private readonly actions = inject(LocationActions);
 
   readonly deviceStore = inject(DeviceStore);
   readonly statsStore = inject(LocationStatsStore);
@@ -69,62 +67,7 @@ export class LocationDetails {
     this.deviceTypeStore.load();
   }
 
-  newLocation(): void {
-    this.openDialog(this.id());
-  }
-
-  private openDialog(parentId: number | null = null): void {
-    this.formDialog
-      .open<Location>({
-        title: 'LOCATIONS.ADD.TITLE',
-        subtitle: 'LOCATIONS.ADD.SUBTITLE',
-        submitLabel: 'COMMON.ACTIONS.CREATE',
-        fields: [
-          {
-            key: 'name',
-            label: 'COMMON.FORM.NAME',
-            placeholder: 'COMMON.FORM.NAME_PLACEHOLDER',
-            required: true
-          },
-          {
-            key: 'description',
-            label: 'COMMON.FORM.DESCRIPTION',
-            placeholder: 'COMMON.FORM.DESCRIPTION_PLACEHOLDER',
-            type: 'textarea',
-            rows: 4
-          },
-        ],
-        onSubmit: (values) => {
-          const v = values as { name: string; description?: string };
-
-          const draft: Omit<Location, 'id'> = {
-            name: v.name,
-            description: v.description ?? '',
-            parentId,
-          } as Omit<Location, 'id'>;
-
-          return this.store.add(draft).pipe(
-            switchMap((res) =>
-              res.ok
-                ? of(res.data)
-                : throwError(() => this.toErrorMessage(res.reason)),
-            ),
-            tap({
-              next: () => this.notification.success('Created successfully.'),
-              error: () => this.notification.error('Failed to save. Try again later.'),
-            }),
-          );
-        },
-      })
-      .closed.subscribe();
-  }
-
-  private toErrorMessage(reason: MutationError): string {
-    switch (reason) {
-      case 'MAX_DEPTH_EXCEEDED':
-        return 'LOCATIONS.ERRORS.MAX_DEPTH';
-      case 'INVALID_PARENT':
-        return 'LOCATIONS.ERRORS.INVALID_PARENT';
-    }
+   newLocation(): void {
+    this.actions.openCreate(this.id());
   }
 }

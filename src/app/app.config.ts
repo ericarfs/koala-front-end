@@ -5,6 +5,7 @@ import {
   provideAppInitializer,
   provideBrowserGlobalErrorListeners,
   isDevMode,
+  Provider,
 } from '@angular/core';
 import { provideRouter, Router } from '@angular/router';
 import { CORE_ROUTES } from './app.routes';
@@ -30,17 +31,50 @@ import { DeviceTypeService } from '@shared/domain/device-type/services/device-ty
 import { MockDeviceTypeService } from '@shared/domain/device-type/services/device-type.mock';
 import { FirmwareService } from '@shared/domain/device/services/firmware';
 import { MockFirmwareService } from '@shared/domain/device/services/firmware.mock';
-import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
-import { MockDeviceMappingService } from '@shared/domain/device/services/device-mapping.mock';
+import { DeviceMappingService } from '@shared/domain/device/services/mapping/device-mapping';
+import { MockDeviceMappingService } from '@shared/domain/device/services/mapping/device-mapping.mock';
 import { UserService } from '@shared/domain/user/services/user';
 import { MockUserService } from '@shared/domain/user/services/user.mock';
 import { MockAuthService } from '@core/auth/services/auth.mock';
 import { ActuatorService } from '@shared/domain/actuator/services/actuator';
 import { MockActuatorService } from '@shared/domain/actuator/services/actuator.mock';
-import { ActuatorMappingService } from '@shared/domain/device/services/actuator-mapping';
-import { MockActuatorMappingService } from '@shared/domain/device/services/actuator-mapping.mock';
+import { ActuatorMappingService } from '@shared/domain/device/services/mapping/actuator-mapping';
+import { MockActuatorMappingService } from '@shared/domain/device/services/mapping/actuator-mapping.mock';
 import { DATA_SCOPE } from '@shared/tokens/data-scope';
 import { CURRENT_USER } from '@shared/tokens/current-user';
+
+function initializeApplicationRoutes(): void {
+  const router = inject(Router);
+  const registry = inject(ExtensionRegistryService);
+  const mainLayoutRoute = CORE_ROUTES.find((r) => r.component === MainLayout);
+
+  if (mainLayoutRoute?.children) {
+    mainLayoutRoute.children = [
+      ...mainLayoutRoute.children,
+      ...registry.buildRoutes(),
+      { path: '**', redirectTo: '/' },
+    ];
+  }
+  router.resetConfig([...CORE_ROUTES]);
+}
+
+function getMockProviders(): Provider[] {
+  if (!environment.useMock) return [];
+
+  return [
+    { provide: MetricsService, useClass: MockMetricsService },
+    { provide: LocationService, useClass: MockLocationService },
+    { provide: DeviceService, useClass: MockDeviceService },
+    { provide: DeviceTypeService, useClass: MockDeviceTypeService },
+    { provide: FirmwareService, useClass: MockFirmwareService },
+    { provide: ActuatorService, useClass: MockActuatorService },
+    { provide: DeviceMappingService, useClass: MockDeviceMappingService },
+    { provide: ActuatorMappingService, useClass: MockActuatorMappingService },
+    { provide: UserService, useClass: MockUserService },
+    { provide: AuthService, useClass: MockAuthService },
+  ];
+}
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -52,36 +86,10 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     provideKoalaModule(airconModuleDefinition),
 
-    provideAppInitializer(() => {
-      const router = inject(Router);
-      const registry = inject(ExtensionRegistryService);
+    provideAppInitializer(initializeApplicationRoutes),
 
-      const mainLayoutRoute = CORE_ROUTES.find((r) => r.component === MainLayout);
+    ...getMockProviders(),
 
-      if (mainLayoutRoute && mainLayoutRoute.children) {
-        mainLayoutRoute.children = [
-          ...mainLayoutRoute.children,
-          ...registry.buildRoutes(),
-          { path: '**', redirectTo: '/' },
-        ];
-      }
-
-      router.resetConfig([...CORE_ROUTES]);
-    }),
-    (environment.useMock
-      ? [
-          { provide: MetricsService, useClass: MockMetricsService },
-          { provide: LocationService, useClass: MockLocationService },
-          { provide: DeviceService, useClass: MockDeviceService },
-          { provide: DeviceTypeService, useClass: MockDeviceTypeService },
-          { provide: FirmwareService, useClass: MockFirmwareService },
-          { provide: ActuatorService, useClass: MockActuatorService },
-          { provide: DeviceMappingService, useClass: MockDeviceMappingService },
-          { provide: ActuatorMappingService, useClass: MockActuatorMappingService },
-          { provide: UserService, useClass: MockUserService },
-          { provide: AuthService, useClass: MockAuthService },
-        ]
-      : []),
     provideTransloco({
       config: {
         availableLangs: ['en', 'pt'],

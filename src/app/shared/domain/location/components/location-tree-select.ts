@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { buildTree } from './location-tree';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { LocationStore } from './stores/location-store';
+import { LocationStore } from '../stores/location-store';
 import { noop } from 'rxjs';
 
 interface LocationNode {
@@ -20,6 +20,34 @@ interface FlatNode {
   depth: number;
   hasChildren: boolean;
   expanded: boolean;
+}
+
+function flattenSearch(tree: LocationNode[], term: string): FlatNode[] {
+  const out: FlatNode[] = [];
+  const walk = (nodes: LocationNode[], depth: number): void => {
+    for (const n of nodes) {
+      if (n.name.toLowerCase().includes(term)) {
+        out.push({ id: n.id, name: n.name, depth, hasChildren: false, expanded: false });
+      }
+      if (n.children?.length) walk(n.children, depth + 1);
+    }
+  };
+  walk(tree, 0);
+  return out;
+}
+
+function flattenVisible(tree: LocationNode[], expanded: Set<number>): FlatNode[] {
+  const out: FlatNode[] = [];
+  const walk = (nodes: LocationNode[], depth: number): void => {
+    for (const n of nodes) {
+      const hasChildren = !!n.children?.length;
+      const isExpanded = expanded.has(n.id);
+      out.push({ id: n.id, name: n.name, depth, hasChildren, expanded: isExpanded });
+      if (hasChildren && isExpanded) walk(n.children!, depth + 1);
+    }
+  };
+  walk(tree, 0);
+  return out;
 }
 
 @Component({
@@ -247,46 +275,10 @@ export class LocationTreeSelect implements ControlValueAccessor {
     const term = this.search().trim().toLowerCase();
     const { tree } = this.treeData();
 
-    // Busca: lista achatada, sem indentação profunda, sem expand/collapse
     if (term) {
-      const out: FlatNode[] = [];
-      const walk = (nodes: LocationNode[], depth: number): void => {
-        for (const n of nodes) {
-          if (n.name.toLowerCase().includes(term)) {
-            out.push({
-              id: n.id,
-              name: n.name,
-              depth,
-              hasChildren: false,
-              expanded: false,
-            });
-          }
-          if (n.children?.length) walk(n.children, depth + 1);
-        }
-      };
-      walk(tree, 0);
-      return out;
+      return flattenSearch(tree, term);
     }
-
-    // Navegação: respeita expandidos
-    const expanded = this.expandedIds();
-    const out: FlatNode[] = [];
-    const walk = (nodes: LocationNode[], depth: number): void => {
-      for (const n of nodes) {
-        const hasChildren = !!n.children?.length;
-        const isExpanded = expanded.has(n.id);
-        out.push({
-          id: n.id,
-          name: n.name,
-          depth,
-          hasChildren,
-          expanded: isExpanded,
-        });
-        if (hasChildren && isExpanded) walk(n.children!, depth + 1);
-      }
-    };
-    walk(tree, 0);
-    return out;
+    return flattenVisible(tree, this.expandedIds());
   });
 
   toggle(): void {

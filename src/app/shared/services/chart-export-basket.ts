@@ -1,5 +1,5 @@
 import { computed, Injectable, signal } from '@angular/core';
-import { ChartExportItem } from './pdf-export';
+import { ChartExportItem } from './pdf-export/pdf-expert.types';
 
 export interface SavedChart extends ChartExportItem {
   id: string;

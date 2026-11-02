@@ -4,16 +4,16 @@ import { Location as RouterLocation } from '@angular/common';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ContentLayout } from '@shared/layouts/content/content';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { LocationTreeSelect } from '@shared/domain/location/location-tree-select';
+import { LocationTreeSelect } from '@shared/domain/location/components/location-tree-select';
 import { ChipSelect } from '@shared/domain/monitoring/components/chip-select';
 import { Input } from '@shared/components/input/input';
 import { DeviceStore } from '@shared/domain/device/stores/device-store';
 import { LocationStore } from '@shared/domain/location/stores/location-store';
 import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
-import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
+import { DeviceMappingService } from '@shared/domain/device/services/mapping/device-mapping';
 import { DeviceFirmwareSection } from './device-firmware-section';
 import { ActuatorStore } from '@shared/domain/actuator/stores/actuator';
-import { ActuatorMappingService } from '@shared/domain/device/services/actuator-mapping';
+import { ActuatorMappingService } from '@shared/domain/device/services/mapping/actuator-mapping';
 import { forkJoin, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { DeviceMapping } from '@shared/interfaces/device-mapping';
 import { ActuatorMapping } from '@shared/interfaces/actuator-mapping';
@@ -112,6 +112,33 @@ export class DeviceForms implements OnInit {
   save(): void {
     if (this.deviceForm.invalid || this.submitting()) return;
 
+    this.submitting.set(true);
+
+    this.getSaveOperation()
+      .pipe(
+        tap({
+          next: () => this.notification.success(this.editing ? 'Updated successfully.' : 'Created successfully.'),
+          error: () => this.notification.error('Failed to save. Try again later.'),
+        }),
+      )
+      .subscribe({
+        next: (res) => {
+          this.submitting.set(false);
+          if (res.ok) {
+            this.routerLocation.back();
+          } else {
+            this.notification.error('Failed to save. Try again later.');
+          }
+        },
+        error: (err: unknown) => {
+          console.error('[DeviceForms] save failed', err);
+          this.submitting.set(false);
+          this.notification.error('Failed to save. Try again later.');
+        },
+      });
+  }
+
+  private getSaveOperation() {
     const v = this.deviceForm.getRawValue();
     const payload = {
       name: v.name!,
@@ -120,14 +147,11 @@ export class DeviceForms implements OnInit {
       id_enviroment: v.location!,
     };
 
-    this.submitting.set(true);
-
     const op$ = this.editing && this.deviceId
       ? this.deviceStore.update(this.deviceId, payload)
       : this.deviceStore.add(payload);
 
-    op$
-    .pipe(
+    return op$.pipe(
       switchMap((res) => {
         if (!res.ok) return of(res);
 
@@ -140,26 +164,7 @@ export class DeviceForms implements OnInit {
           map(() => res),
         );
       }),
-      tap({
-        next: () => this.notification.success(this.editing ? 'Updated successfully.' : 'Created successfully.'),
-        error: () => this.notification.error('Failed to save. Try again later.'),
-      }),
-    )
-    .subscribe({
-      next: (res) => {
-        this.submitting.set(false);
-        if (res.ok) {
-          this.routerLocation.back();
-        } else {
-          this.notification.error('Failed to save. Try again later.');
-        }
-      },
-      error: (err) => {
-        console.error('[DeviceForms] save failed', err);
-        this.submitting.set(false);
-        this.notification.error('Failed to save. Try again later.');
-      },
-    });
+    );
   }
 
   private saveMappings(deviceId: number, sensorIds: number[], actuatorIds: number[]): Observable<unknown> {

@@ -1,21 +1,9 @@
-import { computed, inject, Injectable } from '@angular/core';
-import { ActuatorMappingService } from '../services/actuator-mapping';
-import { rxResource } from '@angular/core/rxjs-interop';
+import { inject, Injectable } from '@angular/core';
+import { ActuatorMappingService } from '../services/mapping/actuator-mapping';
+import { MappingStore } from './mapping';
+import { ActuatorMapping } from '@shared/interfaces/actuator-mapping';
 
 @Injectable({ providedIn: 'root' })
-export class ActuatorMappingStore {
-  private readonly service = inject(ActuatorMappingService);
-
-  private readonly mappings = rxResource({
-    stream: () => this.service.getAllMappings(),
-  });
-
-  readonly items = computed(() => this.mappings.value() ?? []);
-  readonly loading = this.mappings.isLoading;
-  readonly error = this.mappings.error;
-  readonly loaded = computed(() => this.mappings.hasValue());
-
-  refresh(): void {
-    this.mappings.reload();
-  }
+export class ActuatorMappingStore extends MappingStore<ActuatorMapping> {
+  protected readonly service = inject(ActuatorMappingService);
 }

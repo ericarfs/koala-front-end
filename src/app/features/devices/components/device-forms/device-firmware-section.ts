@@ -8,6 +8,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { FirmwareService } from '@shared/domain/device/services/firmware';
 import { DeviceStore } from '@shared/domain/device/stores/device-store';
 import { Firmware, FirmwareUpdateProgress } from '@shared/interfaces/firmware';
+import { catchError, of, switchMap, throwError } from 'rxjs';
 
 @Component({
   selector: 'app-device-firmware-section',
@@ -184,32 +185,34 @@ export class DeviceFirmwareSection {
         { emitEvent: false },
       );
     });
-}
+  }
 
   updateFirmware(): void {
     const deviceId = this.deviceId();
-    const name = this.selectedName();
-    const version = this.selectedVersion();
+    const target = this.firmwares().find(
+      (f) => f.name === this.selectedName() && f.version === this.selectedVersion()
+    );
 
-    const target = this.firmwares().find((f) => f.name === name && f.version === version);
     if (!target) return;
 
     this.progress.set({ status: 'progress', message: '0' });
 
-    this.firmwareService.updateDeviceFirmware(deviceId, target.id).subscribe({
-      next: (res) => {
+    this.firmwareService.updateDeviceFirmware(deviceId, target.id).pipe(
+      switchMap((res) => {
         if (res.status !== 'ok' || !res.sessionId) {
-          this.progress.set({ status: 'error', message: res.message });
-          return;
+          return throwError(() => new Error(res.message));
         }
-        this.firmwareService.deviceUpdateProgress(res.sessionId).subscribe({
-          next: (p) => this.progress.set(p),
-          error: () => this.progress.set({ status: 'error', message: 'SSE failed' }),
-        });
-      },
-      error: () => {
-        this.progress.set({ status: 'error', message: 'Update failed' });
-      },
+        return this.firmwareService.deviceUpdateProgress(res.sessionId);
+      }),
+      catchError((err) => {
+        const message = err instanceof Error ? err.message : 'Update failed';
+        this.progress.set({ status: 'error', message });
+        return of(null);
+      })
+    ).subscribe({
+      next: (progress) => {
+        if (progress) this.progress.set(progress);
+      }
     });
   }
 }

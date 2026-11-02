@@ -1,21 +1,19 @@
 import { Component, computed, effect, inject, input, untracked } from '@angular/core';
-import { of, switchMap, tap, throwError } from 'rxjs';
 import { LocationCard } from '@features/location/components/location-card';
 import { ContentLayout } from '@shared/layouts/content/content';
 import { Paginator } from '@shared/components/pagination/paginator';
-import { DialogService } from '@shared/components/dialogs/dialogs.service';
-import { LocationStore, MutationError } from '@shared/domain/location/stores/location-store';
-import { getChildren } from '@shared/domain/location/location-tree';
+import { LocationStore } from '@shared/domain/location/stores/location-store';
+import { getChildren } from '@shared/domain/location/components/location-tree';
 import { paginate } from '@shared/utils/paginate';
 import { Location } from '@shared/interfaces/location';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { LocationTreeSelect } from '@shared/domain/location/location-tree-select';
+import { LocationTreeSelect } from '@shared/domain/location/components/location-tree-select';
 import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
 import { LocationStatsStore } from '@shared/domain/location/stores/location-stats-store';
 import { LocationCardSkeleton } from '@features/location/components/location-card-skeleton';
-import { NotificationService } from '@shared/services/notification';
+import { LocationActions } from '@features/location/components/location-actions';
 
 
 @Component({
@@ -29,8 +27,7 @@ import { NotificationService } from '@shared/services/notification';
 })
 export class LocationList {
   private readonly deviceTypeStore = inject(DeviceTypeStore);
-  private readonly formDialog = inject(DialogService);
-  private readonly notification = inject(NotificationService);
+  private readonly actions = inject(LocationActions);
 
   readonly statsStore = inject(LocationStatsStore);
   readonly store = inject(LocationStore);
@@ -85,62 +82,6 @@ export class LocationList {
   }
 
   newLocation(): void {
-    this.openDialog();
-  }
-
-  private openDialog(): void {
-    this.formDialog
-      .open<Location>({
-        title: 'LOCATIONS.ADD.TITLE',
-        subtitle: 'LOCATIONS.ADD.SUBTITLE',
-        submitLabel: 'COMMON.ACTIONS.CREATE',
-        fields: [
-          {
-            key: 'name',
-            label: 'COMMON.FORM.NAME',
-            placeholder: 'COMMON.FORM.NAME_PLACEHOLDER',
-            required: true
-          },
-          {
-            key: 'description',
-            label: 'COMMON.FORM.DESCRIPTION',
-            placeholder: 'COMMON.FORM.DESCRIPTION_PLACEHOLDER',
-            type: 'textarea',
-            rows: 4
-          },
-        ],
-
-        onSubmit: (values) => {
-          const v = values as { name: string; description?: string };
-
-          const draft: Omit<Location, 'id'> = {
-            name: v.name,
-            description: v.description ?? '',
-            parentId: null,
-          } as Omit<Location, 'id'>;
-
-          return this.store.add(draft).pipe(
-            switchMap((res) =>
-              res.ok
-                ? of(res.data)
-                : throwError(() => this.toErrorMessage(res.reason)),
-            ),
-            tap({
-              next: () => this.notification.success('Created successfully.'),
-              error: () => this.notification.error('Failed to save. Try again later.'),
-            }),
-          );
-        },
-      })
-      .closed.subscribe();
-  }
-
-  private toErrorMessage(reason: MutationError): string {
-    switch (reason) {
-      case 'MAX_DEPTH_EXCEEDED':
-        return 'LOCATIONS.ERRORS.MAX_DEPTH';
-      case 'INVALID_PARENT':
-        return 'LOCATIONS.ERRORS.INVALID_PARENT';
-    }
+    this.actions.openCreate();
   }
 }

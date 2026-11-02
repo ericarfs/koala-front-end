@@ -1,6 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Dialog } from '@angular/cdk/dialog';
-import { Overlay } from '@angular/cdk/overlay';
+import { Dialog, DialogRef } from '@angular/cdk/dialog';
 import { FormDialogData } from './entity-form-dialog/entity-form-dialog.types';
 import { FormDialog } from './entity-form-dialog/entity-form-dialog';
 import { ConfirmDialog, ConfirmDialogData } from './confirm-dialog/confirm-dialog';
@@ -8,41 +7,25 @@ import { ConfirmDialog, ConfirmDialogData } from './confirm-dialog/confirm-dialo
 @Injectable({ providedIn: 'root' })
 export class DialogService {
   private readonly dialog = inject(Dialog);
-  private readonly overlay = inject(Overlay);
 
-  open<T = unknown>(data: FormDialogData<T>) {
-  return this.dialog.open<FormDialog, FormDialogData<T>>(
-    FormDialog,
-      {
-        width: '480px',
-        maxWidth: '90vw',
-        maxHeight: '90vh',
-        data,
-        backdropClass: 'bg-black/50',
-        positionStrategy: this.overlay
-          .position()
-          .global()
-          .centerHorizontally()
-          .centerVertically(),
-      },
-    );
+  open<T = unknown>(data: FormDialogData<T>): DialogRef<FormDialog> {
+    return this.openWithDefaults(FormDialog, data);
   }
 
-  openConfirm(data: ConfirmDialogData) {
-  return this.dialog.open<ConfirmDialog, ConfirmDialogData>(
-    ConfirmDialog,
-      {
-        width: '480px',
-        maxWidth: '90vw',
-        maxHeight: '90vh',
-        data,
-        backdropClass: 'bg-black/50',
-        positionStrategy: this.overlay
-          .position()
-          .global()
-          .centerHorizontally()
-          .centerVertically(),
-      },
-    );
+  openConfirm(data: ConfirmDialogData): DialogRef<ConfirmDialog> {
+    return this.openWithDefaults(ConfirmDialog, data);
+  }
+
+  private openWithDefaults<TComp, TData>(
+    component: new (...args: unknown[]) => TComp,
+    data: TData,
+  ): DialogRef<TComp> {
+    return this.dialog.open<TComp, TData>(component, {
+      width: '480px',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      data,
+      backdropClass: 'cdk-overlay-dark-backdrop',
+    });
   }
 }

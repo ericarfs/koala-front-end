@@ -3,7 +3,7 @@ import { Component, inject, input } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ActionButtons } from '@shared/components/action-buttons/action-buttons';
 import { Device } from '@shared/interfaces/device';
-import { DeviceMappingService } from '../services/device-mapping';
+import { DeviceMappingService } from '../services/mapping/device-mapping';
 import { rxResource} from '@angular/core/rxjs-interop';
 import { of } from 'rxjs';
 import { DeviceType } from '@shared/interfaces/device-type';

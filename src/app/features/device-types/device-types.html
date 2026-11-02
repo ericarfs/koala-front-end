@@ -42,7 +42,7 @@
               [deleteMessageKey]="'SENSORS.DELETE.CONFIRM'"
               [deleteMessageParams]="{ name: sensor.name }"
               (edit)="updateSensor(sensor)"
-              (delete)="deleteSensor(sensor)"
+              (delete)="deleteSensor(sensor.id)"
             />
           </div>
           <div class="break-all">

@@ -1,5 +1,5 @@
 import { TimeBucket, timeBucketLabel } from '@shared/domain/monitoring/models/time-bucket';
-import { ChartExportInfo } from '@shared/services/pdf-export';
+import { ChartExportInfo } from '@shared/services/pdf-export/pdf-expert.types';
 
 
 interface Named {

@@ -19,7 +19,7 @@
       "INTERVAL": "Intervalo",
       "DEVICE_TYPES": "Sensores",
       "DEVICES": "Dispositivos (opcional)",
-      "EMPTY":"Nenhum resultado"
+      "EMPTY": "Nenhum resultado"
     },
     "PLACEHOLDERS": {
       "SELECT_LOCATION": "Selecione um ambiente",
@@ -30,11 +30,11 @@
       "TO": "Até"
     },
     "EMPTY": {
-      "DASHBOARD":"Selecione um ambiente e ao menos um sensor, depois clique em Pesquisar",
-      "DEVICES":"Selecione ao menos um sensor e clique em Pesquisar"
+      "DASHBOARD": "Selecione um ambiente e ao menos um sensor, depois clique em Pesquisar",
+      "DEVICES": "Selecione ao menos um sensor e clique em Pesquisar"
     },
-    "REPORT":{
-      "ACTIONS":{
+    "REPORT": {
+      "ACTIONS": {
         "ADD_TO_REPORT": "Adicionar ao relatório"
       },
       "COUNT": "Relatório ({{count}})"
@@ -64,16 +64,17 @@
       "CANCEL": "Cancelar",
       "DELETE": "Excluir",
       "CLEAR": "Limpar",
+      "SEND": "Enviar",
       "CONFIRM": "Confirmar",
       "EDIT": "Editar",
       "BACK": "Voltar",
       "CLOSE": "Fechar",
       "SEARCH": "Pesquisar",
       "EXPORT": "Exportar",
-      "CONFIRM_DELETE":"Tem certeza que deseja excluir?",
-      "LOGIN":"Entrar",
-      "GUEST_LOGIN":"Entrar como convidado",
-      "ACCESS":"Acesse sua conta"
+      "CONFIRM_DELETE": "Tem certeza que deseja excluir?",
+      "LOGIN": "Entrar",
+      "GUEST_LOGIN": "Entrar como convidado",
+      "ACCESS": "Acesse sua conta"
     },
     "FORM": {
       "NAME": "Nome",
@@ -86,26 +87,37 @@
       "PASSWORD": "Senha",
       "PASSWORD_PLACEHOLDER": "Insira a senha",
       "CONFIRM_PASSWORD": "Confirmar senha",
-      "FILE":{
-        "TITLE":"Arquivo",
-        "DRAG_FILE":"Arraste o arquivo aqui",
-        "OR":"ou",
-        "CHOOSE_FILE":"Selecione um arquivo",
-        "NO_FILE":"Nenhum arquivo escolhido",
-        "HELPER":"Clique aqui para trocar o arquivo"
+      "FILE": {
+        "TITLE": "Arquivo",
+        "DRAG_FILE": "Arraste o arquivo aqui",
+        "OR": "ou",
+        "CHOOSE_FILE": "Selecione um arquivo",
+        "NO_FILE": "Nenhum arquivo escolhido",
+        "HELPER": "Clique aqui para trocar o arquivo"
       },
-      "ICON":"Ícone",
-      "ICON_PLACEHOLDER":"(Font Awesome) Ex: fa-user",
-      "INVALID":"Formulário inválido. Preencha todos os campos."
+      "ICON": "Ícone",
+      "ICON_PLACEHOLDER": "(Font Awesome) Ex: fa-user",
+      "INVALID": "Formulário inválido. Preencha todos os campos."
     },
     "STATES": {
-      "LOGIN":"Entrando...",
+      "LOGIN": "Entrando...",
       "LOADING": "Carregando...",
       "SENDING": "Enviando...",
       "SEARCHING": "Buscando...",
       "ADDED": "Adicionado",
       "EMPTY": "Nenhum item encontrado",
-      "ERROR":"Não foi possível carregar os dados. Tente novamente."
+      "ERROR": "Não foi possível carregar os dados. Tente novamente."
+    },
+    "TOASTS": {
+      "CREATED": "Criado com sucesso.",
+      "UPDATED": "Atualizado com sucesso.",
+      "DELETED": "Excluído com sucesso.",
+      "SAVE_FAILED": "Falha ao salvar. Tente novamente mais tarde.",
+      "DELETE_FAILED": "Falha ao excluir. Tente novamente mais tarde."
+    },
+    "ERRORS": {
+      "NOT_FOUND": "Não encontrado.",
+      "GENERIC": "Ocorreu um erro. Tente novamente."
     },
     "VALIDATION": {
       "REQUIRED": "Este campo é obrigatório"
@@ -123,7 +135,7 @@
       "LIGHT_MODE": "Modo Claro",
       "DARK_MODE": "Modo Escuro"
     },
-      "FONT_SIZE": {
+    "FONT_SIZE": {
       "NORMAL": "normal",
       "LARGE": "grande",
       "EXTRA_LARGE": "muito grande",
@@ -187,7 +199,7 @@
       "CONFIRM": "Tem certeza que deseja excluir este dispositivo?"
     },
     "DETAILS": {
-      "NOT_FOUND":"Dispositivo não encontrado."
+      "NOT_FOUND": "Dispositivo não encontrado."
     },
     "FIRMWARE": {
       "TITLE": "Firmware",
@@ -218,7 +230,7 @@
       "CONFIRM": "Tem certeza que deseja excluir o ambiente '{{name}}'?"
     },
     "DETAILS": {
-      "LOCATIONS":"locais",
+      "LOCATIONS": "locais",
       "SUB_LOCATIONS": "Sub-ambientes ({{count}})",
       "SUB_LOCATIONS_COUNT": "{{count}} locais",
       "VIEW_DEVICES": "Ver dispositivos",
@@ -229,6 +241,10 @@
       "DEVICES": "dispositivos",
       "ONLINE": "online",
       "OFFLINE": "offline"
+    },
+    "ERRORS": {
+      "MAX_DEPTH": "Profundidade máxima da hierarquia excedida.",
+      "INVALID_PARENT": "Ambiente pai inválido."
     }
   },
 
@@ -289,20 +305,28 @@
     "LOGOUT": "Sair"
   },
 
-  "OTA":{
+  "OTA": {
     "TITLE": "Atualização OTA",
-    "NAME":"Nome da atualização",
-    "NAME_HELPER":"Digite o nome",
-    "COMPILER":"Compilador",
-    "COMPILER_HELPER":"Selecione o compilador",
-    "COMPILATION_COMPLETED":"Compilação concluída com sucesso.",
-    "ERRORS":{
+    "NAME": "Nome da atualização",
+    "NAME_HELPER": "Digite o nome",
+    "COMPILER": "Compilador",
+    "COMPILER_HELPER": "Selecione o compilador",
+    "COMPILATION_COMPLETED": "Compilação concluída com sucesso.",
+    "ERRORS": {
       "UPLOAD_FAILED": "Falha ao enviar o arquivo. Verifique sua conexão e tente novamente.",
       "LOGS_FAILED": "Falha ao receber os logs de compilação. A conexão foi interrompida."
     }
   },
 
-  "DEVICE_CONTROL":{
-    "TITLE": "Controle de Dispositivos"
+  "DEVICE_CONTROL": {
+    "TITLE": "Controle de Dispositivos",
+    "TARGET_TEMP": "Temperatura alvo",
+    "MODE": "Modo",
+    "POWER_ON": "Ligado",
+    "POWER_OFF": "Desligado",
+    "ERRORS": {
+      "MISSING_LOCATION": "Ambiente não informado.",
+      "SEND_FAILED": "Não foi possível enviar o comando."
+    }
   }
 }

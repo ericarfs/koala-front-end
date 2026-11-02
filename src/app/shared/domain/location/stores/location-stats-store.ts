@@ -3,10 +3,10 @@ import {tap } from 'rxjs';
 import { LocationStore } from './location-store';
 import { DeviceStore } from '@shared/domain/device/stores/device-store';
 import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
-import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
+import { DeviceMappingService } from '@shared/domain/device/services/mapping/device-mapping';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DeviceMapping } from '@shared/interfaces/device-mapping';
-import { getLocationStats, LocationStats } from '../location-stats';
+import { getLocationStats, LocationStats } from '../components/location-stats';
 
 @Injectable({ providedIn: 'root' })
 export class LocationStatsStore {

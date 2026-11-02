@@ -5,8 +5,23 @@ export interface LocationNode extends Location {
   depth: number;
 }
 
-// ─── Constantes ────────────────────────────────────────────────
 export const MAX_DEPTH = 7;
+
+// ─── Helpers de O(1) ───────────────────────────────────────────
+function mapById(list: Location[]): Map<number, Location> {
+  return new Map(list.map(l => [l.id, l]));
+}
+
+function mapChildren(list: Location[]): Map<number, Location[]> {
+  const map = new Map<number, Location[]>();
+  for (const l of list) {
+    if (l.parentId != null) {
+      if (!map.has(l.parentId)) map.set(l.parentId, []);
+      map.get(l.parentId)!.push(l);
+    }
+  }
+  return map;
+}
 
 // ─── Construção da árvore ──────────────────────────────────────
 export function buildTree(list: Location[]): LocationNode[] {
@@ -32,38 +47,8 @@ export function flattenTree(nodes: LocationNode[]): LocationNode[] {
 }
 
 // ─── Caminhos / busca ──────────────────────────────────────────
-export function getPath(id: number, list: Location[]): string {
-  const byId = new Map(list.map(l => [l.id, l]));
-  const parts: string[] = [];
-  let current = byId.get(id);
-  while (current) {
-    parts.unshift(current.name);
-    current = current.parentId != null ? byId.get(current.parentId) : undefined;
-  }
-  return parts.join(' › ');
-}
-
-export function getDescendantIds(id: number, list: Location[]): Set<number> {
-  const result = new Set<number>([id]);
-  let added = true;
-  while (added) {
-    added = false;
-    for (const l of list) {
-      if (l.parentId != null && result.has(l.parentId) && !result.has(l.id)) {
-        result.add(l.id);
-        added = true;
-      }
-    }
-  }
-  return result;
-}
-
-export function getChildren(parentId: number | null, list: Location[]): Location[] {
-  return list.filter(l => (l.parentId ?? null) === parentId);
-}
-
 export function getAncestors(id: number, list: Location[]): Location[] {
-  const byId = new Map(list.map(l => [l.id, l]));
+  const byId = mapById(list);
   const chain: Location[] = [];
   let current = byId.get(id);
   while (current) {
@@ -73,16 +58,25 @@ export function getAncestors(id: number, list: Location[]): Location[] {
   return chain;
 }
 
+/** Reutiliza getAncestors (mata o clone de 85%) */
+export function getPath(id: number, list: Location[]): string {
+  return getAncestors(id, list).map(l => l.name).join(' › ');
+}
+
+export function getChildren(parentId: number | null, list: Location[]): Location[] {
+  return list.filter(l => (l.parentId ?? null) === parentId);
+}
+
 export function getActionLabel(id: number, list: Location[]): string {
   const count = getChildren(id, list).length;
   if (count === 0) return 'Ver dispositivos';
   return count === 1 ? '1 local' : `${count} locais`;
 }
 
-// ─── Regras de profundidade (MAX_DEPTH) ────────────────────────  ← AQUI
-/** Profundidade do nó (raiz = 0). */
+// ─── Regras de profundidade (Otimizadas) ───────────────────────
+
 export function getDepth(id: number, list: Location[]): number {
-  const byId = new Map(list.map((l) => [l.id, l]));
+  const byId = mapById(list);
   let depth = 0;
   let current = byId.get(id);
   while (current?.parentId != null) {
@@ -92,27 +86,38 @@ export function getDepth(id: number, list: Location[]): number {
   return depth;
 }
 
-/** Altura da subárvore com raiz em `id` (folha = 0). */
+export function getDescendantIds(id: number, list: Location[]): Set<number> {
+  const childrenMap = mapChildren(list);
+  const result = new Set<number>();
+  const queue = [id];
+
+  while (queue.length) {
+    const currentId = queue.pop()!;
+    result.add(currentId);
+    const children = childrenMap.get(currentId) || [];
+    for (const c of children) queue.push(c.id);
+  }
+  return result;
+}
+
 export function getSubtreeHeight(id: number, list: Location[]): number {
+  const childrenMap = mapChildren(list);
   let max = 0;
-  const walk = (pid: number, d: number): void => {
-    for (const c of list) {
-      if (c.parentId === pid) {
-        if (d > max) max = d;
-        walk(c.id, d + 1);
-      }
-    }
+
+  const walk = (pid: number, d: number) => {
+    const children = childrenMap.get(pid) || [];
+    if (d > max) max = d;
+    for (const c of children) walk(c.id, d + 1);
   };
+
   walk(id, 1);
   return max;
 }
 
-/** Pode inserir um filho direto em `parentId` sem estourar MAX_DEPTH? */
 export function canAddChild(parentId: number, list: Location[]): boolean {
   return getDepth(parentId, list) + 1 < MAX_DEPTH;
 }
 
-/** Pode mover `id` (e sua subárvore) para debaixo de `newParentId`? */
 export function canReparent(
   id: number,
   newParentId: number | null,

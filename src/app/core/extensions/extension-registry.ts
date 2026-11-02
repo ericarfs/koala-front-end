@@ -43,17 +43,57 @@ export class ExtensionRegistryService {
       .filter((m) => !m.adminOnly || isAdmin)
       .sort((a, b) => (a.order ?? 100) - (b.order ?? 100));
 
+    const { topLevelItems, groupContributions } = this.groupModules(sortedModules);
+
+    const monitoringGroup = this.buildGroupItem(
+      'monitoring', 'MENU.MONITORING', 'fa-solid fa-chart-line',
+      this.monitoringBaseItems, groupContributions.get('monitoring')
+    );
+
+    const settingsGroup = this.buildGroupItem(
+      'settings', 'MENU.SETTINGS', 'fa-solid fa-gear',
+      this.settingsBaseItems, groupContributions.get('settings')
+    );
+
+    const settings = isAdmin ? [settingsGroup] : [];
+    return [monitoringGroup, ...topLevelItems, ...settings];
+  }
+
+  buildRoutes(): Route[] {
+    return this.modules.map((m): Route => ({
+      path: m.routePath,
+      ...(m.adminOnly ? { canActivate: [adminGuard] } : {}),
+      ...(m.loadChildren
+        ? { loadChildren: m.loadChildren }
+        : { loadComponent: m.loadComponent }),
+    }));
+  }
+
+
+  private groupModules(modules: KoalaModuleDefinition[]) {
     const topLevelItems: MenuItem[] = [];
     const groupContributions = new Map<string, MenuItem[]>();
 
+    for (const m of modules) {
+      const item = this.mapModuleToMenuItem(m);
+      if (m.menuGroup) {
+        const list = groupContributions.get(m.menuGroup) ?? [];
+        list.push(item);
+        groupContributions.set(m.menuGroup, list);
+      } else {
+        topLevelItems.push(item);
+      }
+    }
+    return { topLevelItems, groupContributions };
+  }
 
-    for (const m of sortedModules) {
-      const item: MenuItem = {
-        id: m.id,
-        labelKey: m.label,
-        routerLink: `/${m.routePath}`,
-        icon: m.icon ?? 'fa-solid fa-puzzle-piece',
-        order: m.order,
+  private mapModuleToMenuItem(m: KoalaModuleDefinition): MenuItem {
+    return {
+      id: m.id,
+      labelKey: m.label,
+      routerLink: `/${m.routePath}`,
+      icon: m.icon ?? 'fa-solid fa-puzzle-piece',
+      order: m.order,
       subItems: (m.subItems ?? []).map((s) => ({
         id: s.id,
         labelKey: s.label,
@@ -62,49 +102,16 @@ export class ExtensionRegistryService {
         subItems: [],
       })),
     };
-
-    if (m.menuGroup) {
-        const list = groupContributions.get(m.menuGroup) ?? [];
-        list.push(item);
-        groupContributions.set(m.menuGroup, list);
-      } else {
-        topLevelItems.push(item);
-      }
-    }
-
-    const mergeGroup = (base: MenuItem[], groupId: string): MenuItem[] =>
-      [...base, ...(groupContributions.get(groupId) ?? [])].sort(
-        (a, b) => (a.order ?? 100) - (b.order ?? 100)
-      );
-
-    const monitoringGroup: MenuItem = {
-      id: 'monitoring',
-      labelKey: 'MENU.MONITORING',
-      routerLink: '',
-      icon: 'fa-solid fa-chart-line',
-      subItems: mergeGroup(this.monitoringBaseItems, 'monitoring'),
-    };
-
-    const settingsGroup: MenuItem = {
-      id: 'settings',
-      labelKey: 'MENU.SETTINGS',
-      routerLink: '',
-      icon: 'fa-solid fa-gear',
-      subItems: mergeGroup(this.settingsBaseItems, 'settings'),
-    };
-
-    const settings = this.permissions.isAdmin() ? [settingsGroup] : [];
-    return [monitoringGroup, ...topLevelItems, ...settings];
   }
 
-  buildRoutes(): Route[] {
-    return this.modules.map((m): Route => ({
-      path: m.routePath,
-     ...(m.adminOnly ? { canActivate: [adminGuard] } : {}),
-      ...(m.loadChildren
-        ? { loadChildren: m.loadChildren }
-        : { loadComponent: m.loadComponent }),
-    }));
+  private buildGroupItem(
+    id: string, labelKey: string, icon: string,
+    baseItems: MenuItem[], contributions?: MenuItem[]
+  ): MenuItem {
+    const merged = [...baseItems, ...(contributions ?? [])].sort(
+      (a, b) => (a.order ?? 100) - (b.order ?? 100)
+    );
+    return { id, labelKey, routerLink: '', icon, subItems: merged };
   }
 
   private validate(defs: KoalaModuleDefinition[]): KoalaModuleDefinition[] {

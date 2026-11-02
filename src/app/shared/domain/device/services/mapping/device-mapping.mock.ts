@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { delay, Observable, of } from 'rxjs';
 import { DeviceMappingService } from './device-mapping';
 import { DeviceMapping } from '@shared/interfaces/device-mapping';
-import { DEVICE_MAPPINGS_MOCK } from '../../../../mocks/device-mapping';
+import { DEVICE_MAPPINGS_MOCK } from '../../../../../mocks/device-mapping';
 
 const FAKE_LATENCY_MS = 300;
 

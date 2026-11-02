@@ -4,12 +4,13 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DeviceList } from '@shared/domain/device/components/device-list';
 import { Input } from '@shared/components/input/input';
-import { LocationTreeSelect } from '@shared/domain/location/location-tree-select';
+import { LocationTreeSelect } from '@shared/domain/location/components/location-tree-select';
 import { Device } from '@shared/interfaces/device';
-import { getDescendantIds, getPath } from '@shared/domain/location/location-tree';
+import { getDescendantIds, getPath } from '@shared/domain/location/components/location-tree';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { DeviceStore } from '@shared/domain/device/stores/device-store';
 import { LocationStore } from '@shared/domain/location/stores/location-store';
+import { Location } from '@shared/interfaces/location';
 
 
 @Component({
@@ -46,28 +47,32 @@ export class DevicesList {
   devices = computed(() => {
     const { name, deviceLocation, deviceStatus } = this.filters();
     const locations = this.locationStore.items();
+
     let filtered = this.deviceStore.items();
-
-    if (name?.trim()) {
-      const needle = name.trim().toLowerCase();
-      filtered = filtered.filter((d) => d.name?.toLowerCase().includes(needle));
-    }
-
-    if (deviceLocation) {
-      const ids = getDescendantIds(Number(deviceLocation), locations);
-      filtered = filtered.filter(
-        (d) => d.id_enviroment != null && ids.has(d.id_enviroment),
-      );
-    }
-
-    if (deviceStatus === '1') {
-      filtered = filtered.filter((d) => d.available);
-    } else if (deviceStatus === '2') {
-      filtered = filtered.filter((d) => !d.available);
-    }
+    filtered = this.filterByName(filtered, name);
+    filtered = this.filterByLocation(filtered, deviceLocation, locations);
+    filtered = this.filterByStatus(filtered, deviceStatus);
 
     return filtered;
   });
+
+  private filterByName(devices: Device[], term: string | null | undefined): Device[] {
+    if (!term?.trim()) return devices;
+    const needle = term.trim().toLowerCase();
+    return devices.filter((d) => d.name?.toLowerCase().includes(needle));
+  }
+
+  private filterByLocation(devices: Device[], locationId: number | null | undefined, locations: Location[]): Device[] {
+    if (!locationId) return devices;
+    const ids = getDescendantIds(Number(locationId), locations);
+    return devices.filter((d) => d.id_enviroment != null && ids.has(d.id_enviroment));
+  }
+
+  private filterByStatus(devices: Device[], status: string | null | undefined): Device[] {
+    if (status === '1') return devices.filter((d) => d.available);
+    if (status === '2') return devices.filter((d) => !d.available);
+    return devices;
+  }
 
   setStatus(value: string): void {
     this.searchForms.patchValue({ deviceStatus: value });

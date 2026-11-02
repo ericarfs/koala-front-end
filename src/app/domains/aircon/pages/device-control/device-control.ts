@@ -7,7 +7,7 @@ import { AirconMode, AirconParameters } from './control-form-dialog.types';
 import { finalize } from 'rxjs';
 import { ActuatorService } from '@shared/domain/actuator/services/actuator';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { LocationTreeSelect } from '@shared/domain/location/location-tree-select';
+import { LocationTreeSelect } from '@shared/domain/location/components/location-tree-select';
 
 const MIN_TEMP = 16;
 const MAX_TEMP = 27;

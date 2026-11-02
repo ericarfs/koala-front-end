@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal, viewChild } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { ChartExportInfo, ChartExportItem, computeSensorStats, PdfExportService, SensorStats } from '@shared/services/pdf-export';
+import { PdfExportService } from '@shared/services/pdf-export/pdf-export';
 import { TimeSeriesChart } from './time-series-chart';
 import { ChartData } from '../models/chart-data';
 import { ChartExportBasket } from '@shared/services/chart-export-basket';
+import { ChartExportInfo, ChartExportItem, SensorStats } from '@shared/services/pdf-export/pdf-expert.types';
+import { computeSensorStats } from '@shared/services/pdf-export/pdf-export.utils';
 
 @Component({
   selector: 'app-chart-panel',

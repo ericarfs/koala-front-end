@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { getDescendantIds, getPath } from '@shared/domain/location/location-tree';
-import { LocationTreeSelect } from '@shared/domain/location/location-tree-select';
+import { getDescendantIds, getPath } from '@shared/domain/location/components/location-tree';
+import { LocationTreeSelect } from '@shared/domain/location/components/location-tree-select';
 import { ContentLayout } from '@shared/layouts/content/content';
-import { DeviceMappingService } from '@shared/domain/device/services/device-mapping';
+import { DeviceMappingService } from '@shared/domain/device/services/mapping/device-mapping';
 import { Subscription } from 'rxjs';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ChipOption, ChipSelect } from '@shared/domain/monitoring/components/chip-select';
@@ -14,11 +14,13 @@ import { ChartPanel } from '@shared/domain/monitoring/components/chart-panel';
 import { DEFAULT_TIME_BUCKET, TIME_BUCKET_OPTIONS, TimeBucket } from '@shared/domain/monitoring/models/time-bucket';
 import { IntervalSelector } from '@shared/domain/monitoring/components/interval-selector';
 import { SearchButton } from '@shared/domain/monitoring/components/search-button';
-import { ChartExportInfo, localeFromLang } from '@shared/services/pdf-export';
-import { buildChartInfo } from '@shared/utils/chart-exports-info';
+import { buildChartInfo } from '@shared/domain/monitoring/utils/chart-exports-info';
 import { DeviceStore } from '@shared/domain/device/stores/device-store';
 import { LocationStore } from '@shared/domain/location/stores/location-store';
 import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
+import { buildChartSubtitle, ChartType, parseDateRange } from '@shared/domain/monitoring/utils/chart-form';
+import { ChartExportInfo } from '@shared/services/pdf-export/pdf-expert.types';
+import { localeFromLang } from '@shared/services/pdf-export/pdf-export.utils';
 
 
 
@@ -121,32 +123,15 @@ export class Dashboard {
 
   search(): void {
     const { location, timeBucket, fromDate, toDate } = this.filterForm.getRawValue();
-    const types = this.selectedTypes().map(id => ({ id, name: this.typeName(id) }));
+    const types = this.getSelectedTypes();
+
     if (location == null || types.length === 0 || this.filterForm.invalid) return;
 
-    const start = fromDate ? new Date(fromDate) : null;
-    const end = toDate ? new Date(toDate) : new Date();
-    end.setHours(23, 59, 59);
-
-    // Dispositivos só valem com 1 tipo (o store ignora com 2, mas aqui já fica explícito)
-    const selected = this.selectedDevices();
-    const devices = types.length === 1
-      ? this.availableDevices().filter(d => selected.includes(d.id))
-      : [];
-
+    const { start, end } = parseDateRange(fromDate, toDate);
+    const devices = this.getSelectedDevices(types);
     const locationPath = getPath(location, this.locationStore.items());
 
-    this.chartTitle.set(locationPath);
-    this.chartSubtitle.set(this.buildSubtitle(types, devices));
-    this.chartInfo.set(buildChartInfo({
-      location: locationPath,
-      sensors: types,
-      devices,
-      timeBucket,
-      start,
-      end,
-      locale: localeFromLang(this.transloco.getActiveLang()),
-    }));
+    this.updateChartDisplay(locationPath, types, devices, timeBucket, start, end);
 
     this.store.load({
       base: { idEnviroment: location, startDate: start, endDate: end, timeBucket },
@@ -155,12 +140,36 @@ export class Dashboard {
     });
   }
 
-  private buildSubtitle(types: { name: string }[], devices: unknown[]): string {
-    if (types.length > 1) return types.map(t => t.name).join(' × ');
-    if (devices.length > 0) {
-      return `${types[0].name} — ${devices.length} dispositivo${devices.length > 1 ? 's' : ''}`;
-    }
-    return types[0].name;
+  private getSelectedTypes(): ChartType[] {
+    return this.selectedTypes().map(id => ({ id, name: this.typeName(id) }));
+  }
+
+  private getSelectedDevices(types: ChartType[]): ChipOption[] {
+    if (types.length !== 1) return [];
+    const selected = this.selectedDevices();
+    return this.availableDevices().filter(d => selected.includes(d.id));
+  }
+
+  private updateChartDisplay(
+    locationPath: string,
+    types: ChartType[],
+    devices: ChipOption[],
+    timeBucket: TimeBucket,
+    start: Date | null,
+    end: Date
+  ): void {
+    this.chartTitle.set(locationPath);
+    this.chartSubtitle.set(buildChartSubtitle(types, devices));
+
+    this.chartInfo.set(buildChartInfo({
+      location: locationPath,
+      sensors: types,
+      devices: devices,
+      timeBucket,
+      start,
+      end,
+      locale: localeFromLang(this.transloco.getActiveLang()),
+    }));
   }
 
   private typeName(id: number): string {

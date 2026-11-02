@@ -1,15 +1,13 @@
 import { Component, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Location } from '@shared/interfaces/location';
-import { LocationStats } from '@shared/domain/location/location-stats';
+import { LocationStats } from '@shared/domain/location/components/location-stats';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CommonModule } from '@angular/common';
 import { ActionButtons } from '@shared/components/action-buttons/action-buttons';
-import { DialogService } from '@shared/components/dialogs/dialogs.service';
-import { LocationStore, MutationError } from '@shared/domain/location/stores/location-store';
-import { finalize, of, switchMap, tap, throwError } from 'rxjs';
+import { finalize, noop } from 'rxjs';
 import { LocationStatsSkeleton } from './location-stats-skeleton';
-import { NotificationService } from '@shared/services/notification';
+import { LocationActions } from '@features/location/components/location-actions';
 
 @Component({
   selector: 'app-location-card',
@@ -113,13 +111,9 @@ import { NotificationService } from '@shared/services/notification';
   `,
 })
 export class LocationCard {
-  private readonly formDialog = inject(DialogService);
-  private readonly notification = inject(NotificationService);
-
-  private readonly store = inject(LocationStore);
+  private readonly actions = inject(LocationActions);
 
   readonly stats = input<LocationStats | null >(null);
-
   readonly location = input.required<Location>();
   readonly actionLabel = input('Ver dispositivos');
   readonly statsLoading = input(false);
@@ -127,83 +121,16 @@ export class LocationCard {
   readonly deleting = signal(false);
 
   onEdit(): void {
-    const location = this.location();
-    const editingId = location.id;
-
-    this.formDialog
-      .open<Location>({
-        title: 'LOCATIONS.EDIT.TITLE',
-        subtitle: 'LOCATIONS.EDIT.SUBTITLE',
-        submitLabel: 'COMMON.ACTIONS.SAVE',
-        fields: [
-        {
-          key: 'name',
-          label: 'COMMON.FORM.NAME',
-          placeholder: 'COMMON.FORM.NAME_PLACEHOLDER',
-          required: true
-        },
-        {
-          key: 'description',
-          label: 'COMMON.FORM.DESCRIPTION',
-          placeholder: 'COMMON.FORM.DESCRIPTION_PLACEHOLDER',
-          type: 'textarea',
-          rows: 4
-        },
-        ],
-        initialValues: { name: location.name, description: location.description },
-        onSubmit: (values) => {
-          const v = values as { name: string; description?: string };
-
-          const patch: Partial<Location> = {
-            name: v.name,
-            description: v.description ?? '',
-          };
-
-          return this.store.update(editingId, patch).pipe(
-            switchMap((res) =>
-              res.ok
-              ? of(res.data)
-              : throwError(() => this.toErrorMessage(res.reason)),
-            ),
-            tap({
-              next: () => this.notification.success('Updated successfully.'),
-              error: () => this.notification.error('Failed to save. Try again later.'),
-            }),
-          );
-
-        },
-      })
-    .closed.subscribe();
+    this.actions.openEdit(this.location());
   }
-
-   private toErrorMessage(reason: MutationError): string {
-      switch (reason) {
-        case 'MAX_DEPTH_EXCEEDED':
-          return 'LOCATIONS.ERRORS.MAX_DEPTH';
-        case 'INVALID_PARENT':
-          return 'LOCATIONS.ERRORS.INVALID_PARENT';
-      }
-    }
 
   onDelete(): void {
     const id = this.location().id;
     if (id == null) return;
 
     this.deleting.set(true);
-    this.store.remove(id)
+    this.actions.remove(id)
       .pipe(finalize(() => this.deleting.set(false)))
-      .subscribe({
-        next: (res) => {
-          if (!res.ok) {
-            this.notification.error('Failed to delete. Try again later.');
-            return;
-          }
-          this.notification.success('Deleted successfully.');
-        },
-        error: (err) => {
-          console.error(err);
-          this.notification.error('Failed to delete. Try again later.');
-        },
-      });
+      .subscribe({ error: () => noop });
   }
 }
