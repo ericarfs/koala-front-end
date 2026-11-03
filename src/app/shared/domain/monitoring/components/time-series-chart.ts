@@ -2,8 +2,23 @@ import {
   AfterViewInit, Component, ElementRef, NgZone, OnDestroy,
   effect, inject, input, untracked, viewChild,
 } from '@angular/core';
-import * as echarts from 'echarts';
+
+import * as echarts from 'echarts/core';
+import { LineChart } from 'echarts/charts';
+
+import { GridComponent,  TooltipComponent,  LegendComponent } from 'echarts/components';
+
+import { CanvasRenderer } from 'echarts/renderers';
 import { TimeSeries } from '../models/time-series';
+import { EChartsOption, LegendComponentOption, LineSeriesOption, XAXisOption, YAXisOption } from 'echarts/types/dist/shared';
+
+echarts.use([
+  LineChart,
+  GridComponent,
+  TooltipComponent,
+  LegendComponent,
+  CanvasRenderer,
+]);
 
 const EMPTY_SERIES: TimeSeries = { title: '', values: [] };
 const FALLBACK_PALETTE = ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272'];
@@ -133,7 +148,7 @@ export class TimeSeriesChart implements AfterViewInit, OnDestroy {
     this.hasContent = true;
   }
 
-  private buildOption(textColor: string, animate: boolean): echarts.EChartsOption {
+  private buildOption(textColor: string, animate: boolean): EChartsOption {
     const times = this.timestamps().map(t => new Date(t).getTime());
     this.rangeMs = times.length > 1 ? times[times.length - 1] - times[0] : 0;
 
@@ -156,8 +171,8 @@ export class TimeSeriesChart implements AfterViewInit, OnDestroy {
 
   // ─── Builders Específicos ───
 
-  private buildSeriesList(times: number[]): echarts.LineSeriesOption[] {
-    const series: echarts.LineSeriesOption[] = [this.buildSeries(this.primary(), times, 0, 0)];
+  private buildSeriesList(times: number[]): LineSeriesOption[] {
+    const series: LineSeriesOption[] = [this.buildSeries(this.primary(), times, 0, 0)];
 
     let colorIndex = 1;
     if (this.secondary().values.some(v => v != null)) {
@@ -168,7 +183,7 @@ export class TimeSeriesChart implements AfterViewInit, OnDestroy {
     return series;
   }
 
-  private buildSeries(data: TimeSeries, times: number[], yAxisIndex: number, colorIndex: number): echarts.LineSeriesOption {
+  private buildSeries(data: TimeSeries, times: number[], yAxisIndex: number, colorIndex: number): LineSeriesOption {
     const color = this.seriesColor(colorIndex);
     return {
       id: `${data.title}-${yAxisIndex}-${colorIndex}`,
@@ -184,7 +199,7 @@ export class TimeSeriesChart implements AfterViewInit, OnDestroy {
     };
   }
 
-  private buildYAxes(textColor: string, hasSecondary: boolean): echarts.YAXisComponentOption[] {
+  private buildYAxes(textColor: string, hasSecondary: boolean): YAXisOption[] {
     const axisCommon = {
       type: 'value' as const,
       nameLocation: 'middle' as const,
@@ -195,7 +210,7 @@ export class TimeSeriesChart implements AfterViewInit, OnDestroy {
       axisLine: { lineStyle: { color: textColor, opacity: 0.3 } },
     };
 
-    const axes: echarts.YAXisComponentOption[] = [{
+    const axes: YAXisOption[] = [{
       ...axisCommon,
       id: 'left',
       position: 'left',
@@ -215,7 +230,7 @@ export class TimeSeriesChart implements AfterViewInit, OnDestroy {
     return axes;
   }
 
-  private buildXAxis(textColor: string): echarts.XAXisComponentOption {
+  private buildXAxis(textColor: string): XAXisOption {
     return {
       type: 'time',
       axisLabel: {
@@ -228,7 +243,7 @@ export class TimeSeriesChart implements AfterViewInit, OnDestroy {
     };
   }
 
-  private buildLegend(series: echarts.LineSeriesOption[], textColor: string): echarts.LegendComponentOption {
+  private buildLegend(series: LineSeriesOption[], textColor: string): LegendComponentOption {
     return {
       show: series.length > 1,
       bottom: '0%',

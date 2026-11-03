@@ -5,7 +5,7 @@ import { NotificationService } from '@shared/services/notification';
 import { MutationError, MutationResult } from './crud.types';
 
 @Injectable()
-export abstract class CrudActions<TEntity> {
+export abstract class CrudActions<_TEntity> {
   protected readonly notification = inject(NotificationService);
   protected readonly transloco = inject(TranslocoService);
 
