@@ -53,22 +53,15 @@ export class AuthService implements PermissionsProvider, CurrentUserProvider {
   }
 
   login(username: string, password: string): Observable<LoginResponse> {
-    return this.http
-      .post<LoginResponse>(`${this.baseUrl}/login`, { username, password })
-      .pipe(
-        tap((res) => {
-          if (!res?.token) throw new Error('Resposta de login sem token');
-          this.startSession(res.token, username);
-        })
-      );
+    return this.authenticate(
+      this.http.post<LoginResponse>(`${this.baseUrl}/login`, { username, password }),
+      username,
+    );
   }
 
   guestLogin(): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.baseUrl}/guest`, {}).pipe(
-      tap((res) => {
-        if (!res?.token) throw new Error('Resposta de guest sem token');
-        this.startSession(res.token);
-      })
+    return this.authenticate(
+      this.http.post<LoginResponse>(`${this.baseUrl}/guest`, {}),
     );
   }
 
@@ -76,6 +69,15 @@ export class AuthService implements PermissionsProvider, CurrentUserProvider {
     this.clearStorage();
     this._user.set(null);
     if (redirect) this.router.navigate(['/login']);
+  }
+
+  private authenticate(req$: Observable<LoginResponse>, fallbackUsername = ''): Observable<LoginResponse> {
+    return req$.pipe(
+      tap((res) => {
+        if (!res?.token) throw new Error('AUTH.ERRORS.NO_TOKEN');
+        this.startSession(res.token, fallbackUsername);
+      }),
+    );
   }
 
   private startSession(token: string, fallbackUsername = ''): void {
