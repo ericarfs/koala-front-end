@@ -22,8 +22,8 @@ export class ExtensionRegistryService {
   );
 
   private readonly monitoringBaseItems: MenuItem[] = [
-    { id: 'location', labelKey: 'MENU.LOCATIONS', routerLink: '/location', icon: 'fa-solid fa-map-location-dot', order: 10, subItems: [] },
-    { id: 'sensores', labelKey: 'MENU.SENSORS', routerLink: '/device-type', icon: 'fa-solid fa-tower-broadcast', order: 20, subItems: [] },
+    { id: 'location', labelKey: 'MENU.LOCATIONS', routerLink: '/locations', icon: 'fa-solid fa-map-location-dot', order: 10, subItems: [] },
+    { id: 'sensores', labelKey: 'MENU.SENSORS', routerLink: '/device-types', icon: 'fa-solid fa-tower-broadcast', order: 20, subItems: [] },
     { id: 'dashboard', labelKey: 'MENU.DASHBOARD', routerLink: '/dashboard', icon: 'fa-solid fa-gauge-high', order: 30, subItems: [] },
     { id: 'dispositivos', labelKey: 'MENU.DEVICES', routerLink: '/devices', icon: 'fa-solid fa-microchip', order: 40, subItems: [] },
     { id: 'ota', labelKey: 'MENU.OTA', routerLink: '/ota', icon: 'fa-solid fa-file-arrow-up', order: 50, subItems: [] },

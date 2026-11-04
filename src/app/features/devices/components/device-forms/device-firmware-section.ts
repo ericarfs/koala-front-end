@@ -5,8 +5,8 @@ import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { FirmwareService } from '@shared/domain/device/services/firmware';
-import { DeviceStore } from '@shared/domain/device/stores/device-store';
+import { FirmwareService } from '@shared/domains/device/services/firmware';
+import { DeviceStore } from '@shared/domains/device/stores/device-store';
 import { Firmware, FirmwareUpdateProgress } from '@shared/interfaces/firmware';
 import { catchError, of, switchMap, throwError } from 'rxjs';
 

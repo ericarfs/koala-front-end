@@ -20,9 +20,9 @@ export const CORE_ROUTES: Route[] = [
     children: [
       { path: 'dashboard',
         loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard), },
-      { path: 'location',
-        loadChildren: () => import('./features/location/location.routes').then((m) => m.LOCATION_ROUTES) },
-      { path: 'device-type',
+      { path: 'locations',
+        loadChildren: () => import('./features/locations/location.routes').then((m) => m.LOCATION_ROUTES) },
+      { path: 'device-types',
         loadComponent: () => import('./features/device-types/device-types').then((m) => m.DeviceTypes), },
       { path: 'devices', loadChildren: () => import('./features/devices/devices.routes').then((m) => m.DEVICES_ROUTES) },
       { path: 'account',

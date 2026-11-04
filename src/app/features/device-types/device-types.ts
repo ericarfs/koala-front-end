@@ -3,7 +3,7 @@ import { DeviceType } from '../../shared/interfaces/device-type';
 import { ActionButtons } from '@shared/components/action-buttons/action-buttons';
 import { ContentLayout } from '@shared/layouts/content/content';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
+import { DeviceTypeStore } from '@shared/domains/device-type/stores/device-type';
 import { DeviceTypesActions } from './components/device-type-actions';
 import { noop } from 'rxjs';
 

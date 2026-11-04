@@ -2,14 +2,14 @@ import { ContentLayout } from '@shared/layouts/content/content';
 import { Component, computed, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { DeviceList } from '@shared/domain/device/components/device-list';
+import { DeviceList } from '@shared/domains/device/components/device-list';
 import { Input } from '@shared/components/input/input';
-import { LocationTreeSelect } from '@shared/domain/location/components/location-tree-select';
+import { LocationTreeSelect } from '@shared/domains/location/components/location-tree-select';
 import { Device } from '@shared/interfaces/device';
-import { getDescendantIds, getPath } from '@shared/domain/location/components/location-tree';
+import { getDescendantIds, getPath } from '@shared/domains/location/components/location-tree';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { DeviceStore } from '@shared/domain/device/stores/device-store';
-import { LocationStore } from '@shared/domain/location/stores/location-store';
+import { DeviceStore } from '@shared/domains/device/stores/device-store';
+import { LocationStore } from '@shared/domains/location/stores/location-store';
 import { Location } from '@shared/interfaces/location';
 
 

@@ -6,7 +6,7 @@ import { Input } from '@shared/components/input/input';
 import { InputPassword } from '@shared/components/input/input-password';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { AuthService } from '@core/auth/services/auth';
-import { UserService } from '@shared/domain/user/services/user';
+import { UserService } from '@shared/domains/user/services/user';
 import { of, switchMap } from 'rxjs';
 import { NotificationService } from '@shared/services/notification';
 

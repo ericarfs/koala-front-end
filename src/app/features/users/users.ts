@@ -5,7 +5,7 @@ import { UserBasic } from '@shared/interfaces/user';
 import { ContentLayout } from '@shared/layouts/content/content';
 import { paginate } from '@shared/utils/paginate';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { UserStore } from '@shared/domain/user/stores/user';
+import { UserStore } from '@shared/domains/user/stores/user';
 import { UsersActions } from './components/user-actions';
 import { noop } from 'rxjs';
 

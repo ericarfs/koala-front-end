@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { DialogService } from '@shared/components/dialogs/dialogs.service';
-import { DeviceTypeStore } from '@shared/domain/device-type/stores/device-type';
-import { CrudActions } from '@shared/domain/crud/crud-actions';
+import { DeviceTypeStore } from '@shared/domains/device-type/stores/device-type';
+import { CrudActions } from '@shared/domains/crud/crud-actions';
 import { DeviceType } from '@shared/interfaces/device-type';
 import { DEVICE_TYPE_ADD_DIALOG, DEVICE_TYPE_EDIT_DIALOG } from './device-type-form';
 

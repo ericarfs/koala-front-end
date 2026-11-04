@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { LocationService } from "@shared/domain/location/services/location";
+import { LocationService } from "@shared/domains/location/services/location";
 import { environment } from "../../../../environments/environment";
 import { Observable } from "rxjs";
 import { Location } from "@shared/interfaces/location";

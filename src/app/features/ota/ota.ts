@@ -3,7 +3,7 @@ import { Component, ElementRef, inject, signal, viewChild } from '@angular/core'
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Input } from '@shared/components/input/input';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { FirmwareService } from '@shared/domain/device/services/firmware';
+import { FirmwareService } from '@shared/domains/device/services/firmware';
 import { NotificationService } from '@shared/services/notification';
 import { EMPTY, catchError, finalize, switchMap, takeWhile, tap } from 'rxjs';
 

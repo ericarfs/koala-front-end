@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { DialogService } from '@shared/components/dialogs/dialogs.service';
-import { UserStore } from '@shared/domain/user/stores/user';
-import { CrudActions } from '@shared/domain/crud/crud-actions';
+import { UserStore } from '@shared/domains/user/stores/user';
+import { CrudActions } from '@shared/domains/crud/crud-actions';
 import { UserBasic } from '@shared/interfaces/user';
 import { USER_ADD_DIALOG, USER_EDIT_DIALOG } from './user-form';
 
