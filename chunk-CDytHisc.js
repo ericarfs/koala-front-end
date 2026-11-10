@@ -1,0 +1,1 @@
+import{S as F,r as Af}from"./chunk-ywE-wFe9.js";import{t as s}from"./chunk-BTdKtOvf.js";var i=class e extends s{basePath=`deviceType`;static ɵfac=(()=>{let t;return function(a){return(t||(t=Af(e)))(a||e)}})();static ɵprov=F({token:e,factory:e.ɵfac,providedIn:`root`})};export{i as t};

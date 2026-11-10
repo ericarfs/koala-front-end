@@ -1,0 +1,1 @@
+import{Dt as Z,O as Ha}from"./chunk-ywE-wFe9.js";function f(d,i){let e;Ha(()=>{let n=d();Z(()=>{e!==void 0&&e!==n&&i.reset(),e=n,n&&i.load()})})}export{f as t};

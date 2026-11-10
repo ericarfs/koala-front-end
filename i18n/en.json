@@ -33,8 +33,8 @@
       "DASHBOARD": "Select a location and at least one sensor, then click Search",
       "DEVICES": "Select at least one sensor and click Search"
     },
-    "REPORT":{
-      "ACTIONS":{
+    "REPORT": {
+      "ACTIONS": {
         "ADD_TO_REPORT": "Add to the report"
       },
       "COUNT": "Report ({{count}})"
@@ -64,6 +64,7 @@
       "CANCEL": "Cancel",
       "DELETE": "Delete",
       "CLEAR": "Clear",
+      "SEND": "Send",
       "CONFIRM": "Confirm",
       "EDIT": "Edit",
       "BACK": "Back",
@@ -71,9 +72,9 @@
       "SEARCH": "Search",
       "EXPORT": "Export",
       "CONFIRM_DELETE": "Are you sure you want to delete?",
-      "LOGIN":"Login",
-      "GUEST_LOGIN":"Login as guest",
-      "ACCESS":"Access your account"
+      "LOGIN": "Login",
+      "GUEST_LOGIN": "Login as guest",
+      "ACCESS": "Access your account"
     },
     "FORM": {
       "NAME": "Name",
@@ -86,32 +87,45 @@
       "PASSWORD": "Password",
       "PASSWORD_PLACEHOLDER": "Enter the password",
       "CONFIRM_PASSWORD": "Confirm password",
-      "FILE":{
-        "TITLE":"File",
-        "DRAG_FILE":"Drag the file here",
-        "OR":"or",
-        "CHOOSE_FILE":"Choose a file",
-        "NO_FILE":"No file selected",
-        "HELPER":"Clique here to change the file"
+      "FILE": {
+        "TITLE": "File",
+        "DRAG_FILE": "Drag the file here",
+        "OR": "or",
+        "CHOOSE_FILE": "Choose a file",
+        "NO_FILE": "No file selected",
+        "HELPER": "Click here to change the file"
       },
-      "ICON":"Icon",
-      "ICON_PLACEHOLDER":"(Font Awesome) Ex: fa-user",
-      "INVALID":"Invalid form. Fill all fields."
+      "ICON": "Icon",
+      "ICON_PLACEHOLDER": "(Font Awesome) Ex: fa-user",
+      "INVALID": "Invalid form. Fill all fields."
     },
     "STATES": {
-      "LOGIN":"Logging in...",
+      "LOGIN": "Logging in...",
       "LOADING": "Loading...",
       "SENDING": "Sending...",
       "SEARCHING": "Searching...",
       "ADDED": "Added",
       "EMPTY": "No items found",
-      "ERROR":"Could not load the data. Please try again."
+      "ERROR": "Could not load the data. Please try again."
+    },
+    "TOASTS": {
+      "CREATED": "Created successfully.",
+      "UPDATED": "Updated successfully.",
+      "DELETED": "Deleted successfully.",
+      "SAVE_FAILED": "Failed to save. Try again later.",
+      "DELETE_FAILED": "Failed to delete. Try again later."
+    },
+    "ERRORS": {
+      "NOT_FOUND": "Not found.",
+      "GENERIC": "An error occurred. Please try again."
     },
     "VALIDATION": {
       "REQUIRED": "This field is required"
     },
     "PAGINATION": {
-      "PAGE_OF": "Page {{current}} of {{total}}"
+      "PAGE_OF": "Page {{current}} of {{total}}",
+      "PREVIOUS": "Previous page",
+      "NEXT": "Next page"
     },
     "THEME": {
       "TOGGLE_TO_LIGHT": "Switch to light mode",
@@ -128,6 +142,10 @@
       "ARIA_LABEL": "Font size: {{size}}. Click to change",
       "TITLE": "Font size: {{size}}",
       "SR_ONLY": "Change font size"
+    },
+    "NAV": {
+      "MAIN": "Main menu",
+      "BREADCRUMB": "Navigation breadcrumb"
     }
   },
 
@@ -212,7 +230,7 @@
       "CONFIRM": "Are you sure you want to delete the location '{{name}}'?"
     },
     "DETAILS": {
-      "LOCATIONS":"locations",
+      "LOCATIONS": "locations",
       "SUB_LOCATIONS": "Sub-locations ({{count}})",
       "SUB_LOCATIONS_COUNT": "{{count}} locations",
       "VIEW_DEVICES": "View devices",
@@ -223,6 +241,10 @@
       "DEVICES": "devices",
       "ONLINE": "online",
       "OFFLINE": "offline"
+    },
+    "ERRORS": {
+      "MAX_DEPTH": "Maximum hierarchy depth exceeded.",
+      "INVALID_PARENT": "Invalid parent location."
     }
   },
 
@@ -283,20 +305,30 @@
     "LOGOUT": "Logout"
   },
 
-  "OTA":{
+  "OTA": {
     "TITLE": "OTA Update",
-    "NAME":"Update name",
-    "NAME_HELPER":"Enter the name",
-    "COMPILER":"Compiler",
-    "COMPILER_HELPER":"Select the compiler",
-    "COMPILATION_COMPLETED":"Compilation completed successfully.",
-    "ERRORS":{
+    "NAME": "Update name",
+    "NAME_HELPER": "Enter the name",
+    "COMPILER": "Compiler",
+    "COMPILER_HELPER": "Select the compiler",
+    "COMPILATION_COMPLETED": "Compilation completed successfully.",
+    "ERRORS": {
       "UPLOAD_FAILED": "Failed to upload the file. Check your connection and try again.",
       "LOGS_FAILED": "Failed to receive compilation logs. The connection was interrupted."
     }
   },
 
-  "DEVICE_CONTROL":{
-    "TITLE": "Device Control"
+  "DEVICE_CONTROL": {
+    "TITLE": "Device Control",
+    "TARGET_TEMP": "Target temperature",
+    "MODE": "Mode",
+    "POWER_ON": "On",
+    "POWER_OFF": "Off",
+    "ERRORS": {
+      "MISSING_LOCATION": "Location not provided.",
+      "SEND_FAILED": "Could not send the command."
+    },
+    "DECREASE_TEMP": "Decrease temperature",
+    "INCREASE_TEMP": "Increase temperature"
   }
 }

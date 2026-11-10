@@ -1,0 +1,1 @@
+var t=[{path:``,children:[{path:`device-control`,loadComponent:()=>import(`./chunk-7p3ph3-X.js`).then(o=>o.DeviceControl)}]}];export{t as AIRCON_ROUTES};
