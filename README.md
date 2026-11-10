@@ -1,62 +1,200 @@
-# KoalaFrontend
+# Smart Lab - Iot Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.8.
+Aplicação web frontend para gerenciamento de dispositivos IoT desenvolvida com Angular. O Smart Lab oferece uma interface moderna e responsiva para monitoramento, controle e gerenciamento de dispositivos conectados, sensores e ambientes.
 
 ## Demo
-https://ericarfs.github.io/koala-front-end/
 
-## Development server
+Uma demonstração da aplicação pode ser encontrada em: https://ericarfs.github.io/koala-front-end/
 
-To start a local development server, run:
+## Funcionalidades
+
+- **Dashboard Interativo**: Visualização de dados em tempo real com gráficos e métricas
+- **Gerenciamento de Dispositivos**: CRUD completo para dispositivos IoT
+- **Controle de Dispositivos**: Interface para controle e atuação de dispositivos
+- **Gerenciamento de Sensores**: Configuração e monitoramento de tipos de sensores
+- **Gerenciamento de Ambientes**: Organização de dispositivos por ambientes/locações
+- **Atualização OTA**: Sistema de atualização Over-The-Air para dispositivos
+- **Gerenciamento de Usuários**: Sistema de autenticação e controle de acesso
+- **Interface Responsiva**: Design adaptável para desktop, tablet e mobile
+- **Menu Colapsável**: Sidebar retrátil para otimização de espaço
+
+## Tecnologias
+
+- **Framework**: Angular 22.1.0
+- **UI Libraries**:
+  - Angular Material 22.2.5
+  - Angular CDK 22.1.7
+  - Tailwind CSS 4.1.12
+- **Gráficos**:
+  - ECharts 6.1.0
+  - ngx-echarts 22.0.0
+- **Internacionalização (i18n)**:
+  - Transloco 8.4.0
+- **Geração de PDF**:
+  - jsPDF 4.2.1
+- **Programação Reativa**:
+  - RxJS 7.8.0
+
+## Pré-requisitos
+
+- Node.js 22 ou superior
+- npm 11.19.0
+- Angular CLI 22.1.8
+
+## Instalação
+
+1. Clone o repositório:
 
 ```bash
+git clone <repository-url>
+cd koala-frontend
+```
+
+2. Instale as dependências:
+
+```bash
+npm install
+```
+
+3. Configure as variáveis de ambiente:
+
+```bash
+# Edite src/environments/environment.ts com as configurações da API
+```
+
+4. Inicie o servidor de desenvolvimento:
+
+```bash
+npm start
+# ou
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+A aplicação estará disponível em `http://localhost:4200/`
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Build
 
 ```bash
-ng generate component component-name
+npm run build
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Os arquivos compilados estarão em `dist/koala-frontend/browser/`
 
-```bash
-ng generate --help
+## Estruturas do Projeto
+
+### 1. Estrutura de Pastas
+
+```
+public/
+└── i18n/                    # Arquivos de internacionalização
+src/
+├── app/
+│   ├── core/                # Núcleo da aplicação
+│   │   ├── auth/            # Autorização (guards, interceptors, services)
+│   │   ├── extensions/      # Arquivos de extensão
+│   │   └── layout/          # Layout base da aplicação
+│   ├── features/            # Páginas da aplicação
+│   │   ├── dashboard/       # Dashboard principal
+│   │   ├── devices/         # Gerenciamento de dispositivos
+│   │   ├── device-types/    # Tipos de sensores
+│   │   ├── locations/       # Ambientes
+│   │   ├── users/           # Usuários
+│   │   ├── ota/             # Atualização OTA
+│   │   └── ...
+|   ├── domains/             # Módulos de extensão
+│   │   ├── aircon/          # Módulo principal - controle de ar-condicionados
+│   │   └── ...
+│   ├── shared/
+│   │   ├── components/      # Componentes compartilhados
+│   │   ├── domains/         # Serviços, componentes e definições específicas por domínio
+│   │   ├── interfaces/      # Modelos de entidades
+│   │   ├── layouts/         # Layouts compartilhados
+│   │   ├── services/        # Serviços compartilhados
+|   |   |   ├── pdf-export/  # Exportação de PDFs
+|   |   |   └── ...
+|   │   ├── tokens/          # Tokens
+│   │   └── utils/           # Funções utilitárias
+└── enviroments/             # Configurações de ambiente
 ```
 
-## Building
+### 2. Estrutura Arquitetural
 
-To build the project run:
+- **Arquitetura Modular (Feature-based)**: Divisão clara de responsabilidades.
+  - **Core**: configuração da aplicação e rotas principais, autenticação (guards, interceptor e serviço de sessão), layout e navegação, e o mecanismo de extensão (registro e definição de módulo)
+  - **Shared**: componentes comuns (diálogos, campos de formulário, paginação e preferências de interface), modelos (interfaces), serviços, stores e componentes compartilhados, organizados por domínio (dispositivos, locais, monitoramento, entre outros), além de tokens e funções utilitárias.
+  - **Features**: funcionalidades base do sistema (login, convidado, dashboard, ambientes, dispositivos, tipos de sensores, usuários e conta).
+  - **Domains**: módulos de domínio integrados ao núcleo, cada um com suas páginas, rotas, serviços e modelos.
+- **Arquitetura em Camadas**: O fluxo de dados segue a hierarquia: `Backends (API)` ➔ `Serviços  (Comunicação)` ➔ `Stores (Estado)` ➔ `Features/Domains (UI)`.
+  - **UI (Componentes)**: Camada de Apresentação: exibem os dados e capturam interações do usuário.
+  - **Stores (Estado)**: Camada de gerenciamento de estado. Eles guardam os dados em memória, gerenciam estados de carregamento/erro e notificam a UI de forma reativa.
+  - **Services (Serviços)**: Camada de comunicação e acesso a dados. Eles são responsáveis por fazer as chamadas HTTP (Rest) e lidar com os fluxos de eventos em tempo real (SSE) e entregam os dados para o Store.
+  - **Backends**: Camada externa que fornece os dados.
 
-```bash
-ng build
-```
+  > **Exemplo de Fluxo:** O Componente pede os dados ao _Store_. O _Store_ chama o _Service_. O _Service_ faz a requisição HTTP ao _Backend_. A resposta volta pelo _Service_, é guardada no _Store_, e o _Store_ atualiza o _Componente_ automaticamente.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### 3. Mecanismo de Extensão
 
-## Running unit tests
+Para facilitar a manutenção e expansão do sistema, o repositório conta com um guia prático intitulado [`HOW_TO_ADD_A_KOALA_MODULE.md`](https://github.com/ORIENTACOES-TCC-2026/projeto-erica/blob/main/koala-frontend/HOW_TO_ADD_A_KOALA_MODULE.md). O documento explica detalhadamente como futuros desenvolvedores podem registrar e adicionar novos módulos ao frontend da aplicação.
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+### 4. Variáveis de Ambientes
 
-```bash
-ng test
-```
+As URLs das APIs são configuradas nos arquivos em `src/environments/`:
 
-## Running end-to-end tests
+- `apiUrl`: URL base da API REST principal
+- `otaUrl`: URL da API de OTA
 
-For end-to-end (e2e) testing, run:
+### 5. Internacionalização (i18n)
 
-```bash
-ng e2e
-```
+O sistema utiliza Transloco para internacionalização. Os arquivos de tradução estão em `public/i18n/`. Para adicionar um novo idioma, crie um arquivo `<idioma>.json` e registre-o no `provideTransloco` em `app.config.ts`.
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Funcionalidades Principais
 
-## Additional Resources
+### Dashboard
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- Visualização de dados em tempo real
+- Gráficos interativos com normalização automática de timestamps
+- Suporte para múltiplos dispositivos com alinhamento automático
+- Métricas e estatísticas
+- Tooltip robusto com tratamento de valores faltantes
+
+### Dispositivos
+
+- Listagem de dispositivos
+- Cadastro e edição
+- Monitoramento de status
+
+### Controle de Dispositivos
+
+- Interface para atuação
+- Controle de ar-condicionado
+- Comandos em tempo real
+
+### Sensores
+
+- Gerenciamento de tipos de sensores
+- Configuração de parâmetros
+- Histórico de leituras
+
+### Ambientes
+
+- Organização por locações
+- Agrupamento de dispositivos
+- Mapeamento de ambientes
+
+### OTA (Over-The-Air)
+
+- Atualização de firmware
+- Gerenciamento de versões
+- Distribuição de atualizações
+
+## Autenticação
+
+A aplicação utiliza autenticação baseada em JWT. O token é armazenado no `localStorage` e enviado automaticamente em todas as requisições HTTP através do interceptor de autenticação.
+
+## Responsividade
+
+A aplicação é totalmente responsiva com:
+
+- **Desktop**: Sidebar fixa com opção de colapsar
+- **Tablet**: Sidebar colapsada fixa, com expansão temporária ao clicar em um ícone
+- **Mobile**: Menu hambúrguer com sidebar deslizante
