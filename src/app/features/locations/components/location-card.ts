@@ -15,7 +15,7 @@ import { LocationActions } from '@features/locations/components/location-actions
   host: { class: 'contents' },
   template: `
     <a
-      [routerLink]="deleting() ? null : ['/location', location().id]"
+      [routerLink]="deleting() ? null : ['/locations', location().id]"
       [class.pointer-events-none]="deleting()"
       [class.opacity-50]="deleting()"
       [attr.aria-disabled]="deleting()"
